@@ -43,7 +43,7 @@ class Install(unittest.TestCase):
         plugin = self.home / ".cursor" / "plugins" / "local" / "crav1-2" / ".cursor-plugin" / "plugin.json"
         manifest = json.loads(plugin.read_text(encoding="utf-8"))
         self.assertEqual(manifest["name"], "crav1-2")
-        self.assertEqual(manifest["version"], "2.0.0-alpha.2")
+        self.assertEqual(manifest["version"], "2.0.0-alpha.3")
         skill = self.home / ".claude" / "skills" / "crav1-2-help" / "SKILL.md"
         self.assertIn("alpha", skill.read_text(encoding="utf-8").lower())
         self.assertFalse((self.home / ".claude" / "CLAUDE.md").exists())
@@ -51,7 +51,11 @@ class Install(unittest.TestCase):
         agent = self.home / ".claude" / "agents" / "crav1-2-source-extractor-agent.md"
         cursor_agent = self.home / ".cursor" / "plugins" / "local" / "crav1-2" / "agents" / agent.name
         self.assertEqual(agent.read_bytes(), cursor_agent.read_bytes())
-        for name in ("crav1-2-add-to-sot", "crav1-2-show-sot"):
+        gap = self.home / ".claude" / "agents" / "crav1-2-gap-finder-agent.md"
+        cursor_gap = self.home / ".cursor" / "plugins" / "local" / "crav1-2" / "agents" / gap.name
+        self.assertEqual(gap.read_bytes(), cursor_gap.read_bytes())
+        self.assertIn("crav1-2-gap-finder-agent", gap.read_text(encoding="utf-8"))
+        for name in ("crav1-2-add-to-sot", "crav1-2-show-sot", "crav1-2-link-to-spec"):
             claude_skill = self.home / ".claude" / "skills" / name / "SKILL.md"
             cursor_skill = self.home / ".cursor" / "plugins" / "local" / "crav1-2" / "skills" / name / "SKILL.md"
             self.assertEqual(claude_skill.read_bytes(), cursor_skill.read_bytes())
@@ -62,7 +66,7 @@ class Install(unittest.TestCase):
             capture_output=True,
             env={**__import__("os").environ, "PYTHONPATH": str(engine)},
         )
-        self.assertEqual(probe.stdout.strip(), "2.0.0-alpha.2", probe.stderr)
+        self.assertEqual(probe.stdout.strip(), "2.0.0-alpha.3", probe.stderr)
         report = json.loads(run(self.home, "status").stdout)
         self.assertTrue(report["installed"])
         self.assertEqual(report["changed"], [])

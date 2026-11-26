@@ -41,7 +41,7 @@ class Cli(unittest.TestCase):
         self.assertEqual(init.returncode, 0, init.stderr)
         self.assertEqual((self.root / ".crav1-2" / ".gitattributes").read_bytes(), GITATTRIBUTES)
         engine = json.loads((self.root / ".crav1-2" / "engine.json").read_text(encoding="utf-8"))
-        self.assertEqual(engine["engine"], "2.0.0-alpha.2")
+        self.assertEqual(engine["engine"], "2.0.0-alpha.3")
         self.assertEqual(engine["schema"], 1)
         bad = run(self.root, "append", stdin='{"v": 9}\n')
         self.assertEqual(bad.returncode, 2, bad.stderr)

@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from crav1_2.add_to_sot import add_to_sot, parse_invocation
+from crav1_2.link_to_spec import link_to_spec
 from crav1_2.errors import EngineError
 from crav1_2.events import load_jsonl
 from crav1_2.lines import one_x_lines_unchanged, owned_mark_lines
@@ -27,6 +28,7 @@ WORDS = (
     "session-end",
     "add-to-sot",
     "show-sot",
+    "link-to-spec",
 )
 
 
@@ -88,6 +90,9 @@ def _main(argv: list[str]) -> int:
         return 0
     if command == "show-sot":
         _emit(show_sot(repo, args))
+        return 0
+    if command == "link-to-spec":
+        _emit(link_to_spec(repo, args, _object_stdin("link-to-spec")))
         return 0
     status = {"session-open": "open", "session-park": "parked", "session-end": "ended"}[command]
     if len(args) != 1:
@@ -162,6 +167,6 @@ def _usage() -> None:
         "crav1-2 engine (alpha). Words: " + ", ".join(WORDS) + ".\n"
         "The project is the working directory. Add `repo <path>` at the end to point elsewhere.\n"
         "append reads one JSON object, or one object per line, from stdin.\n"
-        "add-to-sot reads one JSON object from stdin. show-sot writes nothing.",
+        "add-to-sot and link-to-spec read one JSON object from stdin. show-sot writes nothing.",
         file=sys.stderr,
     )

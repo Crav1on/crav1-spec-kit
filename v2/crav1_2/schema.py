@@ -5,7 +5,8 @@ Required fields are the phase-1 design. ``note.added`` also accepts optional
 rebuilt from the log, plus ``vendor``, ``captured_from``, ``session_id``,
 ``quotes``, and ``redactions`` for this-session. ``note.extended`` appends
 passages to a note. ``answer.matched`` records an open-question match and does
-not close the question. Unknown fields are refused.
+not close the question. ``note.read`` records that a note was read against one
+spec. Unknown fields are refused.
 """
 
 from __future__ import annotations
@@ -58,6 +59,7 @@ DATA_KEYS = {
     "note.added": NOTE_KEYS,
     "note.extended": ("note", "passages", "passage_list", "files", "know"),
     "answer.matched": ("note", "passage", "spec", "question"),
+    "note.read": ("note", "spec"),
     "fact.cited": ("fact", "note", "passage", "quote", "weak"),
     "gap.found": ("gap", "spec", "kind", "facts", "impact", "uncertainty", "holds"),
     "card.asked": ("card", "gap", "question", "options", "recommended", "missing_fact", "facts"),
@@ -185,6 +187,8 @@ def _validate_data(kind: str, data: dict, fail) -> dict:
         return _extended(data, fail)
     if kind == "answer.matched":
         return _answer_matched(data, fail)
+    if kind == "note.read":
+        return _note_read(data, fail)
     if kind == "fact.cited":
         return _fact(data, fail)
     if kind == "gap.found":
@@ -371,6 +375,16 @@ def _extended(data: dict, fail) -> dict:
     if "know" in data:
         cleaned["know"] = _know(data["know"], None, fail)
     return _order(cleaned, DATA_KEYS["note.extended"])
+
+
+def _note_read(data: dict, fail) -> dict:
+    return _order(
+        {
+            "note": _ident(data, "note", NOTE_ID, fail),
+            "spec": _ident(data, "spec", SPEC_SLUG, fail),
+        },
+        DATA_KEYS["note.read"],
+    )
 
 
 def _answer_matched(data: dict, fail) -> dict:

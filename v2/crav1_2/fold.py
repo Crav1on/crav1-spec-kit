@@ -28,6 +28,7 @@ def empty_state() -> dict:
         "items": {},
         "runs": {},
         "answers": [],
+        "reads": {},
         "dropped_duplicate_ids": [],
         "disambiguated": [],
     }
@@ -139,6 +140,13 @@ def _apply(state: dict, event: dict) -> None:
         if data.get("know"):
             rec.setdefault("know", [])
             rec["know"].extend(copy.deepcopy(data["know"]))
+        return
+    if kind == "note.read":
+        state["reads"][f"{data['note']}|{data['spec']}"] = {
+            "note": data["note"],
+            "spec": data["spec"],
+            "at": event["at"],
+        }
         return
     if kind == "answer.matched":
         state["answers"].append({

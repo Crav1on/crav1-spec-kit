@@ -27,6 +27,16 @@ def render_ending(specs: list[str], note_id: str | None) -> str:
     return text
 
 
+def render_settled(recorded: str | None) -> str:
+    """The link-to-spec ending. Run next first. At most one Also recorded line."""
+    lines = ["Run next: nothing needed now."]
+    if recorded:
+        lines.extend(["", f"Also recorded: {recorded}."])
+    text = "\n".join(lines) + "\n"
+    _check(text)
+    return text
+
+
 def _check(text: str) -> None:
     if not text.startswith("Run next:"):
         raise EngineError("Refused: the ending must start with Run next.")
