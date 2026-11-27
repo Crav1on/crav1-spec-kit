@@ -22,10 +22,10 @@ Recommend one option and put it first, with ` (Recommended)` at the end of its l
 
 ## Write
 
-Nothing is written until the user confirms the whole batch. One question card, as `crav1-docs/reference/question-cards.md` says. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `P4 tasks miss the 400 path: add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table.
+Nothing is written until the user confirms the whole batch. One question card, as `crav1-docs/reference/question-cards.md` says. Follow **Batch of several items** in that file before this card. Print the findings table in this reply, then ask. The card names each item and its recommendation, for example `Tasks miss the 400 path (P4): add a test`. Never write `table above` unless that table is in this reply. Never ask the card without the table.
 
 - `yes (Recommended)`: write it as shown.
-- The card's free-text answer. Hint: `Type your changes, e.g. only C1` or `C2: keep it open`. An item that answer does not mention keeps what was shown.
+- The card's free-text answer. Hint: `Type your changes, e.g. Static-IP option (C1) keep` or `Cut-off time (C2): keep it open`. An item that answer does not mention keeps what was shown.
 
 Nothing gets committed either way. Do not add an `Edits` option.
 
@@ -34,5 +34,6 @@ After the yes or the typed answer, then, per settled conflict:
 - Replace or keep the decided line as picked. Keep its existing source and add the new note as a second source when the new quote won. Keep the `Decided` date format the spec uses; the date is today.
 - Remove the `**Conflict:**` line.
 - Add a trace to the note named in `Full source:` as `crav1-add-to-spec` `references/notes.md` says, and run `scripts/notes_index.py` from that skill when a note changed. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says.
+- Then run the stale-state check for that settled conflict, the same script and the same batch card as `references/after-choice.md` step 2. Pass `--changed` as that constraint's `C#` and `--old` as the words the settled line no longer uses. A quote line is excluded and never changed. On yes the script appends `Superseded <date> by <decision>.` to each leftover note.
 
 A headless or bot run lists the conflicts and settles none. Do not commit. End with what was settled, what stays open, and `/crav1-finalize-commit` when a file changed.

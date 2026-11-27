@@ -18,6 +18,14 @@
    Push the specs repo:
    `git push`
 
+   Unfinished spec walk: resume that walk before a build walk. The branch on a build walk is the working branch, never `main` or `master` unless that branch is checked out.
+
+   Run next:
+   The spec walk is not finished.
+
+   Resume the spec walk:
+   `$crav1-tighten-and-plan-ready-to-build orders-api`
+
    Unfinished build walk on this branch: a Run next entry, not a `Next:` line (1.157.0). The command resumes that walk: the branch for a `Run: whole branch` file, otherwise the file's first unticked `T#`.
 
    Run next:

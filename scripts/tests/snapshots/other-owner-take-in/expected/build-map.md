@@ -45,7 +45,7 @@ An arrow means the later branch waits for the earlier one.
 ### feat/orders-table
 
 - Tasks:
-  - ~~T1 Add the orders table~~ ✓ done (feat/orders-table)
+  - ~~Add the orders table (T1)~~ ✓ done (feat/orders-table)
 - Waited for: none
 - Question: none
 - Ready now: done
@@ -57,9 +57,9 @@ An arrow means the later branch waits for the earlier one.
 ### feat/orders-fixes
 
 - Tasks:
-  - T2 A test of the 404 for an unknown order
-  - T3 A test of the order id guard
-  - T4 PR 7 takes in develop, conflicts resolved, whole suite green
+  - A test of the 404 for an unknown order (T2)
+  - A test of the order id guard (T3)
+  - PR 7 takes in develop, conflicts resolved, whole suite green (T4)
 - Waits for:
   - feat/orders-table
 - Question: none

@@ -131,12 +131,12 @@ class ReadyByBranch(unittest.TestCase):
             plan = (root / "plan.md").read_text(encoding="utf-8")
         self.assertEqual(payload["result"], "ready-partial")
         self.assertEqual(payload["ready_lines"], [
-            "- `feat/orders-api-record` (wave 1): T2 Record the decision; T5 Store the card",
-            "- `feat/orders-api-export` (wave 1): T6 Email the receipt",
+            "- `feat/orders-api-record` (wave 1): Record the decision (T2); Store the card (T5)",
+            "- `feat/orders-api-export` (wave 1): Email the receipt (T6)",
         ])
         self.assertEqual(payload["held_lines"], [
-            '- `feat/orders-api-currency` (wave 1):\n  - T3 Choose the currency — open question "Which currency for refunds?" Waiting for the partner.',
-            "- `feat/orders-api-archive` (wave 2):\n  - T4 Archive the receipt — held, waits on T3",  # one task per line, 1.164.0
+            '- `feat/orders-api-currency` (wave 1):\n  - Choose the currency (T3) — open question "Which currency for refunds?" Waiting for the partner.',
+            "- `feat/orders-api-archive` (wave 2):\n  - Archive the receipt (T4) — held, waits on T3",  # one task per line, 1.164.0
         ])
         self.assertEqual(payload["next_lines"], [])  # the hint moved to help, 1.176.0
         self.assertEqual(payload["next"], "/crav1-build-tasks builds one task without the walk.")
@@ -145,17 +145,17 @@ class ReadyByBranch(unittest.TestCase):
         # 1.155.0: the next task, then the whole branch when it has 2+ open tasks.
         # 1.164.0: one block per branch, whole branch first, then the first task.
         self.assertIn("**feat/orders-api-record**", joined)
-        self.assertIn("2 open tasks:\n- T2 Record the decision\n- T5 Store the card", joined)
+        self.assertIn("2 open tasks:\n- Record the decision (T2)\n- Store the card (T5)", joined)
         self.assertIn("Run the whole branch:\n`/crav1-build-walk orders-api feat/orders-api-record`\nRun only T2, the first task:\n`/crav1-build-walk orders-api T2`", joined)
         self.assertNotIn("`/crav1-build-walk orders-api feat/orders-api-export`", joined)
         # The plain sentence comes from the plan step that owns the branch.
-        self.assertIn("**feat/orders-api-export**\nExport the receipt.\n1 open task:\n- T6 Email the receipt\n\nRun T6:\n`/crav1-build-walk orders-api T6`", joined)
+        self.assertIn("**feat/orders-api-export**\nExport the receipt.\n1 open task:\n- Email the receipt (T6)\n\nRun T6:\n`/crav1-build-walk orders-api T6`", joined)
         self.assertIn("**feat/orders-api-record**\nRecord the decision.\n2 open tasks:", joined)
         self.assertNotIn("/crav1-build-walk", payload["next"])
         self.assertNotIn("Next: /crav1-build-walk", payload["next"])
         self.assertEqual(payload["line"], "Ready now\n" + "\n".join(payload["ready_lines"] + ["Held"] + payload["held_lines"]))
         for line in payload["ready_lines"] + payload["held_lines"]:
-            self.assertRegex(line, r"T\d+ \S")
+            self.assertRegex(line, r"\(T\d+\)")
         for task, branch in (("T2", "feat/orders-api-record"), ("T6", "feat/orders-api-export"), ("T3", "feat/orders-api-currency"), ("T4", "feat/orders-api-archive")):
             self.assertEqual(bm.recommended_branch(root.name, spec, plan, text, task), branch)
 
@@ -182,13 +182,13 @@ class ReadyByBranch(unittest.TestCase):
         self.assertIsNone(payload["line"])
         self.assertEqual(payload["held_lines"], [])
         self.assertEqual(payload["ready_lines"], [
-            "- `feat/orders-api-record` (wave 1): T1 Record the decision; T2 Store the card",
+            "- `feat/orders-api-record` (wave 1): Record the decision (T1); Store the card (T2)",
         ])
         self.assertEqual(payload["next_lines"], [])  # the hint moved to help, 1.176.0
         self.assertIn("`/crav1-build-walk", payload["run_lines"][0])
         self.assertEqual(len(payload["run_lines"]), 1)  # one block per branch, 1.164.0
         self.assertIn("Run only T1, the first task:\n`/crav1-build-walk", payload["run_lines"][0])
-        self.assertIn("- T1 Record the decision\n- T2 Store the card", payload["run_lines"][0])
+        self.assertIn("- Record the decision (T1)\n- Store the card (T2)", payload["run_lines"][0])
         self.assertNotIn("/crav1-build-walk", payload["next"])
         self.assertNotIn("Next: /crav1-build-walk", payload["next"])
 
@@ -204,13 +204,13 @@ class ReadyByBranch(unittest.TestCase):
             payload = must(["readiness", "--full", "--root", str(root)])
         self.assertEqual(payload["result"], "ready")
         self.assertEqual(payload["ready_lines"], [
-            "- `feat/orders-api-record` (wave 1): T1 Record the decision",
+            "- `feat/orders-api-record` (wave 1): Record the decision (T1)",
         ])
         self.assertEqual(payload["next_lines"], [])  # the hint moved to help, 1.176.0
         # 1.164.0: T2 waits in order, so only the whole branch and the open list name it.
         self.assertIn("Run only T1, the first task:", payload["run_lines"][0])
         self.assertNotIn("T2`", payload["run_lines"][0])
-        self.assertIn("- T1 Record the decision\n- T2 Store the card", payload["run_lines"][0])
+        self.assertIn("- Record the decision (T1)\n- Store the card (T2)", payload["run_lines"][0])
         self.assertNotIn("/crav1-build-walk", payload["next"])
         self.assertNotIn("Next: /crav1-build-walk", payload["next"])
 
@@ -254,8 +254,8 @@ Reviewed: 2026-11-11, P# open: 0
 """
         work = "Work item: 44 — task: T5 orders-api: require pipeline 6 as build validation (ADO: example/orders)\n"
         text = self.bm.build("orders-api", spec, plan, tasks, work, verify)["markdown"]
-        self.assertIn("- Tasks:\n  - ~~T1 Persist the decision~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))", text)
-        self.assertIn("- Tasks:\n  - T5 orders-api: require pipeline 6 as build validation", text)
+        self.assertIn("- Tasks:\n  - ~~Persist the decision (T1)~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))", text)
+        self.assertIn("- Tasks:\n  - orders-api: require pipeline 6 as build validation (T5)", text)
         delivers = "\n".join(line for line in text.splitlines() if line.startswith("- Delivers:"))
         self.assertNotIn("T1", delivers)
         self.assertNotIn("T5", delivers)

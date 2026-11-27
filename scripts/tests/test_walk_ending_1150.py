@@ -7,6 +7,7 @@ reopened step is not a blocker. Clear with nothing new is unchanged.
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import subprocess
 import sys
@@ -194,7 +195,7 @@ class EndingBlock(unittest.TestCase):
             self.assertEqual(lines[head - 1], "")
         for held in payload["held_lines"]:
             self.assertIn(held, ending)
-            self.assertRegex(held, r"T\d+ \S")
+            self.assertRegex(held, r"\(T\d+\)")
         self.assertIn("person A", "\n".join(payload["held_lines"]))
         self.assertNotIn("above", ending.lower())
         self.assertNotIn("listed above", ending.lower())
@@ -251,7 +252,8 @@ class SelfReopen(unittest.TestCase):
                 tasks.replace("Store the card", "Store the card now"),
                 encoding="utf-8",
             )
-            must(["clear", "--root", str(root), "--step", "review-and-tighten-plan", "--yes"])
+            must(["clear", "--root", str(root), "--step", "review-and-tighten-plan", "--card",
+                  hashlib.sha256(b"reopen\nreview-and-tighten-plan").hexdigest()[:12], "--yes"])
             payload = must(["readiness", "--full", "--root", str(root)])
             resumed = must(["resume", "--root", str(root), "--no-playbook"])
         self.assertEqual(payload["result"], "ready-partial")
@@ -310,14 +312,16 @@ class SelfReopen(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertEqual(missing["code"], "needs-yes")
             cleared_plan = must([
-                "clear", "--root", str(root), "--step", "review-and-tighten-plan", "--yes",
+                "clear", "--root", str(root), "--step", "review-and-tighten-plan", "--card",
+                hashlib.sha256(b"reopen\nreview-and-tighten-plan").hexdigest()[:12], "--yes",
             ])
             self.assertEqual(cleared_plan["confirmation"], "nothing new")
             text = (root / "walk-progress.md").read_text(encoding="utf-8")
             self.assertIn("Result: done", text)
             self.assertIn("Result: ready-partial", text)
             cleared = must([
-                "clear", "--root", str(root), "--step", "tasks-ready-to-build", "--yes",
+                "clear", "--root", str(root), "--step", "tasks-ready-to-build", "--card",
+                hashlib.sha256(b"reopen\ntasks-ready-to-build").hexdigest()[:12], "--yes",
             ])
             self.assertEqual(cleared["confirmation"], "nothing new")
             self.assertEqual(cleared["cleared"], "tasks-ready-to-build")

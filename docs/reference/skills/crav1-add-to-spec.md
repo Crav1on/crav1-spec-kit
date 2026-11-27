@@ -8,6 +8,8 @@
 
 Bring new information into existing specs; asks what you have: a fact, a dump, a code change, or a meeting.
 
+1.207.0: after an `Answered:` line, and when a stale research point is settled, `scripts/stale_state_lines.py` lists leftover open-state notes and old values. A quote is excluded. On yes each note gains `Superseded <date> by <decision>.`
+
 1.200.0: `scripts/ending.py` prints the ending from the shared run-ending helper, Run next first. Before a write, the same helper's stay card applies when a `design/<topic>` branch is checked out or owns the change: the recommended option stays on that branch, and the card never offers a switch to the default branch.
 
 **[`/crav1-add-to-spec`](crav1-add-to-spec.md)** opens with one question: what you have, a fact, a dump (a mail or a chat goes here), a code change, or a meeting (minutes or a transcript). It skips the question when the message shows which. It replaces match-dump-to-specs, code-into-specs, and meeting-to-specs; their rules are kept as branches, and a kept quote from any of them goes through the fact rules.

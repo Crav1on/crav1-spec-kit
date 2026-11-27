@@ -126,6 +126,8 @@ Since 1.182.0 a teammate whose repo already has `.githooks/commit-msg` but whose
 
 Since 1.195.0 every Run next example starts with its reason line, for example `The commit is only local.` above `Push the specs repo:` and `git push`.
 
+Since 1.207.0 an unfinished spec walk comes first: `Resume the spec walk:` and `/crav1-tighten-and-plan-ready-to-build orders-api`. The build walk uses the working branch, and it does not name main or master unless that branch is checked out.
+
 ## 1.199.0 changes
 
 `/crav1-finalize-commit commit-push` commits and then pushes once the fetch check says nothing was lost: one yes for both, never a force push. An `Uncommitted:` line names the command in a code span.

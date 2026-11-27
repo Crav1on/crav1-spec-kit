@@ -122,12 +122,12 @@ class SecondTaskWalk(unittest.TestCase):
                                     "--step", "build T47", "--result", "done at 8b1e4d7", "--yes")
             self.assertEqual(code, 0, out)
             text = (root / "build-progress/feat--orders-cicd.md").read_text(encoding="utf-8")
-            self.assertIn("Tasks: T43 Add the build pipeline, T47 Add the deploy stage", text)
+            self.assertIn("Tasks: Add the build pipeline (T43), Add the deploy stage (T47)", text)
             self.assertIn("- Step: build T47", text)
             code, out = self.run_bw("next", "--root", str(root), "--branch", "feat/orders-cicd")
             self.assertEqual(out["phase"], "verify")
             self.assertIn("T43 and T47", out["lead"])
-            self.assertIn("T47 Add the deploy stage", out["ending"])
+            self.assertIn("Add the deploy stage (T47)", out["ending"])
             self.assertTrue(out["ending"].startswith("Run next:"))
 
     def test_record_still_refuses_an_unknown_step(self):
@@ -163,14 +163,14 @@ class SecondTaskReadyCheck(unittest.TestCase):
             root = copy_snapshot(tmp, last_step="verify")
             text = self.readiness(root)
             self.assertNotIn("T47 is yours; the walk resumes it.", text)
-            self.assertIn("T47 Add the deploy stage — waits for PR 21 to merge", text)
+            self.assertIn("Add the deploy stage (T47) — waits for PR 21 to merge", text)
             self.assertNotIn("`/crav1-build-walk orders-api T47`", text)
 
     def test_snapshot_merge_list_ticks_both_and_dependant_waits_on_the_merge(self):
         reply = (SNAP.parent / "expected/reply.txt").read_text(encoding="utf-8")
         self.assertIn("ticks T43 and T47, then T48 can start.", reply)
         self.assertIn("you added T47,", reply)
-        self.assertIn("T48 Add smoke tests — held, waits on PR 21 to merge (T47, recorded)", reply)
+        self.assertIn("Add smoke tests (T48) — held, waits on PR 21 to merge (T47, recorded)", reply)
         self.assertNotIn("is yours; the walk resumes it", reply)
         build_map = (SNAP.parent / "expected/build-map.md").read_text(encoding="utf-8")
         self.assertIn("class b1,b2,key2 waiting", build_map)

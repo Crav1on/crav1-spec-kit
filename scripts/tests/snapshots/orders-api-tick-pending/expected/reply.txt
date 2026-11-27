@@ -13,9 +13,9 @@ Ask the PR owners to merge, in this order:
 
 Held:
 - `feat/orders-cicd` (wave 2):
-  - T2 Add the build pipeline — waits for PR 12 to merge
+  - Add the build pipeline (T2) — waits for PR 12 to merge
 - `feat/orders-deploy` (wave 3):
-  - T3 Add the deploy stage — waits on T2
+  - Add the deploy stage (T3) — waits on T2
 
 Merge these PRs, in this order:
 1. PR 12 (Person B's, you added T2, feat/orders-cicd): ticks T2, then T3 can start.

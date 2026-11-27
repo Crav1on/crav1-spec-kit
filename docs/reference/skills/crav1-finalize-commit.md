@@ -8,6 +8,8 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
+1.207.0: `--walk` reads `walk-progress.md`. A reopened or unfinished spec walk prints `Resume the spec walk:` and [`/crav1-tighten-and-plan-ready-to-build`](crav1-tighten-and-plan-ready-to-build.md) <slug>`. Otherwise the build walk uses the working branch, never main or master unless that branch is checked out.
+
 1.200.0: `scripts/ending.py` prints the ending from the shared run-ending helper, Run next first. A failed commit has no Run next. Before a write, the same helper's stay card applies when a `design/<topic>` branch is checked out or owns the change, and the card never offers a switch to the default branch.
 
 1.180.0: a task recorded merged on the host but not ticked is not a reason to recommend `stop`. `scripts/task_state.py commit-check --root <spec-folder>` (a thin wrapper over the shared crav1-tasks-ready-to-build module) lists it as tick pending, recommends `commit`, and gives the Run next entry: the verify step, or the tick once verify passes it.

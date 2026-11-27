@@ -180,7 +180,7 @@ class VerifiedOnBranch(unittest.TestCase):
             root = two_pr_slice(tmp)
             (root / "verify.md").write_text(VERIFY_ON_BRANCH, encoding="utf-8")
             text = ending(root)
-            self.assertIn("T5 Orders README — verified on feat/orders-readme, waits for PR 71 to merge", text)
+            self.assertIn("Orders README (T5) — verified on feat/orders-readme, waits for PR 71 to merge", text)
             self.assertNotIn("Not implemented", text)
 
 
@@ -202,7 +202,7 @@ class EndingFromProgress(unittest.TestCase):
             text = out["ending"]
             self.assertTrue(text.startswith("Run next:"))
             self.assertIn("Merge PR 82 into develop, after your yes:\n`/crav1-build-walk", text)
-            self.assertIn("- T9 Orders CI/CD: infra Bicep for dev, test and prod: commit 1f2e3d4, tests green", text)
+            self.assertIn("- Orders CI/CD: infra Bicep for dev, test and prod (T9): commit 1f2e3d4, tests green", text)
             self.assertTrue(text.rstrip().endswith("Before the merge:\n- PR 82 needs one approver."))
             self.assertNotIn("Next:", text.replace("Run next:", ""))
 

@@ -4,7 +4,7 @@ A question card is one question in the questions tool (1.130.0). A batch confirm
 
 The recommended choice is listed first and its label ends with ` (Recommended)`, for example `yes (Recommended)`.
 
-Typed changes go through that card's free-text answer, and the hint lives on that option, for example `Type your changes, e.g. C1: keep it open`. An item the answer does not mention keeps its recommendation.
+Typed changes go through that card's free-text answer, and the hint lives on that option, for example `Type your changes, e.g. Cut-off time (C1): keep it open`. An item the answer does not mention keeps its recommendation. A coded item is the plain name first and the code in parentheses, for example `Cut-off time (C1)`. The code stays typeable. A header or a question that is only the code, such as `P9`, is wrong.
 
 Never add an option that only tells the user to type somewhere else. There is no `Edits` option. Picking that kind of option opens no text field.
 
@@ -24,7 +24,7 @@ A batch card applies one yes to each of several items: plan findings (`P#`), spe
 
 Print a findings table in that same reply, immediately before the card. The card is never asked without it. Columns, in order: Id, Issue, Options, Recommendation. One row per item. The issue is one line. Options are plain words for that item, never letters or internal names (1.196.0). Recommendation is the choice `yes` will apply, such as `add a test` or `keep as written`.
 
-The question is short (1.197.0): it is only the `Card:` line from the command below, such as `Tighten-plan batch: apply all 3 recommendations?`. Never put the items in the question. The items live in the bullets above the card, one per item as `<id> <one-line issue>. Why: … Yes: <recommendation>.`, and in the `On yes:` line under the question, which is the card's result-on-yes and names every item as `<id> <one-line issue>: <recommendation>`, for example `P4 tasks miss the 400 path: add a test`. That line still makes sense if the table scrolled away. `yes (Recommended)` applies every recommendation on that line. A skill whose options are already **Accept all recommendations (Recommended)** and **Go through them one by one** keeps those labels. Typed changes stay on the card's free-text answer.
+The question is short (1.197.0): it is only the `Card:` line from the command below, such as `Tighten-plan batch: apply all 3 recommendations?`. Never put the items in the question. The items live in the bullets above the card, one per item as `<name> (<id>). Why: … Yes: <recommendation>.`, and in the `On yes:` line under the question, which is the card's result-on-yes and names every item as `<name> (<id>): <recommendation>`, for example `Tasks miss the 400 path (P4): add a test`. That line still makes sense if the table scrolled away. The table's Id column stays the code. `yes (Recommended)` applies every recommendation on that line. A skill whose options are already **Accept all recommendations (Recommended)** and **Go through them one by one** keeps those labels. Typed changes stay on the card's free-text answer. The hint names the item, for example `Login page (I1) keep`.
 
 Never write `table above`, `the table recommends`, or `as in the table` unless that table is in this reply. Do not use those phrases on the card. The card does not point at the table; its `On yes:` line repeats each item. Never ask the card without the table.
 
@@ -67,11 +67,11 @@ A script that prints a card uses the same shape: a `Card:` line, then numbered o
 
 These hold for the cards inside the spec walk: tighten-spec, tighten-plan, tighten-and-plan, the ready check and its reopen cards, and the pull-request sort and add-to-spec cards the walk asks.
 
-1. **Batch cards: bullets above, short question, result on yes.** One background bullet per item above the card, `- P4 tasks miss the 400 path. Why: the spec names a 400 reply. Yes: add a test.` The question is short, `Tighten-plan batch: apply all 8 recommendations?`, and one `On yes:` line says what the yes does.
+1. **Batch cards: bullets above, short question, result on yes.** One background bullet per item above the card, `- Tasks miss the 400 path (P4). Why: the spec names a 400 reply. Yes: add a test.` The question is short, `Tighten-plan batch: apply all 8 recommendations?`, and one `On yes:` line says what the yes does. The name comes first and the code stays in parentheses.
 2. **Single cards name the item in its own words.** For example `Tick 'unit tests for the retry' (item 5, acceptance)?` The evidence and the quoted spec line go in a bullet above the card, not in the question.
 3. **Plain labels.** No `A`/`B`/`C` letters and no internal names such as `tick-from-verify`, `park-risk` or `add-regression` on a card. The scripts map them: `LABELS` in `batch_offer.py`, `plan_check.py --vendor copilot` through it, and `PLAIN_LABELS` in `walk_progress.py --vendor copilot`.
 4. **`suggest` only for wording findings.** A finding about behaviour, tasks, checks or prod never offers a suggestion option.
-5. **Every card has a result-on-yes line** in the same place, right under the question: `On yes: …`.
+5. **A result-on-yes line** sits right under the question, `On yes: …`, only when it adds a fact the option does not already say. A batch card's `On yes:` line names every item, so it stays. When the recommended option already says what yes does, do not print a second line that repeats it.
 6. **Still at most 4 options and one question per card.**
 
 Left as they are, by design: the playbook card that is always asked, the open-pr card with the draft inside the question, pr-status's single closing prompt, and the meeting batch's fixed choice set.

@@ -120,7 +120,7 @@ class ReleaseGate(unittest.TestCase):
         self.assertEqual(gates["T3"], "waits for the first release to main and a prod yes")
         self.assertIn("T2", gates)
         text = py(WALK, "readiness", "--root", str(root), "--text").stdout
-        self.assertIn("T3 (manual, prod, owner: person A) Drop the audit table — waits for the first release to main", text)
+        self.assertIn("(manual, prod, owner: person A) Drop the audit table (T3) — waits for the first release to main", text)
         self.assertNotIn("Run only T2", text)
         self.assertNotIn("Run only T3", text)
         self.assertNotIn("orders-api T3`", text)

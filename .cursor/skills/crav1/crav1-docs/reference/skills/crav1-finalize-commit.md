@@ -10,6 +10,9 @@ writes: Only write the message: Writes a host persist rule only when the user ch
 leaves alone: Only write the message: Leaves the git commit alone. Commit: Leaves push alone.
 limits: Only write the message: commits only when the user also asked to commit in that turn. Commit: the worker commits immediately and skips the menu.
 flow:
+- `--walk` reads `walk-progress.md`.
+- A reopened or unfinished spec walk prints `Resume the spec walk:` and `/crav1-tighten-and-plan-ready-to-build <slug>`.
+- Otherwise the build walk uses the working branch, never main or master unless that branch is checked out.
 - `scripts/ending.py` prints the ending from the shared run-ending helper, Run next first.
 - Before a write, the same helper's stay card applies when a `design/<topic>` branch is checked out or owns the change, and the card never offers a switch to the default branch.
 - a task recorded merged on the host but not ticked is not a reason to recommend `stop`.
@@ -69,4 +72,4 @@ runs by itself: Only write the message: Calls no skill. Commit: Calls `/crav1-fi
 you run next: /crav1-open-pr
 first: `/crav1-finalize-commit`
 walkthrough: from-commit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-finalize-commit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-finalize-commit.md

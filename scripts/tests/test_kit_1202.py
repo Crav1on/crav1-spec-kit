@@ -48,7 +48,7 @@ class HeldList(unittest.TestCase):
             {"task": "T17", "bucket": "waits-in-order", "reason": "waits on T8 (recorded)"},
         ]
         text = "\n".join(self.bm.report_by_branch(built, rows)["held_lines"])
-        self.assertIn("T17 Notify on export — waits on T8", text)
+        self.assertIn("Notify on export (T17) — waits on T8", text)
         self.assertNotIn("T8 Export orders", text)
 
     def test_a_task_the_map_missed_is_still_listed(self):

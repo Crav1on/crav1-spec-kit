@@ -225,7 +225,7 @@ CONTINUE_POINT = "review-and-tighten-plan, tasks-ready-to-build"
 JUMP_CHOICE = "Fix it in the spec first (Recommended)"
 POINT_CHOICE = "Keep it as an open point and go on"
 FINDING_ID = re.compile(r"^P[1-9][0-9]*$")
-JUMP_RESULTS = {"jumped", "open-point", "already-fixed"}
+JUMP_RESULTS = {"jumped", "open-point", "already-fixed", "patched"}
 # The owner of a spec finding (1.194.0). A finding about code the spec has not
 # recorded (unrecorded commits, a merged PR, Synced at or In the code drift,
 # new PR comments) is /crav1-add-to-spec's. Wording, structure, diagrams and
@@ -242,7 +242,17 @@ PLAIN_LABELS = {
     "rerun": "Redo the step",
     "nothing new": "Skip redoing the step",
 }
-FINDING_KINDS = ("code-drift", "spec-text")
+FINDING_KINDS = ("code-drift", "spec-text", "stale-wording")
+UPDATE_CHOICE = "Update the wording now (Recommended)"
+KEEP_STALE = "Keep it as an open point"
+# Words that mean leftover wording, not a new requirement (1.207.0).
+# "still says" is stale only when the line is not code drift.
+STRONG_STALE = re.compile(
+    r"(?i)\b(?:superseded|restates?|stale wording|possible answer|not a settlement|stands until)\b"
+)
+SOFT_STALE = re.compile(r"(?i)\bstill says\b")
+QUESTION_WORDS = re.compile(r"(?i)\b(?:open questions?|question still|q\d+)\b")
+_JUMP_HEADS = ("- Jump-back: ", "- Open point: ", "- Patched: ")
 DRIFT_WORDS = re.compile(
     r"(?i)\b(?:merged?|unrecorded|not recorded|has not recorded|hasn't recorded|not in the spec yet|"
     r"synced at|in the code|new (?:pr )?(?:comments?|replies|threads?)|new commits?|commits? after|"
@@ -1246,12 +1256,12 @@ def parse_progress(text: str) -> dict:
         if line.startswith("Acknowledged stamp: "):
             acks.append(_parse_ack(line))
             continue
-        if line.startswith("- Jump-back: ") or line.startswith("- Open point: "):
+        if line.startswith(_JUMP_HEADS):
             label, _, fid = line.partition(": ")
             if not FINDING_ID.fullmatch(fid):
                 fail("progress-file", f"jump id is not a P#: {line}")
             current = {
-                "kind": "jump-back" if label == "- Jump-back" else "open-point",
+                "kind": {"- Jump-back": "jump-back", "- Patched": "patched"}.get(label, "open-point"),
                 "id": fid,
             }
             jumps.append(current)
@@ -1344,6 +1354,9 @@ def parse_progress(text: str) -> dict:
                 fail("progress-file", f"jump-back {jump['id']} result is not jumped")
             if jump.get("open") not in (TIGHTEN_SPEC_PATH, ADD_TO_SPEC_PATH):
                 fail("progress-file", f"jump-back {jump['id']} does not name {TIGHTEN_SPEC_PATH} or {ADD_TO_SPEC_PATH}")
+        elif jump["kind"] == "patched":
+            if jump["result"] != "patched":
+                fail("progress-file", f"patched {jump['id']} result is not patched")
         elif jump["result"] not in ("open-point", "already-fixed"):
             fail("progress-file", f"open point {jump['id']} result is not open-point")
     return {"slice": slice_line, "steps": steps, "acks": acks, "jumps": jumps, "branch_runs": branch_runs}
@@ -1365,9 +1378,13 @@ def _render_stamp(lines: list[str], body: dict) -> None:
         lines.append(f"  Content stamp: {body['content_stamp']}")
 
 
+def _jump_title(kind: str) -> str:
+    return {"jump-back": "Jump-back", "patched": "Patched"}.get(kind, "Open point")
+
+
 def _render_jumps(lines: list[str], jumps: list | None) -> None:
     for jump in jumps or []:
-        title = "Jump-back" if jump["kind"] == "jump-back" else "Open point"
+        title = _jump_title(jump["kind"])
         lines.append(f"- {title}: {jump['id']}")
         lines.append(f"  Done: {jump['when']}")
         lines.append(f"  Finding: {jump['finding']}")
@@ -2659,6 +2676,9 @@ def clear(args: argparse.Namespace) -> None:
     drift = affected_drift(root, args.step, body, data["steps"])
     if not drift:
         fail("not-reopened", f"{args.step} is not reopened")
+    token = reopen_token(args.step)
+    if getattr(args, "card", None) != token:
+        fail("needs-card", "ask the reopen card first")
     refresh_versions(root, args.step, body)
     still = affected_drift(root, args.step, body, data["steps"])
     if still:
@@ -2729,12 +2749,16 @@ def reopen_card(step: str, drift: list[str], recommend_rerun: bool, stale_seen: 
         options = [skip, rerun]
     return {
         "step": step,
+        "card": reopen_token(step),
         "background": f"{name[:1].upper()}{name[1:]} reopened because {said}.",
         "question": f"Skip redoing {name}?",
         "options": options,
-        "result": (f"On yes: {name} runs again on the current files." if options[0]["id"] == "rerun"
-                   else f"On yes: {name} stays done and the walk goes on."),
     }
+
+
+def reopen_token(step: str) -> str:
+    """The token `clear --card` must repeat. It is the `card` field on that step's reopen card."""
+    return hashlib.sha256(f"reopen\n{step}".encode("utf-8")).hexdigest()[:12]
 
 
 CHANGED_FILE = {
@@ -6325,6 +6349,7 @@ def brief_payload(out: dict) -> dict:
         "claim_warnings": out.get("claim_warnings") or [],
         "stop": out.get("stop", False),
         "reply": out.get("reply") or out.get("ending") or "",
+        "stale_seen": bool(out.get("stale_seen")),
     }
     if out.get("build_map"):
         brief["build_map"] = out["build_map"]
@@ -6336,6 +6361,7 @@ def brief_payload(out: dict) -> dict:
         brief["reopen_cards"] = out["reopen_cards"]
     if out.get("auto_clear"):
         brief["auto_clear"] = out["auto_clear"]
+        brief["auto_clear_cards"] = out.get("auto_clear_cards") or []
         brief["auto_clear_line"] = auto_clear_line(out["auto_clear"])
     return brief
 
@@ -6394,6 +6420,50 @@ def reply_for(root: Path | None, out: dict) -> str:
         work_item=root is not None and (root / "work-item.md").is_file(),
         next_line=next_line,
     )
+
+
+_STALE_SINCE = re.compile(r"^Stale since\s+(\d{4}-\d{2}-\d{2})", re.M)
+
+
+def _research_findings(text: str) -> str:
+    lines = []
+    on = False
+    for line in (text or "").splitlines():
+        if line.startswith("## "):
+            if on:
+                break
+            on = line.strip().lower() == "## research findings"
+            continue
+        if on:
+            lines.append(line)
+    return "\n".join(lines)
+
+
+def stale_mark_since_record(root: Path) -> bool:
+    """A Stale since line add-to-spec wrote on or after the latest walk Done date (1.207.0)."""
+    spec = root / "spec.md"
+    if not spec.is_file():
+        return False
+    marks = _STALE_SINCE.findall(_research_findings(spec.read_text(encoding="utf-8")))
+    if not marks:
+        return False
+    data = load(root)
+    dates = [str(body.get("when") or "")[:10] for body in (data.get("steps") or {}).values() if str(body.get("when") or "")[:10]]
+    if not dates:
+        return False
+    latest = max(dates)
+    return any(mark >= latest for mark in marks)
+
+
+def _stale_seen(args, root) -> bool:
+    if bool(getattr(args, "stale_seen", False)):
+        return True
+    if root is None:
+        return False
+    folder = Path(root)
+    if not folder.is_dir():
+        return False
+    return stale_mark_since_record(folder)
 
 
 def readiness(args: argparse.Namespace) -> None:
@@ -6743,14 +6813,20 @@ def _readiness(args: argparse.Namespace) -> None:
         "waiting_next": waiting_next,
         "resolve_waiting": resolve_waiting,
         "recommend_jump": bool(jump) and result == "not-ready",
+        "stale_seen": _stale_seen(args, root),
         "reopen_cards": [
             reopen_card(h["step"], h.get("changed") or [], bool(jump) and result == "not-ready",
-                        bool(getattr(args, "stale_seen", False)))
+                        _stale_seen(args, root))
             for h in hits if h.get("bucket") == "reopened" and h.get("step")
             and h["step"] not in set(getattr(args, "covered", None) or [])
         ],
         "auto_clear": [h["step"] for h in hits if h.get("bucket") == "reopened" and h.get("step")
                        and h["step"] in set(getattr(args, "covered", None) or [])],
+        "auto_clear_cards": [
+            {"step": h["step"], "card": reopen_token(h["step"])}
+            for h in hits if h.get("bucket") == "reopened" and h.get("step")
+            and h["step"] in set(getattr(args, "covered", None) or [])
+        ],
         "jump_back": jump,
         "reopened": reopened,
         "reopen_line": None,
@@ -6972,7 +7048,8 @@ def _close_findings(jumps: list, text: str, fid: str, topic: str) -> list[dict]:
     return list(by_key.values())
 
 
-def _same_or_new_offer(fid: str, close: list[dict]) -> dict:
+def _same_or_new_offer(fid: str, close: list[dict], name: str = "") -> dict:
+    label = named_item(name or display_name((close[0].get("finding") if close else "") or ""), fid)
     if len(close) == 1:
         hit = close[0]
         options = [
@@ -6981,29 +7058,29 @@ def _same_or_new_offer(fid: str, close: list[dict]) -> dict:
             {"id": "new", "label": NEW_CHOICE, "recommended": False,
              "text": "Record it as a new finding, then offer the jump back for it."},
         ]
-        background = f"{fid} looks like the recorded finding \"{hit['finding']}\"."
-        question = f"Is {fid} the same as that recorded finding?"
+        background = f"{label} looks like the recorded finding \"{hit['finding']}\"."
+        question = f"Is {label} the same as that recorded finding?"
     else:
         options = [{"id": "new", "label": NEW_CHOICE_REC, "recommended": True,
                     "text": "Record it as a new finding, then offer the jump back for it. Why: more than one recorded finding is close."}]
         for hit in close[:3]:
-            short = hit["finding"]
-            if len(short) > 80:
-                short = short[:77].rstrip() + "..."
+            short = display_name(hit.get("topic") or hit["finding"])
+            hit_label = named_item(short, hit["id"])
             options.append({
                 "id": "same",
-                "label": f"same as {hit['id']}: {short}",
+                "label": hit_label,
                 "recommended": False,
                 "match_key": hit["key"],
-                "text": f"Count it as {hit['id']}, so it is not jumped back twice.",
+                "text": f"Count it as {hit_label}, so it is not jumped back twice.",
             })
-        background = f"{fid} is close to more than one recorded finding."
-        question = f"Is {fid} new, or the same as one of them?"
+        background = f"{label} is close to more than one recorded finding."
+        question = f"Is {label} new, or the same as one of them?"
     return {
         "ok": True,
         "offer": "same-or-new",
         "spec": True,
         "finding": fid,
+        "header": label,
         "matched": [hit["id"] for hit in close],
         "matches": close,
         "background": background,
@@ -7049,15 +7126,79 @@ def _append_finding(root: Path, data: dict, kind: str, fid: str, text: str, key:
 
 
 def finding_owner(text: str, kind: str | None = None, topic: str = "") -> str:
-    """add-to-spec or tighten-spec (1.194.0). The kind hint wins; then words; unclear is tighten-spec."""
+    """add-to-spec, tighten-spec, or resolve-open-questions (1.194.0, 1.207.0).
+
+    The kind hint wins. Stale wording about an open question is
+    resolve-open-questions. Other wording stays tighten-spec. Unclear is
+    tighten-spec.
+    """
     if kind == "code-drift":
         return "add-to-spec"
+    if kind == "stale-wording":
+        words = f"{text} {topic.replace('-', ' ')}"
+        if QUESTION_WORDS.search(words):
+            return "resolve-open-questions"
+        return "tighten-spec"
     if kind == "spec-text":
         return "tighten-spec"
     words = f"{text} {topic.replace('-', ' ')}"
     if DRIFT_WORDS.search(words) and not SPEC_TEXT_WORDS.search(words):
         return "add-to-spec"
     return "tighten-spec"
+
+
+def infer_kind(text: str, topic: str, kind: str | None) -> str | None:
+    """An explicit kind wins. Strong stale words select stale-wording. 'still says' does too, unless the line is code drift."""
+    if kind:
+        return kind
+    words = f"{text} {topic}"
+    if STRONG_STALE.search(words):
+        return "stale-wording"
+    if SOFT_STALE.search(words) and not DRIFT_WORDS.search(words):
+        return "stale-wording"
+    return None
+
+
+def named_item(name: str, code: str) -> str:
+    """Plain name first, the code in parentheses. A missing name is 'This finding', never the bare code."""
+    name = re.sub(r"\s+", " ", str(name or "").strip())
+    code = str(code or "").strip()
+    if not name:
+        name = "This finding"
+    if code and f"({code})" in name:
+        return name
+    lead = re.match(rf"^{re.escape(code)}\s+(.+)$", name) if code else None
+    if lead:
+        name = lead.group(1).strip()
+    return f"{name} ({code})" if code else name
+
+
+def display_name(raw: str, limit: int = 42) -> str:
+    text = re.sub(r"\s+", " ", (raw or "").strip())
+    text = re.split(r"[,:;]|\s+but\s+", text, maxsplit=1)[0].strip().rstrip(".")
+    if len(text) > limit:
+        cut = text[:limit].rsplit(" ", 1)[0].rstrip(".,;:")
+        text = cut or text[:limit].rstrip()
+    if text and text[0].isalpha() and text[0].islower():
+        text = text[0].upper() + text[1:]
+    return text or "This finding"
+
+
+def ensure_topic(explicit: str, text: str) -> tuple[str, str]:
+    """Normalized topic for matching, and the display name. An empty topic is derived from the text."""
+    raw = (explicit or "").strip()
+    if not raw:
+        raw = re.split(r"[,:;]|\s+but\s+", (text or "").strip(), maxsplit=1)[0]
+    display = display_name(raw)
+    norm = _norm_topic(display)
+    if not _topic_ok(norm):
+        words = re.findall(r"[A-Za-z0-9][A-Za-z0-9'-]*", text or "")[:6]
+        display = display_name(" ".join(words) or "spec wording")
+        norm = _norm_topic(display)
+    if not _topic_ok(norm):
+        display = "Spec wording"
+        norm = "spec wording"
+    return norm, display
 
 
 def add_to_spec_command(text: str, pr: str | None = None, branch: str | None = None) -> str:
@@ -7139,31 +7280,68 @@ def _already_fixed_offer(fid: str, check: dict) -> dict:
     }
 
 
-def _jump_back_offer(fid: str, owner: str = "tighten-spec", command: str = "/crav1-tighten-spec") -> dict:
+def _jump_back_offer(fid: str, owner: str = "tighten-spec", command: str = "/crav1-tighten-spec", name: str = "") -> dict:
+    label = named_item(name, fid)
     if owner == "add-to-spec":
         first = {"id": "add-to-spec", "label": ADD_CHOICE, "recommended": True,
-                 "text": f"Open {command} for {fid} only, then the walk goes on with the plan. Why: the spec has not recorded that code yet."}
+                 "text": f"Open {command} for {label} only, then the walk goes on with the plan. Why: the spec has not recorded that code yet."}
         path = ADD_TO_SPEC_PATH
     else:
         first = {"id": "tighten-spec", "label": JUMP_CHOICE, "recommended": True,
-                 "text": f"Open /crav1-tighten-spec for {fid} only, then the walk goes on with the plan. Why: the plan is built from the spec."}
+                 "text": f"Open /crav1-tighten-spec for {label} only, then the walk goes on with the plan. Why: the plan is built from the spec."}
         path = TIGHTEN_SPEC_PATH
     return {
         "ok": True,
         "offer": "jump-back",
         "spec": True,
         "finding": fid,
+        "header": label,
         "owner": owner,
         "command": command,
-        "background": f"{fid} is about the spec, not the plan.",
-        "question": f"Fix {fid} in the spec now, before the plan goes on?",
-        "result": f"On yes: {command} runs for {fid} only, then the walk goes on with the plan.",
+        "background": f"{label} is about the spec, not the plan.",
+        "question": f"Fix {label} in the spec now, before the plan goes on?",
         "options": [
             first,
             {"id": "open-point", "label": POINT_CHOICE, "recommended": False,
-             "text": f"Record {fid} as an open point and go on; the spec stays as it is for now."},
+             "text": f"Record {label} as an open point and go on. The spec stays as it is for now."},
         ],
         "path": path,
+        "already_jumped": False,
+        "pause": False,
+        "wrote": None,
+    }
+
+
+def _stale_question(name: str, fid: str) -> str:
+    body = name[:1].lower() + name[1:] if name else "wording"
+    if body.startswith("the old ") or body.startswith("old "):
+        return f"Update {body} ({fid}) now?"
+    return f"Update the old {body} ({fid}) now?"
+
+
+def _stale_offer(fid: str, owner: str, name: str) -> dict:
+    """A wording patch, not a full jump back (1.207.0). The option says what happens, so there is no second On yes line."""
+    label = named_item(name, fid)
+    command = "/crav1-resolve-open-questions" if owner == "resolve-open-questions" else "/crav1-tighten-spec"
+    return {
+        "ok": True,
+        "offer": "stale-wording",
+        "spec": True,
+        "finding": fid,
+        "header": label,
+        "owner": owner,
+        "command": command,
+        "patch_only": True,
+        "full_skill": False,
+        "background": f"{label} still uses the wording from before the decision.",
+        "question": _stale_question(name or "wording", fid),
+        "options": [
+            {"id": "update", "label": UPDATE_CHOICE, "recommended": True,
+             "text": f"Patch {label} through the {command} patch-only path and show the diff first. The full skill does not run. Why: only the leftover wording is wrong."},
+            {"id": "open-point", "label": KEEP_STALE, "recommended": False,
+             "text": f"Record {label} as an open point and go on. The spec stays as it is for now."},
+        ],
+        "path": "../crav1-add-to-spec/scripts/stale_state_lines.py",
         "already_jumped": False,
         "pause": False,
         "wrote": None,
@@ -7197,26 +7375,38 @@ def spec_finding(args: argparse.Namespace) -> None:
         fail("finding", "a spec finding needs --text")
     if not FINDING_ID.fullmatch(args.id or ""):
         fail("finding", "id must be a P# such as P2")
-    topic = _norm_topic(args.topic) if args.topic else ""
-    if args.topic and not _topic_ok(topic):
+    explicit = _norm_topic(args.topic) if args.topic else ""
+    if args.topic and not _topic_ok(explicit):
         fail("topic", "topic is a short specific name, at least 4 letters, such as approver")
+    derived, display = ensure_topic(args.topic or "", args.text)
+    # An omitted --topic still matches a close reword. A stored record always gets a topic.
+    topic = explicit or derived
+    if not topic:
+        fail("topic", "a finding needs a topic")
     root = Path(args.root)
     if not root.is_dir():
         fail("root", f"not a folder: {root}")
     data = load(root)
     key = _finding_key(args.text)
     jumps = data.get("jumps") or []
+    kind = infer_kind(args.text, topic, args.kind)
     if args.kind and args.kind not in FINDING_KINDS:
-        fail("kind", "kind must be code-drift or spec-text")
-    owner = finding_owner(args.text, args.kind, topic)
-    command = add_to_spec_command(args.text, args.pr, args.branch) if owner == "add-to-spec" else "/crav1-tighten-spec"
+        fail("kind", "kind must be code-drift, spec-text, or stale-wording")
+    owner = finding_owner(args.text, kind, topic)
+    if owner == "add-to-spec":
+        command = add_to_spec_command(args.text, args.pr, args.branch)
+    elif owner == "resolve-open-questions":
+        command = "/crav1-resolve-open-questions"
+    else:
+        command = "/crav1-tighten-spec"
+    label = named_item(display, args.id)
     # 1.196.0 (1119d S3): a code-drift text passed as spec-text is asked, not routed silently.
     if args.kind == "spec-text" and not args.choice and finding_owner(args.text, None, topic) == "add-to-spec":
         drift_cmd = add_to_spec_command(args.text, args.pr, args.branch)
-        emit({"ok": True, "offer": "kind-conflict", "spec": True, "finding": args.id, "kind_conflict": True,
-              "background": f"{args.id} was passed as spec text, but it reads like code the spec has not recorded (a merge or commits).",
-              "question": f"Is {args.id} about code the spec has not recorded?",
-              "result": f"On yes: it goes to {drift_cmd}; otherwise to /crav1-tighten-spec.",
+        emit({"ok": True, "offer": "kind-conflict", "spec": True, "finding": args.id, "header": label,
+              "kind_conflict": True,
+              "background": f"{label} was passed as spec text, but it reads like code the spec has not recorded (a merge or commits).",
+              "question": f"Is {label} about code the spec has not recorded?",
               "options": [
                   {"id": "add-to-spec", "label": "Yes, record the code (Recommended)", "recommended": True,
                    "text": f"Run the same command with --kind code-drift; {drift_cmd} records it. Why: merged work not marked merged is code drift."},
@@ -7228,7 +7418,7 @@ def spec_finding(args: argparse.Namespace) -> None:
     if args.choice == "already-done":
         check = already_fixed(root, args.text, owner, args.expect, args.code_repo)
         if not check["covered"]:
-            offer = _jump_back_offer(args.id, owner, command)
+            offer = _jump_back_offer(args.id, owner, command, display)
             offer["still_missing"] = check["missing"]
             offer["message"] = f"The spec does not show {args.id} fixed yet: " + "; ".join(check["missing"]) + "."
             emit(offer)
@@ -7244,7 +7434,7 @@ def spec_finding(args: argparse.Namespace) -> None:
     if args.choice == "same":
         first, _aliases, _stored_topic, _finding = _family(jumps, key)
         if first is None:
-            close = _close_findings(jumps, args.text, args.id, topic)
+            close = _close_findings(jumps, args.text, args.id, explicit)
             if not close:
                 fail("choice", "no recorded finding is close to this wording")
             if len(close) > 1:
@@ -7275,19 +7465,19 @@ def spec_finding(args: argparse.Namespace) -> None:
     elif not force_new:
         first, _aliases, _stored_topic, _finding = _family(jumps, key)
         if first is None:
-            close = _close_findings(jumps, args.text, args.id, topic)
+            close = _close_findings(jumps, args.text, args.id, explicit)
             if close:
                 if args.choice in ("tighten-spec", "add-to-spec", "open-point"):
-                    emit(_same_or_new_offer(args.id, close))
+                    emit(_same_or_new_offer(args.id, close, display))
                     return
-                emit(_same_or_new_offer(args.id, close))
+                emit(_same_or_new_offer(args.id, close, display))
                 return
     first, aliases, stored_topic, recorded = _family(jumps, key)
     use_topic = stored_topic or topic
     if key != first and key not in aliases and first:
         aliases = list(aliases) + [key]
     jumped = any(first and item.get("key") == first and item["kind"] == "jump-back" for item in jumps)
-    pointed = any(first and item.get("key") == first and item["kind"] == "open-point" for item in jumps)
+    pointed = any(first and item.get("key") == first and item["kind"] in ("open-point", "patched") for item in jumps)
     if jumped or pointed:
         payload = {
             "ok": True,
@@ -7326,14 +7516,48 @@ def spec_finding(args: argparse.Namespace) -> None:
         emit(payload)
         return
     if args.choice in (None, "new", "same"):
+        if kind == "stale-wording":
+            emit(_stale_offer(args.id, owner, display))
+            return
         check = already_fixed(root, args.text, owner, args.expect, args.code_repo)
         if check["covered"]:
             emit(_already_fixed_offer(args.id, check))
             return
-        emit(_jump_back_offer(args.id, owner, command))
+        emit(_jump_back_offer(args.id, owner, command, display))
+        return
+    if args.choice == "update":
+        if kind != "stale-wording":
+            fail("choice", "update is only for stale wording; pass --kind stale-wording")
+        if not args.yes:
+            fail("needs-yes", "spec-finding writes the progress file only with --yes, after the card was answered", status=2)
+        notes_only = bool(getattr(args, "notes_only", False))
+        no_drift = bool(getattr(args, "no_scope_drift", False))
+        cover = ["plan-from-spec", "review-and-tighten-plan"] if notes_only and no_drift else []
+        continue_line = "tasks-ready-to-build" if cover else CONTINUE_POINT
+        _append_finding(
+            root, data, "patched", args.id, args.text, key, "patched",
+            continue_line, topic=topic,
+        )
+        emit({
+            "ok": True,
+            "offer": None,
+            "spec": True,
+            "finding": args.id,
+            "header": label,
+            "key": key,
+            "recorded": "patched",
+            "choice": "update",
+            "owner": owner,
+            "patch_only": True,
+            "full_skill": False,
+            "cover": cover,
+            "pause": False,
+            "continue": _continue_list(continue_line),
+            "wrote": PROGRESS_NAME,
+        })
         return
     if args.choice not in ("tighten-spec", "add-to-spec", "open-point"):
-        fail("choice", "choice must be tighten-spec, add-to-spec, open-point, already-done, same, or new")
+        fail("choice", "choice must be tighten-spec, add-to-spec, open-point, update, already-done, same, or new")
     if not args.yes:
         fail(
             "needs-yes",
@@ -7341,6 +7565,8 @@ def spec_finding(args: argparse.Namespace) -> None:
             status=2,
         )
     if args.choice in ("tighten-spec", "add-to-spec"):
+        if kind == "stale-wording":
+            fail("choice", "stale wording is a patch; pass --choice update, not a full jump back")
         path = ADD_TO_SPEC_PATH if args.choice == "add-to-spec" else TIGHTEN_SPEC_PATH
         _append_finding(
             root, data, "jump-back", args.id, args.text, key, "jumped",
@@ -7985,7 +8211,7 @@ def _enclosing_step(lines: list[str], start: int) -> str | None:
             return text[len("- Step: "):]
         if text.startswith("- Extra: "):
             return text[len("- Extra: "):]
-        if text.startswith("- Jump-back: ") or text.startswith("- Open point: "):
+        if text.startswith(_JUMP_HEADS):
             return text
         i -= 1
     return None
@@ -8346,7 +8572,7 @@ def _align_jump_keys(ours: dict, theirs: dict) -> list[dict]:
         if jump.get("key") != recomputed or twin.get("key") != recomputed:
             if jump.get("key") != twin.get("key") or jump.get("key") != recomputed:
                 jump["key"] = recomputed
-                title = "Jump-back" if jump["kind"] == "jump-back" else "Open point"
+                title = _jump_title(jump["kind"])
                 actions.append({
                     "step": f"{title} {jump['id']}",
                     "restamped": ["Key"],
@@ -8810,6 +9036,7 @@ def main(argv: list[str] | None = None) -> None:
     k.add_argument("--root", required=True)
     k.add_argument("--step", required=True)
     k.add_argument("--yes", action="store_true")
+    k.add_argument("--card", help="Token from this step's reopen_cards card field. Required when the step is reopened (1.207.0).")
     k.set_defaults(func=clear)
 
     st = sub.add_parser("start")
@@ -8864,8 +9091,10 @@ def main(argv: list[str] | None = None) -> None:
     f.add_argument("--id", required=True)
     f.add_argument("--text", required=True)
     f.add_argument("--tag", default="spec", help="spec offers a jump back. plan behaves as today.")
-    f.add_argument("--choice", help="tighten-spec, add-to-spec, open-point, already-done, same, or new")
-    f.add_argument("--kind", help="code-drift (add-to-spec owns it) or spec-text (tighten-spec owns it); unclear is tighten-spec")
+    f.add_argument("--choice", help="tighten-spec, add-to-spec, open-point, update, already-done, same, or new")
+    f.add_argument("--kind", help="code-drift, spec-text, or stale-wording. Unclear wording stays tighten-spec. Stale words are detected when --kind is omitted.")
+    f.add_argument("--notes-only", action="store_true", help="The patch touched only notes or question context (1.207.0).")
+    f.add_argument("--no-scope-drift", action="store_true", help="The reviewer reported no scope drift. With --notes-only, plan steps are covered.")
     f.add_argument("--pr", help="the pull request a code-drift finding is about, e.g. 73")
     f.add_argument("--branch", help="the branch a code-drift finding is about")
     f.add_argument("--expect", help="words the fix leaves in spec.md; checks whether it is already fixed")

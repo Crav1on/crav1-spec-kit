@@ -533,6 +533,7 @@ skills:
   walkthrough: docs/from-draft-spec.md
   purpose: Walk an existing spec issue-by-issue.
   in_depth:
+  - '1.207.0: the batch hint names the item, for example `Login page (I1) keep`.'
   - One issue at a time, with explained resolutions (plus get a suggestion) and impact; patch only that
     issue after the user chooses. When the slice is partial or `## In the code` names paths, reads the
     committed code on the repo and branch the spec names before wording issues. A spec with no code behind
@@ -586,6 +587,7 @@ skills:
   walkthrough: docs/from-draft-spec.md
   purpose: Walk Open questions and Conflict lines in spec.md one by one.
   in_depth:
+  - '1.207.0: after Answer or Cut from v0, and after a settled Conflict line, `stale_state_lines.py` lists leftover open-state notes and lines that still carry the old value. A quote is excluded. One card, `Mark N notes superseded and update M lines?`, shows the diff. On yes each note gains `Superseded <date> by <decision>.` The batch hint names the item, for example `Cut-off time (Q1) keep`.'
   - '1.149.0: the patch, a single named question, a stale research point, and the empty-list ending are references files, each read only when that case applies. The rules are unchanged.'
   - '1.141.0: does not walk `## Approval needed` and does not remove an `Approved:` line. Folding an answer still removes that question''s `Answered:` line.'
   - One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).
@@ -603,7 +605,7 @@ skills:
     writes: The picked question in the spec (with a linked answer's quote and source), a cleared research
       mark when no point stays open, and on apply the playbook copy plus a Playbook line on each spec it changed
   reads: Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`, including `docs/architecture/spec.md` since 1.181.0. It never reads `docs/architecture/designs/`.
-  writes: 'Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes `- Blocks: whole slice`. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.'
+  writes: 'Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. After an Answer, a Cut from v0, or a settled Conflict line, `stale_state_lines.py` can append `Superseded <date> by <decision>.` to leftover notes and reword lines that still carry the old value, after the diff card (1.207.0). A verbatim quote is not changed. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes `- Blocks: whole slice`. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.'
   leaves_alone: Leaves application code and kept-open questions alone. Does not change `Answer:` or
     `Change:` lines in the playbook file. Does not copy a draft. Does not git-commit.
   exceptions: null
@@ -740,6 +742,7 @@ skills:
   purpose: 'Bring new information into existing specs; asks what you have: a fact, a dump, a code change,
     or a meeting.'
   in_depth:
+  - '1.207.0: after an `Answered:` line, and when a stale research point is settled, `scripts/stale_state_lines.py` lists leftover open-state notes and old values. A quote is excluded. On yes each note gains `Superseded <date> by <decision>.`'
   - '1.200.0: `scripts/ending.py` prints the ending from the shared run-ending helper, Run next first. Before a write, the same helper''s stay card applies when a `design/<topic>` branch is checked out or owns the change: the recommended option stays on that branch, and the card never offers a switch to the default branch.'
   - '**`/crav1-add-to-spec`** opens with one question: what you have, a fact, a dump (a mail or a chat goes here), a code change, or
     a meeting (minutes or a transcript). It skips the question when the message shows
@@ -1016,6 +1019,7 @@ skills:
   walkthrough: docs/from-spec-to-plan.md
   purpose: Walk plan.md/tasks.md issues one by one (including /crav1-review-plan P#s).
   in_depth:
+  - '1.207.0: the batch hint names the item, for example `Retry path (P1) keep`. The card and the bullets say `Tasks miss the 400 path (P4)`, and the table Id column stays `P4`.'
   - '1.202.0: `reviewed --items <file>` writes the open count the script computes. A hand-counted `--open` is not the path.'
   - '1.180.0: with no plan issue left, Run next names `/crav1-tasks-ready-to-build <slug>`, never `/crav1-build-tasks`; uncommitted files come first inside Run next as `Commit the <n> changed spec files:` above `/crav1-finalize-commit`.'
   - '1.176.0: the empty queue ends with a Run next entry, its label above the command, no `Next:` line. A spec finding already patched, dropped or kept no longer sends you back to `/crav1-tighten-spec`.'
@@ -1392,6 +1396,7 @@ skills:
   walkthrough: docs/from-commit.md
   purpose: Draft the commit message, then commit, copy, change, or stop.
   in_depth:
+  - '1.207.0: `--walk` reads `walk-progress.md`. A reopened or unfinished spec walk prints `Resume the spec walk:` and `/crav1-tighten-and-plan-ready-to-build <slug>`. Otherwise the build walk uses the working branch, never main or master unless that branch is checked out.'
   - '1.200.0: `scripts/ending.py` prints the ending from the shared run-ending helper, Run next first. A failed commit has no Run next. Before a write, the same helper''s stay card applies when a `design/<topic>` branch is checked out or owns the change, and the card never offers a switch to the default branch.'
   - '1.180.0: a task recorded merged on the host but not ticked is not a reason to recommend `stop`. `scripts/task_state.py commit-check --root <spec-folder>` (a thin wrapper over the shared crav1-tasks-ready-to-build module) lists it as tick pending, recommends `commit`, and gives the Run next entry: the verify step, or the tick once verify passes it.'
   - '1.173.0: every ending, `commit`, `copy`, `stop` or a failed commit, is Run next or nothing, never a `Next:` line; a suggestion to throw an edit away is a plain sentence with the git command in a code span. A typed `commit` or `commit-now` still asks, with `stop` recommended, when the only changed files are kit-rewritten files (`build-map.md`, `walk-progress.md`, `build-progress/*`) whose values disagree with `verify.md` or `build-progress`, such as a done hash.'
@@ -2404,6 +2409,7 @@ skills:
   walkthrough: docs/from-tighten-and-plan.md
   purpose: Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
   in_depth:
+  - '1.207.0: leftover wording in plan review is a patch (`--kind stale-wording`), not a full jump back. The card header is the name and the code, for example `Static-IP notes (P9)`. `clear --step` needs `--card` from that step''s reopen card, and a reopen clear is never folded into another step''s card. A `Stale since` line on or after the latest walk Done date counts as stale seen.'
   - '1.202.0: the Reviewed line uses `plan_check.py open-count --review <file>` (`open: <n>`). Held includes a task that only waits, via `(after:)`, on a task that is not built yet, and the reason is on that held line.'
   - '1.176.0: each step compares the spec against its own newest section stamps, so a step recorded again after a spec edit stops reading reopened and the ready check no longer blocks on it. `clear --yes` fails with `still-reopened` instead of reporting success when nothing cleared. The ready check reply is `reply`, which keeps the Source, Build map and Zoom the map lines.'
   - '1.175.0: `readiness` offers `Continue the build walk on <branch>:` only when the walk''s claim user (else its `Run yes:` name) matches `--user` or `git config user.name`; someone else''s walk is a Waiting line, `T9 to T12 are person B''s, built, and wait for PR 82 to merge.` or `T9 to T12 are in progress by person B.` Built claimed tasks read `built by <name>, waits for PR <n> to merge`. A reopened step reads one reason sentence, then `Finish the reopened /crav1-tighten-spec step:` above the command. A walk''s own files never reopen a step.'

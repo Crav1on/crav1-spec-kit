@@ -61,4 +61,4 @@ The project it names is only a fallback: the suggestion when a repo's work item 
 
 `$crav1-ado-sync` reads the done-state line too. See [From tasks to Azure Boards](from-ado-sync-push-tasks.md).
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/environments-marks.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/environments-marks.md

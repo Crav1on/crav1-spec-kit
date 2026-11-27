@@ -10,6 +10,8 @@ writes: Writes only the picked plan issue in `plan.md` or `tasks.md`.
 leaves alone: Leaves `spec.md` and application code alone. Leaves a claimed `In progress:` task line in `tasks.md` unchanged.
 limits: a spec-tagged finding is not patched here.
 flow:
+- the batch hint names the item, for example `Retry path (P1) keep`.
+- The card and the bullets say `Tasks miss the 400 path (P4)`, and the table Id column stays `P4`.
 - `reviewed --items <file>` writes the open count the script computes.
 - A hand-counted `--open` is not the path.
 - with no plan issue left, Run next names `/crav1-tasks-ready-to-build <slug>`, never `/crav1-build-tasks`; uncommitted files come first inside Run next as `Commit the <n> changed spec files:` above `/crav1-finalize-commit`.
@@ -37,4 +39,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-ado-sync; /crav1-tasks-ready-to-build; /crav1-build-walk; /crav1-build-tasks; /crav1-build-features
 first: `/crav1-tighten-plan @docs/specs/<slug>/`
 walkthrough: from-spec-to-plan.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-tighten-plan.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-tighten-plan.md

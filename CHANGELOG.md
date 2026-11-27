@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.207.0 (2026-11-27)
+
+Decisions are written back through the spec, leftover wording is a patch, and cards name the item.
+
+- **Decisions written back.** After an answer or a settled conflict, a check lists notes that still say the choice is open (`Possible answer`, `Waiting for`, `stands until`, `not a settlement`, a conflict line) and other lines that still carry the old date or the old option. A verbatim quote is left as it is. One card asks to mark the notes superseded and update the other lines, and shows the diff first.
+- **Stale wording is a patch.** A plan-review finding that only restates old wording offers to update that wording, or to keep it as an open point. Yes patches those lines and confirms the diff. It does not rerun the whole spec skill. When only notes or question context changed and the reviewer reported no scope drift, the plan is not reviewed again. A finding about an open question's wording goes to the open-questions step.
+- **Readable names.** A task, constraint, question, finding, or batch row is the plain name first and the code in parentheses, for example `Static-IP notes (P9)` or `Add login page (T3)`. A tight header uses a short name plus the code. The code stays searchable and typeable. A card does not repeat an On yes line that only restates the option. The background sentence is chat text before the card.
+- **No silent clear.** Clearing a reopened step needs the token from that step's own reopen card. The clear is not folded into another step's card. A stale-research mark written since the last walk record counts as stale seen.
+- **The right next step after a commit.** When the spec walk still has a reopened or unfinished step, the ending resumes that walk. Otherwise it resumes the build walk on the working branch, and it does not name main or master unless that branch is the one checked out.
+
+Docs and tests: question cards, the tighten-and-plan walkthrough, glossary, and `scripts/tests/test_kit_1207.py`.
+
 ## 1.206.0 (2026-11-27)
 
 Early-access flags for one repo, kept out of git. With no flag file, an update matches 1.205.0.

@@ -225,6 +225,8 @@ When it is settled, replace that point's waiting line with:
 Resolved <date>: <point>. <how>.
 ```
 
+Then run `scripts/stale_state_lines.py --spec <spec.md> --changed <question id> --old "<the waiting words>" --decision "<how>"`, as `$crav1-resolve-open-questions` `references/after-choice.md` says. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. On yes it appends `Superseded <date> by <decision>.` to leftover notes. A quote line is excluded.
+
 Remove that open question when this pass did not already remove it. Lower N. Rewrite the narrowed line. When no point is open, remove the blockquote and the `Stale since` line. Remove the `Resolved` lines and the waiting lines for this mark. The lines under `Cleared` replace them. Write:
 
 ```text

@@ -84,4 +84,4 @@ The words are `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. `kit2` in
 
 A `crav1-` name pattern is not the list. A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are left alone: the update does not write, stage, or delete them. With no version, the target is the newest published 1.x tag. A `v2` tag, including `v2.0.0-alpha.1`, is not offered.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-update-kit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/from-update-kit.md

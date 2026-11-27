@@ -10,7 +10,7 @@ license: MIT
 disable-model-invocation: true
 metadata:
   crav1-vendor: codex
-  crav1-version: 1.206.0
+  crav1-version: 1.207.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.
@@ -83,7 +83,7 @@ Read `references/one-question.md` ("One question") only when the run named one q
 
 Read `references/list-done.md` ("When the list is done") only when no questions or Conflict lines remain to walk.
 
-**Batch (1.145.0).** Read **Batch of several items** in `crav1-docs/reference/question-cards.md` only when one card applies a recommendation to several questions. Print the findings table in this reply, then ask. Never write `table above` unless that table is in this reply. Never ask the card without the table. Hint: `Type your changes, e.g. Q1 A, Q3 keep`.
+**Batch (1.145.0).** Read **Batch of several items** in `crav1-docs/reference/question-cards.md` only when one card applies a recommendation to several questions. Print the findings table in this reply, then ask. Never write `table above` unless that table is in this reply. Never ask the card without the table. Hint: `Type your changes, e.g. Cut-off time (Q1) keep`.
 
 ## Resolution catalog (per question)
 

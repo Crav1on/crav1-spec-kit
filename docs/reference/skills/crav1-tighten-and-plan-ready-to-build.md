@@ -8,6 +8,8 @@
 
 Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
 
+1.207.0: leftover wording in plan review is a patch (`--kind stale-wording`), not a full jump back. The card header is the name and the code, for example `Static-IP notes (P9)`. `clear --step` needs `--card` from that step's reopen card, and a reopen clear is never folded into another step's card. A `Stale since` line on or after the latest walk Done date counts as stale seen.
+
 1.202.0: the Reviewed line uses `plan_check.py open-count --review <file>` (`open: <n>`). Held includes a task that only waits, via `(after:)`, on a task that is not built yet, and the reason is on that held line.
 
 1.176.0: each step compares the spec against its own newest section stamps, so a step recorded again after a spec edit stops reading reopened and the ready check no longer blocks on it. `clear --yes` fails with `still-reopened` instead of reporting success when nothing cleared. The ready check reply is `reply`, which keeps the Source, Build map and Zoom the map lines.

@@ -10,6 +10,7 @@ writes: Writes only the picked issue in `spec.md` and, when that pick says so, t
 leaves alone: Leaves application code and unpicked issues alone. A spec with no code behind it skips that read.
 limits: a different open repo or branch, a missing branch, a stub, or a spec too thin for that read stops and does not tighten. `suggest` does not patch. A disagreement with the code is called out and the spec is not rewritten to match the code. Finish, add a test, and leave are not choices here. A quoted note in `docs/notes/` gets its slug in `used_by` and a `Full source:` link; notes are never absorbed.
 flow:
+- the batch hint names the item, for example `Login page (I1) keep`.
 - When the slice is partial or `## In the code` names paths, reads the committed code on the repo and branch the spec names before wording issues.
 - more than 8 issues starts with one line of counts (issues to fix, open questions, small wording) and does not print the full list.
 - Each time, one issue or a small group; one by one is always offered.
@@ -30,4 +31,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-resolve-open-questions; $crav1-finalize-commit
 first: `$crav1-tighten-spec @docs/specs/<slug>/spec.md`
 walkthrough: from-draft-spec.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-tighten-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-tighten-spec.md

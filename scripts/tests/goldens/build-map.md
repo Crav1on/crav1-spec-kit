@@ -42,8 +42,8 @@ An arrow means the later branch waits for the earlier one.
 ### feat/cancel-booking-record-refund-decision
 
 - Tasks:
-  - T1 Persist the decision
-  - T2 Reject an unknown booking
+  - Persist the decision (T1)
+  - Reject an unknown booking (T2)
 - Waits for: none
 - Question: none
 - Ready now: ready
@@ -53,7 +53,7 @@ An arrow means the later branch waits for the earlier one.
 ### feat/cancel-booking-send-receipt
 
 - Tasks:
-  - T3 Email the receipt
+  - Email the receipt (T3)
 - Waits for:
   - feat/cancel-booking-record-refund-decision
 - Question: none

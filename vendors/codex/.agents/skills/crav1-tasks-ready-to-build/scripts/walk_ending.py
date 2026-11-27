@@ -76,14 +76,19 @@ def run_entry(labels, branch_name, slug=None):
     ids = []
     names = []
     for label in labels:
-        match = re.match(r"(T\d+)\s+(.*)", str(label).strip())
-        if match:
-            ids.append(match.group(1))
-            names.append(f"{match.group(1)} {match.group(2).strip()}")
+        text = str(label).strip()
+        lead = re.match(r"(T\d+)\s+(.*)", text)
+        wrapped = re.search(r"^(.*?)\s*\((T\d+)\)\s*$", text)
+        if lead:
+            ids.append(lead.group(1))
+            rest = lead.group(2).strip()
+            names.append(text if rest.endswith(f"({lead.group(1)})") else f"{rest} ({lead.group(1)})")
+        elif wrapped and wrapped.group(1).strip():
+            ids.append(wrapped.group(2))
+            names.append(text)
         else:
-            token = str(label).strip()
-            ids.append(token)
-            names.append(token)
+            ids.append(text)
+            names.append(text)
     ids_text = ", ".join(ids)
     command = f"/crav1-build-walk {slug} {ids_text}" if slug else f"/crav1-build-walk {ids_text}"
     return f"Build {_join(names)} on {branch_name}:\n`{command}`"
@@ -401,6 +406,7 @@ def tasks_sentence(names, limit=TASK_SUMMARY_LIMIT):
     """
     def _outcome(name):
         item = TASK_PREFIX.sub("", _plain(name)).strip()
+        item = re.sub(r"\s*\(T\d+\)\s*$", "", item).strip()
         # 1.201.1: a branch-and-base clause (`from develop, ...: outcome`) is not the name.
         if ":" in item and re.search(r"\bfrom\s+\S+", item.split(":", 1)[0], re.I):
             item = item.split(":", 1)[1].strip()
@@ -556,8 +562,37 @@ def question_text(text, limit=160, quote=None):
 
 
 def _task_id(label):
-    match = re.match(r"(T\d+)\b", str(label).strip())
-    return match.group(1) if match else str(label).strip()
+    text = str(label).strip()
+    match = re.match(r"(T\d+)\b", text)
+    if match:
+        return match.group(1)
+    match = re.search(r"\((T\d+)\)\s*$", text)
+    return match.group(1) if match else text
+
+
+def _names_from(labels) -> dict:
+    found = {}
+    for label in labels or []:
+        text = str(label).strip()
+        wrapped = re.search(r"^(.*?)\s*\((T\d+)\)\s*$", text)
+        if wrapped and wrapped.group(1).strip():
+            found[wrapped.group(2)] = wrapped.group(1).strip()
+            continue
+        lead = re.match(r"^(T\d+)\s+(.+)$", text)
+        if lead:
+            found[lead.group(1)] = lead.group(2).strip()
+    return found
+
+
+def _named_reason(reason: str, names: dict) -> str:
+    """`waits on T5` prints as `waits on Archive the receipt (T5)` when that name is known."""
+    def repl(match):
+        code = match.group(0)
+        name = names.get(code)
+        if not name or f"({code})" in reason:
+            return code
+        return f"{name} ({code})"
+    return re.sub(r"\bT\d+\b", repl, reason)
 
 
 def branch_block(branch_name, open_labels, first=None, slug=None, about=None, waits=None):
@@ -586,8 +621,11 @@ def branch_block(branch_name, open_labels, first=None, slug=None, about=None, wa
         lines.append(sentence)
     count = len(names)
     lines.append(f"{count} open task{'' if count == 1 else 's'}:")
+    known = _names_from(names)
     for name in names:
         why = waits.get(_task_id(name))
+        if why:
+            why = _named_reason(why, known)
         lines.append(f"- {name} ({why})" if why else f"- {name}")
     lines.append("")
     first_id = _task_id(first)

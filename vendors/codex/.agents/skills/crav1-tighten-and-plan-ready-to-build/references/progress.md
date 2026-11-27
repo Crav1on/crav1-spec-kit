@@ -112,19 +112,19 @@ At the start of a run, `start` returns `resume` before anything is recorded. Tha
 
 On resume, run `resume`. With no playbook on this command, add `--no-playbook` so a playbook step that was never started stays skipped. The script returns `keep`, `reopen`, or `not-started`, and `continue_from`. A recorded extra is `keep` and does not change `continue_from`. Explain each reopen with its `impact` before redoing it. Leave `keep` steps as they are. After a step or an extra is recorded, run `resume` again.
 
-Ask the clear-or-rerun question with the readiness output's `reopen_cards` entry for that step: its `background` sentence first, then its `question`, then its `options` in that order, each with its `text`. For example:
+Ask the clear-or-rerun question with the readiness output's `reopen_cards` entry for that step: its `background` sentence first, then its `question`, then its `options` in that order, each with its `text`. A reopen clear is never folded into another step's card. The entry's `card` field is the token `clear --card` must repeat. For example:
 
 Card: Skip redoing the plan review?
 - **Skip redoing the plan review (Recommended)** (`nothing new`): keep the plan review as done and go straight on to the ready check. Why: only branch tags were added to three tasks; no task text changed.
 - **Redo the plan review** (`rerun`): run the plan review again on the current files, then the walk goes on.
 
-**No card when a finding covers it (1.196.0).** When a step reopened only because of a fact this walk just recorded (for example the PR merge line add-to-spec wrote) and a finding already covers its effect, there is no reopen card. Run `readiness` with `--covered <step>`: that step is left out of `reopen_cards` and listed in `auto_clear` with one `auto_clear_line`. Run `clear --step <step> --yes` and say that line.
+**No card when a finding covers it (1.196.0).** When a step reopened only because of a fact this walk just recorded (for example the PR merge line add-to-spec wrote) and a finding already covers its effect, there is no reopen card. Run `readiness` with `--covered <step>`: that step is left out of `reopen_cards` and listed in `auto_clear` with one `auto_clear_line`. The same step is in `auto_clear_cards` with its `card` token. Run `clear --step <step> --card <token> --yes` and say that line. The token is still required. There is no question to fold into another card.
 
-**Stale seen (1.195.0).** When this walk saw anything stale (merged-since-sync offered `take-in`, code-drift was `behind`, or a stale research mark), run `readiness` with `--stale-seen`: every reopen card then recommends `rerun`, never `nothing new`.
+**Stale seen (1.195.0, 1.207.0).** When this walk saw anything stale (merged-since-sync offered `take-in`, code-drift was `behind`, or a stale research mark), run `readiness` with `--stale-seen`: every reopen card then recommends `rerun`, never `nothing new`. A `Stale since YYYY-MM-DD` line under `## Research findings` whose date is on or after the latest walk `Done` date counts as stale seen even when `--stale-seen` was not passed. The readiness field `stale_seen` says which.
 
 The background names the change in plain words, for example `The plan review only reopened because three tasks got a branch tag.` Never put stamps, `Done`, `Result`, step ids, or a command in the card.
 
-`clear --step <id> --yes` refreshes one reopened step after the user says `nothing new`. `Done` and `Result` stay. Other steps stay as they are. That is the path when a reopened step has nothing new. Do not record `nothing-to-do` over it. A `nothing-to-do` record keeps an earlier `done` Result.
+`clear --step <id> --card <token> --yes` refreshes one reopened step after the user says `nothing new`. `<token>` is the `card` field on that step's reopen card, or on its `auto_clear_cards` entry. Without it the script refuses with `ask the reopen card first`. `Done` and `Result` stay. Other steps stay as they are. That is the path when a reopened step has nothing new. Do not record `nothing-to-do` over it. A `nothing-to-do` record keeps an earlier `done` Result. A reopen clear is never folded into another step's card.
 
 `playbook-status` answers whether this walk already applied that file. It does not read the spec. The apply compare in step 1 does that.
 

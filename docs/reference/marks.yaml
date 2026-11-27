@@ -224,6 +224,20 @@ marks:
     read_by: [crav1-resolve-open-questions]
     since: 1.61.0
 
+  - id: superseded
+    name: "Superseded line"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (on a note under a settled constraint or question)"]
+    format: "Superseded <YYYY-MM-DD> by <decision>."
+    pattern: '^Superseded \d{4}-\d{2}-\d{2} by .+\.$'
+    examples:
+      - "Superseded 2026-11-27 by the static-IP option."
+    meaning: "A sub-note that still described an open choice after that choice was settled. A verbatim quote is not rewritten (1.207.0)."
+    written_by: [crav1-resolve-open-questions, crav1-add-to-spec]
+    read_by: [crav1-resolve-open-questions]
+    mention: "Superseded "
+    since: 1.207.0
+
   - id: source-line
     name: "Source"
     group: spec

@@ -14,12 +14,12 @@ Ask the PR owners to merge, in this order:
 
 Held:
 - `feat/orders-store` (wave 1):
-  - T2 Store a retried order once — waits for PR 11 to merge
+  - Store a retried order once (T2) — waits for PR 11 to merge
 - `feat/orders-cicd` (wave 2):
-  - T3 Add the build pipeline — waits for PR 12 to merge
-  - T4 Take in develop after PR 11 merges — waits for PR 11 to merge
+  - Add the build pipeline (T3) — waits for PR 12 to merge
+  - Take in develop after PR 11 merges (T4) — waits for PR 11 to merge
 - `feat/orders-deploy` (wave 3):
-  - T5 Add the deploy stage — held, waits on PR 12 to merge (T3, recorded)
+  - Add the deploy stage (T5) — held, waits on PR 12 to merge (T3, recorded)
 
 Merge these PRs, in this order:
 1. PR 11 (Person A's, you added T1, feat/orders-store): ticks T1 and T2.

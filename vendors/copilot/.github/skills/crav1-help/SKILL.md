@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   crav1-vendor: copilot
-  crav1-version: 1.206.0
+  crav1-version: 1.207.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.

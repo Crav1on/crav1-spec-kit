@@ -11,6 +11,10 @@ writes: Writes `docs/specs/<slug>/walk-progress.md` through `scripts/walk_progre
 leaves alone: Leaves `spec.md`, `plan.md`, and `tasks.md` to the skills that own them, except that one `Blocks:` pass. Does not change `Answer:` or `Change:` lines in the playbook. Does not start `$crav1-build-tasks`, `$crav1-build-features`, or `$crav1-verify-build-against-spec`. Never writes `verify.md`. Does not git-commit.
 limits: A headless run stops. No playbook skips step 1. Architecture review always runs inside the walk even though the new-slice route marks it optional. Needs verify is named and not started. An open plan-review warning is not ready. The progress script does not decide that a playbook was already applied unless this walk recorded that apply.
 flow:
+- leftover wording in plan review is a patch (`--kind stale-wording`), not a full jump back.
+- The card header is the name and the code, for example `Static-IP notes (P9)`.
+- `clear --step` needs `--card` from that step's reopen card, and a reopen clear is never folded into another step's card.
+- A `Stale since` line on or after the latest walk Done date counts as stale seen.
 - the Reviewed line uses `plan_check.py open-count --review <file> --vendor codex` (`open: <n>`).
 - Held includes a task that only waits, via `(after:)`, on a task that is not built yet, and the reason is on that held line.
 - `clear --yes` fails with `still-reopened` instead of reporting success when nothing cleared.
@@ -152,4 +156,4 @@ runs by itself: Opens each locked skill's file from this skill's folder and foll
 you run next: $crav1-build-walk; $crav1-build-tasks
 first: `$crav1-tighten-and-plan-ready-to-build @docs/specs/<slug>/ <optional playbook file, or leave it out>`
 walkthrough: from-tighten-and-plan.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-tighten-and-plan-ready-to-build.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-tighten-and-plan-ready-to-build.md

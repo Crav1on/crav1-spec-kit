@@ -98,7 +98,11 @@ class ScriptCards(unittest.TestCase):
         walk = _load("walk_progress_1164", SKILLS / "crav1-tighten-and-plan-ready-to-build/scripts/walk_progress.py")
         jump = walk._jump_back_offer("P2")
         self.check(jump)
-        self.assertEqual(jump["background"], "P2 is about the spec, not the plan.")
+        self.assertEqual(jump["background"], "This finding (P2) is about the spec, not the plan.")
+        self.assertEqual(jump["header"], "This finding (P2)")
+        self.assertNotIn("result", jump)
+        self.assertFalse(LINT.bare_code(jump["header"]))
+        self.assertFalse(LINT.bare_code(jump["question"]))
         one = walk._same_or_new_offer("P3", [{"key": "a", "finding": "needs an approver", "id": "P1"}])
         self.check(one)
         many = walk._same_or_new_offer("P3", [
@@ -145,7 +149,7 @@ class PlainWaitingLines(unittest.TestCase):
             for word in LINT.CARD_JARGON + ("Approval needed item", "other-owner"):
                 self.assertNotIn(word.lower(), line.lower(), line)
         self.assertIn("person A to merge pull request 71", seen["wait-merge"])
-        self.assertIn("your yes to run T5", seen["live-yes"])
+        self.assertIn("your yes to run Deploy (T5)", seen["live-yes"])
 
 
 class LiveRunCards(unittest.TestCase):

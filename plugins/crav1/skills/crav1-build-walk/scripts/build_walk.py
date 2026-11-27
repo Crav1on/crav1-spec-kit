@@ -310,7 +310,7 @@ def _task_label(task: dict) -> str:
     if title.endswith(".") and not title.endswith(".."):
         title = title[:-1].rstrip()
     title = short_title(title)
-    return f"{_task_token(task.get('id'))} {title}".strip()
+    return map_mod().task_label(_task_number(task.get("id")), title or "work")
 
 
 TITLE_MAX = 120
@@ -651,11 +651,21 @@ def _join_names(labels: list) -> str:
     return ", ".join(items[:-1]) + " and " + items[-1]
 
 
+def _label_code(label) -> str:
+    """The T# in a label, whether it leads (`T3 Name`) or follows (`Name (T3)`)."""
+    text = str(label).strip()
+    lead = re.match(r"(T\d+)\b", text)
+    if lead:
+        return lead.group(1)
+    wrapped = re.search(r"\((T\d+)\)\s*$", text)
+    return wrapped.group(1) if wrapped else text
+
+
 def phase_label(phase: str | None, labels: list, branch: str, state: dict | None = None) -> str | None:
     """The Run next label for the step the task is on (1.198.0). None for build: run_entry says Build."""
     state = state or {}
     names = _join_names(labels)
-    ids = _join_names([str(label).split(" ", 1)[0] for label in labels]) or "the task"
+    ids = _join_names([_label_code(label) for label in labels]) or "the task"
     pr = state.get("pr")
     named = f"PR {pr}" if pr else "the pull request"
     base = state.get("base") or DEFAULT_BASE
@@ -1285,6 +1295,18 @@ def step_base(step: str | None) -> str:
     return "build" if build_step_tasks(step) is not None else str(step or "").strip().lower()
 
 
+def _readable_task(part: str) -> str:
+    """`T3 Name` and `Name (T3)` both print as `Name (T3)` (1.207.0)."""
+    text = part.strip()
+    wrapped = re.search(r"^(.*?)\s*\((T\d+)\)\s*$", text)
+    if wrapped and wrapped.group(1).strip():
+        return text
+    lead = re.match(r"^(T\d+)\s+(.+)$", text)
+    if lead:
+        return f"{lead.group(2).strip()} ({lead.group(1)})"
+    return text
+
+
 def add_header_tasks(text: str, root: Path, tasks: list[str]) -> str:
     """Add tasks missing from the header's Tasks: line, in order (1.182.0).
 
@@ -1302,7 +1324,7 @@ def add_header_tasks(text: str, root: Path, tasks: list[str]) -> str:
         return text
     titles = task_titles(root)
     rows = [{"id": tid, "title": (titles.get(tid) or {}).get("title") or ""} for tid in missing]
-    current = match.group(1).strip()
+    current = ", ".join(_readable_task(part) for part in match.group(1).split(",") if part.strip())
     added = _task_list(rows)
     value = added if current.lower() in ("", "none") else f"{current}, {added}"
     head = head[:match.start(1)] + value + head[match.end(1):]

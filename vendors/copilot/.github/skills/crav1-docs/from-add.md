@@ -46,6 +46,8 @@ A mail, a transcript, a chat, a screenshot, or another original that is quoted i
 
 No `plan.md`. No `tasks.md`. A missing `docs/system/` is not seeded here. This command does not create `glossary.md`. A meaning the new information does not state is `to be researched`. A quote that is a yes for an `## Approval needed` item is not written as `Answered:` or `Approved:`.
 
+On yes each note gains `Superseded <date> by <decision>.` A verbatim quote is left as it is.
+
 ## After
 
 ```text
@@ -68,4 +70,4 @@ A dump or a code change confirms the sort on one card: `yes (Recommended)`, or t
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-add.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/from-add.md

@@ -265,7 +265,7 @@ class TitlesAndOutput(unittest.TestCase):
     def test_next_lines_match_run_next(self):
         labels = ["T43 incoming tests that follow the code"]
         line = bm.ready_next_line(labels, "feat/orders-api-host-setup", slug="orders-api")
-        self.assertTrue(line.startswith("Build T43 incoming tests that follow the code on feat/orders-api-host-setup:\n`/crav1-build-walk orders-api T43`\n"))
+        self.assertTrue(line.startswith("Build incoming tests that follow the code (T43) on feat/orders-api-host-setup:\n`/crav1-build-walk orders-api T43`\n"))
         self.assertIn("/crav1-build-tasks builds one task without the walk.", line)
         self.assertNotIn("Next: /crav1-build-walk T43", line)
         self.assertNotIn("because that work is on", line)

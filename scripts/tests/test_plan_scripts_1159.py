@@ -231,7 +231,7 @@ class Queue(unittest.TestCase):
             rows.sort(key=lambda r: r["id"])
             self.assertEqual(proc.stdout, bo.offer("Tighten-plan batch", rows))
             self.assertLess(proc.stdout.index("| Id | Issue | Options | Recommendation |"), proc.stdout.index("Card: "))
-            self.assertIn("P4 tasks miss the 400 path: add a test", proc.stdout)
+            self.assertIn("Tasks miss the 400 path (P4): add a test", proc.stdout)
             self.assertNotIn("table above", proc.stdout)
             none = run(WRAPPER, "batch", "--items", items_file(Path(tmp), [dict(ITEMS[0])]))
             self.assertEqual(none.returncode, 2)
