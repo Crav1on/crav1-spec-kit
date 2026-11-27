@@ -336,29 +336,39 @@ def spec_problem(repo: Path, spec: str) -> str | None:
     return f"No spec named '{text}'. Available specs: {slugs}."
 
 
-def _fetch_main(kit: Path) -> str | None:
-    """origin/main, else origin/master, deep enough that a merge-base exists."""
-    fetched = None
-    for name in ("main", "master"):
-        # A single-branch clone does not create origin/main on its own.
-        code, _out = run(GIT + ["-C", str(kit), "fetch", "--quiet", "origin", f"{name}:refs/remotes/origin/{name}"])
-        if code == 0:
-            fetched = name
-            break
-    if not fetched:
-        return None
-    ref = f"origin/{fetched}"
-    for _ in range(6):
-        code, _base = run(GIT + ["-C", str(kit), "merge-base", "HEAD", ref])
-        if code == 0:
-            return ref
-        code, _out = run(GIT + ["-C", str(kit), "fetch", "--quiet", "--deepen=100", "origin",
-                                f"{fetched}:refs/remotes/origin/{fetched}"])
-        if code != 0:
-            run(GIT + ["-C", str(kit), "fetch", "--quiet", "--unshallow", "origin"])
-            break
+def _merge_base_ok(kit: Path, ref: str) -> bool:
     code, _base = run(GIT + ["-C", str(kit), "merge-base", "HEAD", ref])
-    return ref if code == 0 else None
+    return code == 0
+
+
+def _fetch_main(kit: Path) -> tuple[str | None, str]:
+    """origin/main, else origin/master, deep enough that a merge-base exists.
+
+    A `--depth 1 --branch` clone does not fetch main, and a deepen of that one
+    refspec does not reach the branch point on every git. Add main to the
+    remote's branches and unshallow. The second value is the git error when
+    no main ref could be compared.
+    """
+    errors: list[str] = []
+    for name in ("main", "master"):
+        run(GIT + ["-C", str(kit), "remote", "set-branches", "--add", "origin", name])
+        ref = f"origin/{name}"
+        # --unshallow with the branch name pulls that history into a depth-1
+        # clone. A refspec-only deepen leaves the branch point out on some git.
+        code, out = run(GIT + ["-C", str(kit), "fetch", "--quiet", "--unshallow", "origin", name])
+        if code != 0:
+            code, out = run(GIT + ["-C", str(kit), "fetch", "--quiet", "origin",
+                                   f"+refs/heads/{name}:refs/remotes/origin/{name}"])
+        if code != 0:
+            errors.append(out.strip() or f"fetch {name} failed")
+            continue
+        if _merge_base_ok(kit, ref):
+            return ref, ""
+        run(GIT + ["-C", str(kit), "fetch", "--quiet", "--deepen=200", "origin"])
+        if _merge_base_ok(kit, ref):
+            return ref, ""
+        errors.append(f"no merge-base with {ref}")
+    return None, "; ".join(errors)
 
 
 def _behind_count(kit: Path, ref: str) -> int:
@@ -389,8 +399,10 @@ def settle_onto_main(kit: Path, scratch: Path) -> tuple[Path, str | None, set[st
     merged into a scratch worktree. A conflict keeps the branch, warns, and
     returns the files that exist only on main so they are not reported as deletes.
     """
-    ref = _fetch_main(kit)
+    ref, fetch_error = _fetch_main(kit)
     if ref is None:
+        if fetch_error:
+            return kit, f"could not compare this branch with main ({fetch_error}); the dry run uses the branch as-is.", set()
         return kit, None, set()
     behind = _behind_count(kit, ref)
     if behind == 0:

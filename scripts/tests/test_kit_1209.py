@@ -323,8 +323,9 @@ class DryRunOntoMain(unittest.TestCase):
             clean = _dry(ahead, kit)
             self.assertEqual(clean.returncode, 0, clean.stdout + clean.stderr)
             self.assertNotIn("branch is behind main", clean.stdout)
+            self.assertNotIn("could not compare this branch with main", clean.stdout, clean.stdout)
             update = clean.stdout.split("--- Update ---", 1)[1].split("--- Checks ---", 1)[0]
-            self.assertIn("only-on-main.md", update)
+            self.assertIn("only-on-main.md", update, clean.stdout)
 
             git(kit, "checkout", "-q", "main")
             restamp(kit, "1.0.2")
