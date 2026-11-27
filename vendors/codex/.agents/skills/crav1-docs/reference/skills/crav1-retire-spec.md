@@ -31,4 +31,4 @@ runs by itself: Calls no skill.
 you run next: nothing in particular
 first: `$crav1-retire-spec retire docs/specs/<slug>/`
 walkthrough: from-retire-spec.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-retire-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-retire-spec.md

@@ -28,4 +28,4 @@ runs by itself: Verify report gaps: Calls no skill. Live-site gaps: Calls `/crav
 you run next: /crav1-verify-build-against-spec
 first: `/crav1-fix-build-gaps @docs/specs/<slug>/verify.md`
 walkthrough: from-verify.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-fix-build-gaps.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-fix-build-gaps.md

@@ -49,4 +49,4 @@ runs by itself: Suggest Features: Calls no skill. Push Features: Calls `$crav1-a
 you run next: $crav1-plan-from-spec; $crav1-tasks-ready-to-build; $crav1-build-walk; $crav1-build-tasks; $crav1-build-features; $crav1-finalize-commit
 first: `$crav1-ado-sync`
 walkthrough: from-ado-sync-suggest-features.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-ado-sync.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-ado-sync.md

@@ -126,4 +126,4 @@ an unfinished spec walk comes first: `Resume the spec walk:` and `/crav1-tighten
 
 `scripts/ending.py --vendor copilot` prints the ending from the shared helper, Run next first. When a `design/<topic>` branch is checked out or owns the change, the helper shows a stay card and never offers the default branch.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-commit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-commit.md

@@ -65,11 +65,16 @@ class Regression(unittest.TestCase):
         write(root / "sot/index.md", "source of truth, dirty\n")
         before = {rel: (root / rel).read_bytes() for rel in PLANTED}
         before["sot/index.md"] = (root / "sot/index.md").read_bytes()
-        plan = run_kit(["plan", "--old", str(old), "--new", str(new), "--to-version", "1.205.0", "--root", str(root)])
+        plan = run_kit([
+            "plan", "--list-unchanged", "--old", str(old), "--new", str(new),
+            "--to-version", "1.205.0", "--root", str(root),
+        ])
         self.assertEqual(plan.returncode, 0, plan.stderr)
         body = json.loads(plan.stdout)
         kit_paths = []
         for bucket in body["files"].values():
+            if not isinstance(bucket, list):
+                continue
             for item in bucket:
                 kit_paths.append(item if isinstance(item, str) else item.get("path", ""))
         for rel in PLANTED:

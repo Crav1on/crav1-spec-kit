@@ -25,4 +25,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-open-pr; $crav1-pr-status
 first: `$crav1-host-setup Require a green build of <pipeline> on <branch> in <repo>.`
 walkthrough: from-host-setup.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-host-setup.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-host-setup.md

@@ -62,4 +62,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-merge-pr; /crav1-tighten-spec; /crav1-plan-from-spec; /crav1-build-tasks; /crav1-finalize-commit; /crav1-pr-status; /crav1-refresh-system-notes after an outside pull request merges
 first: `/crav1-review-pr https://github.com/<owner>/<repo>/pull/<n> Read the diff. Do not edit. Do not run the tests. Do not merge.`
 walkthrough: from-review-pr.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-review-pr.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-review-pr.md

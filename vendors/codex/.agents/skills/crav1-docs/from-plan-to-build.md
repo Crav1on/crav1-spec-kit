@@ -121,4 +121,4 @@ The run ends as [How a run ends](reference/run-ending.md) says: Run next, never 
 
 `$crav1-tighten-plan` leaves a task listed in `docs/specs/<slug>/claims.md` as `In progress:` unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md` it preserves those lines and says once which claimed tasks were kept.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-plan-to-build.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-plan-to-build.md

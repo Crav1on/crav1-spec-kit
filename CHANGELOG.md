@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.210.0 (2026-11-27)
+
+Kit 2.0 follows the newest published pre-release, and an update plan stays small.
+
+- **Kit 2.0 pre-release.** When `kit2` is on, plan and apply install kit 2.0 from the newest published `v2.0.0-*` tag. The fetch uses the same short temp folder, `core.longpaths=true`, `core.autocrlf=false`, and clean check as `fetch`. When that lookup or fetch fails, the run uses the bundled tree and `kit2_line` says a newer 2.0 may exist. The line names the version that will be installed and the version installed now.
+- **Already current.** When the installed `~/.crav1-2` engine already equals that version and `repo_writes` is 0, `card` is null. There is no install card. The ending says the repo kit is current and kit 2.0 is current, with nothing to do and no reload line.
+- **Compact plan.** `files` carries the counts plus the changed lists (`update`, `merge`, `add`, `delete`, `clash`, `left_extra`). The unchanged list is omitted unless `--list-unchanged`. A plan where nothing changes stays under about 20 KB.
+- **Script output.** Next to plan and apply, the update skill repeats the rule: never pipe or redirect the script output (`| python -c`, `| head`, `>`). Read it directly.
+
+Docs and tests: update-kit walkthrough, glossary, data layout, and `scripts/tests/test_kit_1210.py`.
+
 ## 1.208.0 (2026-11-27)
 
 Parallel kit updates settle on their own, a merge message stays clean, and an update ending says what changed.

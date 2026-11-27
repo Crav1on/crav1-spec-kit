@@ -17,4 +17,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-tighten-spec
 first: `/crav1-review-architecture @docs/specs/<slug>/ Critique the design. Number the issues. Do not edit the spec.`
 walkthrough: from-draft-spec.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-review-architecture.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-review-architecture.md

@@ -41,4 +41,4 @@ Per repo, environments are ordered dev < test < stage, uat, qa < pre-prod < prod
 
 When a pipeline-sourced line is behind the Promotion line, the report ends with **Also check the latest pipeline-runs?** The choice word `pipeline-runs` runs it without asking; a headless run without the word gives the git answer and `Pipeline runs not checked. Add the word: pipeline-runs.` It reads the latest successful Azure DevOps run per pipeline, read-only, and says for example `Promotion (pipeline-runs): test, DeployTest succeeded 2026-10-18 at 63e334b, which contains the work; prod, no successful DeployProd run contains the work.` Hand-written lines keep the branch-reach answer (`pipeline-runs: Azure DevOps only`). With `az` signed out it says `az has no login` and keeps the git answer.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/environments-promotion.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/environments-promotion.md

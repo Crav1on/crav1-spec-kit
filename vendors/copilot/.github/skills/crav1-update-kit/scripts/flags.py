@@ -34,7 +34,7 @@ STATUSES = ("experimental", "beta")
 # Documented registry. kit2 is the first entry.
 REGISTRY: dict[str, dict[str, str]] = {
     "kit2": {
-        "description": "Install kit 2.0 at user level from the same release when this repo is updated.",
+        "description": "Install kit 2.0 at user level from the newest published v2.0.0 pre-release when this repo is updated.",
         "status": "experimental",
     },
 }
@@ -293,28 +293,109 @@ def _one_line(text: str, fallback: str) -> str:
     return fallback
 
 
-def _kit2_result(new_root: Path, home: Path, dry: bool) -> str:
+def _installed_version(home: Path) -> str:
+    """Engine version in ``~/.crav1-2/installed.json``, or ``none`` when kit 2.0 is not installed."""
+    path = Path(home) / RECORD_REL
+    if not path.is_file():
+        return "none"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return "none"
+    if not isinstance(data, dict):
+        return "none"
+    raw = data.get("engine")
+    if not isinstance(raw, str) or not raw.strip():
+        raw = data.get("version")
+    if not isinstance(raw, str) or not raw.strip():
+        return "none"
+    text = raw.strip()
+    return text[1:] if text.startswith("v") else text
+
+
+def _version_rank(version: str) -> tuple:
+    """A release ranks above any pre-release of the same numbers. alpha.10 ranks above alpha.4."""
+    text = version.strip()
+    if text.startswith("v"):
+        text = text[1:]
+    main, sep, pre = text.partition("-")
+    nums = tuple(int(part) for part in main.split(".") if part.isdigit())
+    if not sep:
+        return (nums, 1, ())
+    pieces = []
+    for piece in pre.split("."):
+        if not piece:
+            continue
+        if piece.isdigit():
+            pieces.append((0, int(piece)))
+        else:
+            pieces.append((1, piece))
+    return (nums, 0, tuple(pieces))
+
+
+def _version_at_least(current: str, target: str) -> bool:
+    try:
+        return _version_rank(current) >= _version_rank(target)
+    except (TypeError, ValueError):
+        return current == target
+
+
+def _kit2_note(target: str, current: str, warn: bool) -> str:
+    note = f" Will install {target}; installed now {current}."
+    if warn:
+        note += " A newer 2.0 may exist."
+    return note
+
+
+def _kit2_result(new_root: Path, home: Path, dry: bool, warn: bool = False) -> str:
+    current = _installed_version(home)
     script = Path(new_root) / "v2" / "install.py"
     if not script.is_file():
-        return "Kit 2.0: v2/install.py was not in this release."
-    updating = _record_exists(home)
-    words = ["install", "dry-run"] if dry else ["install"]
-    code, out, err = _run_install(script, home, words)
+        line = "Kit 2.0: v2/install.py was not in this release."
+        if warn:
+            line += " A newer 2.0 may exist."
+        return line
+    code, out, err = _run_install(script, home, ["install", "dry-run"])
     if code != 0:
-        return "Kit 2.0: " + _one_line(err or out, "install failed.")
+        line = "Kit 2.0: " + _one_line(err or out, "install failed.")
+        if warn:
+            line += " A newer 2.0 may exist."
+        return line
     try:
         payload = json.loads(out)
     except json.JSONDecodeError:
-        return "Kit 2.0: install returned no record."
-    version = payload.get("version") or "2.0"
+        line = "Kit 2.0: install returned no record."
+        if warn:
+            line += " A newer 2.0 may exist."
+        return line
+    target = str(payload.get("version") or "2.0")
     count = len(payload.get("files") or [])
+    note = _kit2_note(target, current, warn)
+    if current != "none" and _version_at_least(current, target):
+        return f"Kit 2.0: current {current}.{note}"
     if dry:
-        return f"Kit 2.0: dry-run {version}, {count} files."
-    verb = "updated" if updating else "installed"
-    return f"Kit 2.0: {verb} {version} at user level, {count} files."
+        return f"Kit 2.0: dry-run {target}, {count} files.{note}"
+    code, out, err = _run_install(script, home, ["install"])
+    if code != 0:
+        line = "Kit 2.0: " + _one_line(err or out, "install failed.")
+        if warn:
+            line += " A newer 2.0 may exist."
+        return line
+    try:
+        payload = json.loads(out)
+    except json.JSONDecodeError:
+        line = "Kit 2.0: install returned no record."
+        if warn:
+            line += " A newer 2.0 may exist."
+        return line
+    target = str(payload.get("version") or target)
+    count = len(payload.get("files") or [])
+    note = _kit2_note(target, current, warn)
+    verb = "updated" if current != "none" else "installed"
+    return f"Kit 2.0: {verb} {target} at user level, {count} files.{note}"
 
 
-def early_access(root: Path, new_root: Path, home: Path, dry: bool) -> tuple[str | None, dict]:
+def early_access(root: Path, new_root: Path, home: Path, dry: bool, warn: bool = False) -> tuple[str | None, dict]:
     """Extra JSON for plan or apply. Empty when the output must match a run with no flag file.
 
     The first item is the one plain line for a file that cannot be read, else None.
@@ -329,7 +410,7 @@ def early_access(root: Path, new_root: Path, home: Path, dry: bool) -> tuple[str
     if unknown:
         extra["unknown_flags"] = unknown
     if state.values.get("kit2") is True:
-        extra["kit2_line"] = _kit2_result(new_root, home, dry)
+        extra["kit2_line"] = _kit2_result(new_root, home, dry, warn=warn)
     elif state.values.get("kit2") is False and _record_exists(home):
         extra["kit2_line"] = OFFER
     return None, extra

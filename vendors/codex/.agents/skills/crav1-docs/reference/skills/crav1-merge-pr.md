@@ -43,4 +43,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-refresh-system-notes after an outside pull request merges; $crav1-finalize-commit
 first: `$crav1-merge-pr <pull request number or URL> Merge this pull request.`
 walkthrough: from-commit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-merge-pr.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-merge-pr.md

@@ -14,6 +14,7 @@ import argparse
 import difflib
 import fnmatch
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -39,6 +40,10 @@ _utf8_stdout()
 KIT_REPO = "https://github.com/Crav1on/crav1-spec-kit.git"
 RELEASE_TAG = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
 VERSION_NUM = re.compile(r"^v?(\d+)\.(\d+)\.(\d+)$")
+# Newest published kit 2.0 pre-release a 1.x update may install (1.210.0).
+# A stable v2.0.0 tag is not this pattern, and neither is v2.0.1-*.
+V2_PRE_TAG = re.compile(r"^v2\.0\.0-.+$")
+PLAN_CHANGED = ("update", "merge", "add", "delete", "clash", "left_extra")
 # Kit 2.0 names its skills and agents crav1-2- and writes .crav1-2/ and sot/.
 # This 1.x script never writes, stages, or deletes those paths.
 V2_NAME = re.compile(r"^crav1-2-")
@@ -135,7 +140,7 @@ def git(root: Path, *args: str, check: bool = True) -> subprocess.CompletedProce
     )
 
 
-def published_tags(text: str) -> list[str]:
+def _tag_lines(text: str) -> list[str]:
     found: list[str] = []
     for raw in text.splitlines():
         line = raw.strip()
@@ -147,6 +152,14 @@ def published_tags(text: str) -> list[str]:
             line = line[len("refs/tags/") :]
         if line.endswith("^{}"):
             line = line[:-3]
+        if line:
+            found.append(line)
+    return found
+
+
+def published_tags(text: str) -> list[str]:
+    found: list[str] = []
+    for line in _tag_lines(text):
         match = RELEASE_TAG.fullmatch(line)
         # 1.205.0: a 1.x install is never offered a 2.0 tag, including v2.x
         # and a prerelease such as v2.0.0-alpha.N (that one already fails the
@@ -154,6 +167,33 @@ def published_tags(text: str) -> list[str]:
         if match and match.group(1) == "1":
             found.append(line)
     return sorted(set(found), key=version_key)
+
+
+def v2_pre_key(tag: str) -> tuple:
+    """Order a v2.0.0-<pre> tag. Numeric pieces compare as numbers, so alpha.10 follows alpha.4."""
+    body = tag[1:] if tag.startswith("v") else tag
+    main, _, pre = body.partition("-")
+    nums = tuple(int(part) for part in main.split(".") if part.isdigit())
+    pieces: list[tuple] = []
+    for piece in pre.split("."):
+        if not piece:
+            continue
+        if piece.isdigit():
+            pieces.append((0, int(piece)))
+        else:
+            pieces.append((1, piece))
+    return (nums, tuple(pieces))
+
+
+def v2_prerelease_tags(text: str) -> list[str]:
+    """Published v2.0.0-* tags, oldest first. v2.0.0 and v2.0.1-* are not in the list."""
+    found = [line for line in _tag_lines(text) if V2_PRE_TAG.fullmatch(line)]
+    return sorted(set(found), key=v2_pre_key)
+
+
+def newest_v2_prerelease(text: str) -> str | None:
+    tags = v2_prerelease_tags(text)
+    return tags[-1] if tags else None
 
 
 def normalize_request(text: str | None) -> str | None:
@@ -1619,6 +1659,16 @@ def build_actions(
     }
 
 
+def files_view(files: dict, *, list_unchanged: bool = False) -> dict:
+    """Plan `files`: counts plus the changed lists. Unchanged paths stay out unless asked (1.210.0)."""
+    view: dict = {"counts": {key: len(files.get(key) or []) for key in (*PLAN_CHANGED, "unchanged")}}
+    for key in PLAN_CHANGED:
+        view[key] = list(files.get(key) or [])
+    if list_unchanged:
+        view["unchanged"] = list(files.get("unchanged") or [])
+    return view
+
+
 def repo_write_count(actions: dict) -> int:
     """Repo paths a plan would write, delete, or clash. Zero means nothing to commit."""
     files = actions.get("files") or {}
@@ -1658,6 +1708,11 @@ def kit2_installed(line: str | None) -> bool:
     return text.startswith("Kit 2.0: installed ") or text.startswith("Kit 2.0: updated ")
 
 
+def kit2_current_line(line: str | None) -> bool:
+    """The installed engine already matches the kit 2.0 version this run would install."""
+    return str(line or "").startswith("Kit 2.0: current ")
+
+
 def ending_args(repo_touched: int, kit2_line: str | None = None) -> list[str]:
     """Flags for ``ending``. ``--not-updated`` when this run wrote no repo files."""
     args: list[str] = []
@@ -1665,11 +1720,13 @@ def ending_args(repo_touched: int, kit2_line: str | None = None) -> list[str]:
         args.append("--not-updated")
     if kit2_installed(kit2_line):
         args.append("--kit2")
+    elif repo_touched <= 0 and kit2_current_line(kit2_line):
+        args.append("--kit2-current")
     return args
 
 
-def plan_view(info: dict, actions: dict, target: str | None) -> dict:
-    files = actions["files"]
+def plan_view(info: dict, actions: dict, target: str | None, *, list_unchanged: bool = False) -> dict:
+    files = files_view(actions["files"], list_unchanged=list_unchanged)
     writes = repo_write_count(actions)
     return {
         "mode": info["mode"],
@@ -1991,23 +2048,43 @@ def default_dest(tag: str) -> Path:
     return dest
 
 
+class _CloneFailed(Exception):
+    def __init__(self, message: str):
+        super().__init__(message)
+        self.message = message
+
+
+def _clone_release(tag: str, dest: Path | None, url: str) -> Path:
+    """Shallow clone of one tag: short temp dest, long paths, autocrlf off (1.190.0, 1.210.0)."""
+    dest = dest or default_dest(tag)
+    if dest.exists():
+        raise _CloneFailed(f"Refused: {dest} already exists.")
+    cmd = [
+        "git", "-c", "core.longpaths=true", "-c", "core.autocrlf=false", "clone", "--depth", "1",
+        "--config", "core.longpaths=true", "--config", "core.autocrlf=false", "--branch", tag, url, str(dest),
+    ]
+    result = subprocess.run(cmd, check=False, capture_output=True, text=True)
+    if result.returncode != 0:
+        shutil.rmtree(dest, ignore_errors=True)
+        detail = (result.stderr or result.stdout or "").strip().splitlines()
+        raise _CloneFailed(
+            f"Refused: the clone of {tag} failed: {detail[-1] if detail else 'no output'}. "
+            "Try a shorter --dest, such as a folder right under the system temp folder."
+        )
+    return dest
+
+
 def fetch_release(tag: str, dest: Path | None, url: str) -> Path:
     normalized = normalize_request(tag)
     if normalized is None or not RELEASE_TAG.fullmatch(normalized):
         refuse(refusal_reason(tag.strip()))
     if not normalized.startswith("v1."):
         refuse(f"Refused: {normalized} is not a 1.x release.")
-    dest = dest or default_dest(normalized)
-    if dest.exists():
-        refuse(f"Refused: {dest} already exists.")
-    cmd = ["git", "-c", "core.longpaths=true", "-c", "core.autocrlf=false", "clone", "--depth", "1",
-           "--config", "core.longpaths=true", "--config", "core.autocrlf=false", "--branch", normalized, url, str(dest)]
-    result = subprocess.run(cmd, check=False, capture_output=True, text=True)
-    if result.returncode != 0:
-        detail = (result.stderr or result.stdout or "").strip().splitlines()
-        refuse(f"Refused: the clone of {normalized} failed: {detail[-1] if detail else 'no output'}. "
-               "Try a shorter --dest, such as a folder right under the system temp folder.")
-    verify_checkout(dest)
+    try:
+        dest = _clone_release(normalized, dest, url)
+        verify_checkout(dest)
+    except _CloneFailed as exc:
+        refuse(exc.message)
     return dest
 
 
@@ -2017,8 +2094,56 @@ def verify_checkout(dest: Path) -> None:
     lines = [line for line in status.stdout.splitlines() if line.strip()]
     if status.returncode != 0 or lines:
         sample = ", ".join(line[3:] for line in lines[:3])
-        refuse(f"Refused: the checkout in {dest} is incomplete ({len(lines)} files differ{': ' + sample if sample else ''}), "
-               "often a Windows path-length limit. Delete it and fetch again with a shorter --dest; no plan was made.")
+        raise _CloneFailed(
+            f"Refused: the checkout in {dest} is incomplete ({len(lines)} files differ{': ' + sample if sample else ''}), "
+            "often a Windows path-length limit. Delete it and fetch again with a shorter --dest; no plan was made."
+        )
+
+
+def _kit2_releases_text(path: str | None) -> str:
+    """Tag list for the kit 2.0 lookup. ``--releases-file`` wins, then the test env, then ls-remote."""
+    if path:
+        return Path(path).read_text(encoding="utf-8")
+    forced = os.environ.get("CRAV1_KIT_RELEASES_FILE", "").strip()
+    if forced:
+        return Path(forced).read_text(encoding="utf-8")
+    result = subprocess.run(
+        ["git", "ls-remote", "--tags", "--refs", KIT_REPO],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=5,
+        stdin=subprocess.DEVNULL,
+    )
+    if result.returncode != 0:
+        raise OSError((result.stderr or result.stdout or "ls-remote failed").strip())
+    return result.stdout
+
+
+def kit2_release_tree(new_root: Path, releases_path: str | None, url: str) -> tuple[Path, bool, Path | None]:
+    """Tree whose ``v2/install.py`` runs: ``(tree, fell_back, cleanup)``.
+
+    ``fell_back`` means the newest published ``v2.0.0-*`` tag was not fetched, so a newer 2.0 may exist.
+    The caller deletes ``cleanup`` when it is set. A failed lookup or fetch keeps ``new_root``.
+    """
+    try:
+        tag = newest_v2_prerelease(_kit2_releases_text(releases_path))
+    except (OSError, UnicodeError, subprocess.SubprocessError):
+        return new_root, True, None
+    if not tag:
+        return new_root, True, None
+    dest: Path | None = None
+    try:
+        dest = _clone_release(tag, None, url)
+        verify_checkout(dest)
+    except _CloneFailed:
+        if dest is not None:
+            shutil.rmtree(dest, ignore_errors=True)
+        return new_root, True, None
+    if not (dest / "v2" / "install.py").is_file():
+        shutil.rmtree(dest, ignore_errors=True)
+        return new_root, True, None
+    return dest, False, dest
 
 
 def open_design_topics(root: Path) -> list[str]:
@@ -2033,10 +2158,23 @@ def open_design_topics(root: Path) -> list[str]:
     return out
 
 
-def ending_text(root: Path, uncommitted: int = 0, updated: bool = True, kit2: bool = False) -> str:
+def ending_text(
+    root: Path,
+    uncommitted: int = 0,
+    updated: bool = True,
+    kit2: bool = False,
+    kit2_current: bool = False,
+) -> str:
     """Name what this run changed. Do not say the kit files changed when none did (1.208.0)."""
     lines = ["Run next:"]
     topics = open_design_topics(root)
+    if kit2_current and not updated and not kit2:
+        lines.append("The repo kit is current and kit 2.0 is current. Nothing to do.")
+        for topic in topics:
+            lines += ["", f"Go on with the {topic.replace('-', ' ')} design topic:", f"`/crav1-design-architecture {topic}`"]
+        if uncommitted:
+            lines += ["", f"Uncommitted: {uncommitted} file{'s' if uncommitted != 1 else ''}; commit with `/crav1-finalize-commit` when ready."]
+        return "\n".join(lines) + "\n"
     reasons = []
     if updated:
         reasons.append("The kit files changed; reload the window so the new skills load.")
@@ -2147,12 +2285,35 @@ def flags_module():
     return _flags()
 
 
-def _attach_early(payload: dict, root: Path, new_root: Path, home: Path | None, dry: bool) -> dict:
-    """Add the kit 2.0 line when a flag file is present. No flag file leaves payload unchanged."""
+def _attach_early(
+    payload: dict,
+    root: Path,
+    new_root: Path,
+    home: Path | None,
+    dry: bool,
+    releases: str | None = None,
+    url: str = KIT_REPO,
+) -> dict:
+    """Add the kit 2.0 line when a flag file is present. No flag file leaves payload unchanged.
+
+    When ``kit2`` is on, the line comes from the newest published ``v2.0.0-*`` tag.
+    A failed lookup or fetch uses ``new_root`` and says a newer 2.0 may exist (1.210.0).
+    """
     module = _flags()
     if module is None:
         return payload
-    note, extra = module.early_access(root, new_root, home if home is not None else Path.home(), dry)
+    home_path = home if home is not None else Path.home()
+    state = module.read_flags(root)
+    tree = new_root
+    cleanup: Path | None = None
+    warn = False
+    if state.present and not state.malformed and state.values.get("kit2") is True:
+        tree, warn, cleanup = kit2_release_tree(new_root, releases, url)
+    try:
+        note, extra = module.early_access(root, tree, home_path, dry, warn=warn)
+    finally:
+        if cleanup is not None:
+            shutil.rmtree(cleanup, ignore_errors=True)
     if note:
         print(note, file=sys.stderr)
     if not extra:
@@ -2200,6 +2361,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--home")
     parser.add_argument("--to")
     parser.add_argument("--releases-file")
+    parser.add_argument("--list-unchanged", action="store_true", help="Include unchanged kit paths in the plan. The default keeps the count only.")
     parser.add_argument("--old")
     parser.add_argument("--new")
     parser.add_argument("--from-version", dest="from_version")
@@ -2215,6 +2377,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--uncommitted", type=int, default=0)
     parser.add_argument("--not-updated", action="store_true")
     parser.add_argument("--kit2", action="store_true", help="User-level kit 2.0 was installed or updated. Repo files may be unchanged.")
+    parser.add_argument("--kit2-current", action="store_true", help="The repo kit and kit 2.0 are already current. No reload line.")
     parser.add_argument("--vendor", default=None, help="cursor, claude, codex, or copilot. The default prefix stays /.")
     parser.add_argument("--add", action="append", default=[], help="vendor to install, such as codex. Uses the release tree and does not upgrade other vendors.")
     parser.add_argument("--remove", action="append", default=[], help="vendor to remove. Deletes only kit-owned files that match the release.")
@@ -2266,7 +2429,10 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "ending":
             sys.stdout.write(
-                with_vendor(ending_text(root, args.uncommitted, not args.not_updated, args.kit2), args.vendor)
+                with_vendor(
+                    ending_text(root, args.uncommitted, not args.not_updated, args.kit2, args.kit2_current),
+                    args.vendor,
+                )
             )
             return 0
         info = detect(root, home)
@@ -2285,7 +2451,10 @@ def main(argv: list[str] | None = None) -> int:
                     "branch": info.get("branch"),
                     "heads_up": info.get("heads_up"),
                     "writes_kit_files": False,
-                    "files": {"update": [], "add": [], "merge": [], "delete": [], "clash": [], "unchanged": [], "left_extra": []},
+                    "files": files_view(
+                        {key: [] for key in (*PLAN_CHANGED, "unchanged")},
+                        list_unchanged=args.list_unchanged,
+                    ),
                     "templates": {"update": [], "delete": [], "left": []},
                     "project_untouched": True,
                     "repo_writes": 0,
@@ -2300,7 +2469,12 @@ def main(argv: list[str] | None = None) -> int:
             actions = build_actions(root, Path(args.old), Path(args.new), hosts)
             names, source = read_selection(root)
             ensure_kit_json(root, actions, sorted(hosts) if source == "inferred" else names)
-            view = plan_view(info, actions, None if target is None else str(target))
+            view = plan_view(
+                info,
+                actions,
+                None if target is None else str(target),
+                list_unchanged=args.list_unchanged,
+            )
             view["vendors_from"] = source
             registry = migration_registry(Path(args.new), Path(args.migrations) if args.migrations else None)
             if registry and registry.is_file() and info.get("version") and target:
@@ -2310,8 +2484,10 @@ def main(argv: list[str] | None = None) -> int:
                 ]
             else:
                 view["migration_ids"] = []
-            view = _attach_early(view, root, Path(args.new), home, True)
+            view = _attach_early(view, root, Path(args.new), home, True, args.releases_file, args.url)
             view["card"] = update_card(int(view.get("repo_writes") or 0), kit2_install_planned(view), view.get("branch"))
+            if view.get("card") is None:
+                view["ending_args"] = ending_args(int(view.get("repo_writes") or 0), view.get("kit2_line"))
             _print(view)
             return 0
         if args.command == "apply":
@@ -2334,7 +2510,7 @@ def main(argv: list[str] | None = None) -> int:
                 sorted(hosts) if source == "inferred" else names,
             )
             dry = os.environ.get("CRAV1_KIT2_DRY_RUN") == "1"
-            merged = _attach_early(applied, root, Path(args.new), home, dry)
+            merged = _attach_early(applied, root, Path(args.new), home, dry, args.releases_file, args.url)
             merged["ending_args"] = ending_args(len(merged.get("touched") or []), merged.get("kit2_line"))
             _print(merged)
             return 0
