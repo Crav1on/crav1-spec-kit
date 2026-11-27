@@ -278,8 +278,8 @@ class CardRules(unittest.TestCase):
         self.assertEqual(bo.plain("A park-risk, B add-regression"), "note it as a risk, add a regression test")
         text = bo.offer("Tighten-plan batch", [{"id": "P1", "issue": "no 400 test", "options": "A add-regression; keep",
                                                 "recommendation": "A add-regression", "why": "the spec names a 400 reply"}])
-        self.assertIn("- P1 no 400 test. Why: the spec names a 400 reply. Yes: add a regression test.", text)
-        self.assertIn("Card: Tighten-plan batch: apply the recommendation?\nOn yes: P1 no 400 test: add a regression test.", text)
+        self.assertIn("- No 400 test (P1). Why: the spec names a 400 reply. Yes: add a regression test.", text)
+        self.assertIn("Card: Tighten-plan batch: apply the recommendation?\nOn yes: No 400 test (P1): add a regression test.", text)
         for bad in ("tick-from-verify", "park-risk", "add-regression", "| A ", " A add"):
             self.assertNotIn(bad, text)
 
@@ -289,10 +289,14 @@ class CardRules(unittest.TestCase):
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         card = mod.reopen_card("review-and-tighten-plan", ["tasks"], True)
-        self.assertTrue(card["result"].startswith("On yes:"))
-        jump = mod._jump_back_offer("P9", "add-to-spec", "/crav1-add-to-spec pr73")
+        self.assertNotIn("result", card)
+        self.assertIn("card", card)
+        self.assertIn("again", card["options"][0]["text"].lower())
+        jump = mod._jump_back_offer("P9", "add-to-spec", "/crav1-add-to-spec pr73", "Orders merge")
         self.assertEqual(jump["options"][0]["label"], "Record the code in the spec first (Recommended)")
-        self.assertTrue(jump["result"].startswith("On yes: /crav1-add-to-spec pr73"))
+        self.assertNotIn("result", jump)
+        self.assertEqual(jump["header"], "Orders merge (P9)")
+        self.assertIn("/crav1-add-to-spec pr73", jump["options"][0]["text"])
         for label in mod.PLAIN_LABELS.values():
             self.assertNotIn("/crav1-", label)
 
@@ -383,7 +387,8 @@ class ShouldFixes1119d(unittest.TestCase):
                  "PR 82 merged into develop at f6aad4d; Synced at still says 4ef3776 and misses two commits")
         self.assertEqual(out["offer"], "kind-conflict")
         self.assertEqual(len(out["options"]), 2)
-        self.assertTrue(out["result"].startswith("On yes:"))
+        self.assertNotIn("result", out)
+        self.assertIn("(", out["question"])
         self.assertIsNone(out["wrote"])
 
     def test_uncommitted_counts_notes(self):

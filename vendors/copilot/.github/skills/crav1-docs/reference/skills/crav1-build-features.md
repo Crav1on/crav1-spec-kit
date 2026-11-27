@@ -31,4 +31,4 @@ runs by itself: Opens `/crav1-create-feature-branch` and the several-tasks branc
 you run next: /crav1-open-pr
 first: `/crav1-build-features <slug-a> <slug-b>`
 walkthrough: from-plan-to-build.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-build-features.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-build-features.md

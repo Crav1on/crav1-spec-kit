@@ -22,4 +22,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-what-do-we-know-about-this
 first: `/crav1-explain-existing-system @docs/system/`
 walkthrough: from-explain-existing-system.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-explain-existing-system.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-explain-existing-system.md

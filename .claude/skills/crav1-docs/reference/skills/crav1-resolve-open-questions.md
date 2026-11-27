@@ -7,9 +7,12 @@ purpose: Walk Open questions and Conflict lines in spec.md one by one.
 use_when: Open questions remain
 prompt_note: Prompt budget: 2 for the question walk. On apply, the one confirm includes the proposed docs/playbooks name the first time, and the diff when the committed file was edited in the repo. A conflict still asks once. A value the user left out is outside the budget.
 reads: Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md`, including `docs/architecture/spec.md` since 1.181.0. It never reads `docs/architecture/designs/`.
-writes: Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes `- Blocks: whole slice`. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.
+writes: Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. After an Answer, a Cut from v0, or a settled Conflict line, `stale_state_lines.py` can append `Superseded <date> by <decision>.` to leftover notes and reword lines that still carry the old value, after the diff card. A verbatim quote is not changed. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes `- Blocks: whole slice`. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.
 leaves alone: Leaves application code and kept-open questions alone. Does not change `Answer:` or `Change:` lines in the playbook file. Does not copy a draft. Does not git-commit.
 flow:
+- after Answer or Cut from v0, and after a settled Conflict line, `stale_state_lines.py` lists leftover open-state notes and lines that still carry the old value.
+- One card, `Mark N notes superseded and update M lines?`, shows the diff.
+- On yes each note gains `Superseded <date> by <decision>.` The batch hint names the item, for example `Cut-off time (Q1) keep`.
 - does not walk `## Approval needed` and does not remove an `Approved:` line.
 - Folding an answer still removes that question's `Answered:` line.
 - One Open question at a time; keep it open or answer with impact; patch only that question, found by its words (`Q#` is display only).
@@ -41,4 +44,4 @@ runs by itself: On apply, a kept item opens `/crav1-add-to-spec` `references/fac
 you run next: /crav1-ado-sync; /crav1-plan-from-spec
 first: `/crav1-resolve-open-questions @docs/specs/<slug>/spec.md`
 walkthrough: from-draft-spec.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-resolve-open-questions.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-resolve-open-questions.md

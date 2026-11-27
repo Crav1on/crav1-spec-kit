@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import hashlib
 import subprocess
 import sys
 import tempfile
@@ -141,7 +142,8 @@ class N1StaleBaseline(unittest.TestCase):
         self.assertEqual([h["step"] for h in others], [])
 
     def test_clear_really_clears(self):
-        payload = must(["clear", "--root", str(self.root), "--step", "tighten-spec", "--yes"])
+        token = hashlib.sha256(b"reopen\ntighten-spec").hexdigest()[:12]
+        payload = must(["clear", "--root", str(self.root), "--step", "tighten-spec", "--card", token, "--yes"])
         self.assertEqual(payload["cleared"], "tighten-spec")
         by_id, _ = statuses(self.root)
         self.assertEqual(by_id["tighten-spec"], "keep")
@@ -295,7 +297,7 @@ class LabelAboveCommand(unittest.TestCase):
             ending = bw.next_for(state)["ending"]
             # 1.198.0: the label follows the step the branch is on.
             verb = {"verify": "Verify", "commit": "Commit"}.get(phase, "Build")
-            self.assertIn(f"{verb} T3 Record the decision on feat/orders-api:\n`/crav1-build-walk orders-api T3`", ending, phase)
+            self.assertIn(f"{verb} Record the decision (T3) on feat/orders-api:\n`/crav1-build-walk orders-api T3`", ending, phase)
             self.assertNotIn("\nbranch feat/", ending)
 
     def test_branch_run_endings(self):

@@ -74,11 +74,11 @@ class PhaseLabels(unittest.TestCase):
 
     def test_tick_and_verify_labels(self):
         self.assertIn("Tick T30, now that PR 85 is merged:", self.ending("tick")["ending"])
-        self.assertIn("Verify T30 Idempotent incoming on feat/orders-retry:", self.ending("verify")["ending"])
+        self.assertIn("Verify Idempotent incoming (T30) on feat/orders-retry:", self.ending("verify")["ending"])
 
     def test_short_title(self):
         label = self.bw._task_label({"id": "T30", "title": LONG})
-        self.assertEqual(label, "T30 Idempotent incoming")
+        self.assertEqual(label, "Idempotent incoming (T30)")
         long_one = "Add " + " ".join(["retry"] * 40)
         cut = self.bw.short_title(long_one)
         self.assertLessEqual(len(cut), 121)
@@ -152,7 +152,7 @@ class BuildWalkGate(unittest.TestCase):
         out = bw.next_for(bw.prepare_state(state))
         self.assertNotIn("T52", out["ending"])
         self.assertNotIn("feat/orders-api-separate-keys", out["ending"])
-        self.assertIn("Run the manual task T53 (manual, DEV) Check the DEV export page (no branch):", out["ending"])
+        self.assertIn("Run the manual task (manual, DEV) Check the DEV export page (T53) (no branch):", out["ending"])
         self.assertIn("`/crav1-build-walk T4`", out["ending"])
 
 

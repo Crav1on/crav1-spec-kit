@@ -189,7 +189,7 @@ class TaskNames(unittest.TestCase):
         self.assertNotIn("From develop and from develop", sentence)
         self.assertIn("Apply the CI build policy", sentence)
         label = bw._task_label({"id": "T5", "title": BRANCH_ROW.split(": ", 1)[1]})
-        self.assertEqual(label, "T5 Apply the CI build policy")
+        self.assertEqual(label, "Apply the CI build policy (T5)")
         manual = bw._task_label({"id": "T6", "title": MANUAL_ROW.split(": ", 1)[1]})
         self.assertNotIn("(manual", manual)
         self.assertNotIn("…", manual[:80])

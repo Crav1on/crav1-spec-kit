@@ -41,4 +41,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-review-pr; $crav1-pr-status
 first: `$crav1-open-pr @docs/specs/<slug>/`
 walkthrough: from-commit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-open-pr.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-open-pr.md

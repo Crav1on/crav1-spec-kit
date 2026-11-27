@@ -13,9 +13,9 @@ Ask the PR owners to merge, in this order:
 
 Held:
 - `feat/orders-fixes` (wave 2):
-  - T2 A test of the 404 for an unknown order — verified on feat/orders-fixes, waits for PR 7 to merge
-  - T3 A test of the order id guard — verified on feat/orders-fixes, waits for PR 7 to merge
-  - T4 PR 7 takes in develop after PR 6 merges, with the conflicts in app.py and tests/test_store.py resolved — waits for PR 6 to merge
+  - A test of the 404 for an unknown order (T2) — verified on feat/orders-fixes, waits for PR 7 to merge
+  - A test of the order id guard (T3) — verified on feat/orders-fixes, waits for PR 7 to merge
+  - PR 7 takes in develop after PR 6 merges, with the conflicts in app.py and tests/test_store.py resolved (T4) — waits for PR 6 to merge
 
 Merge these PRs, in this order:
 1. PR 7 (Person A's, you added T2 and T3, feat/orders-fixes): ticks T2 and T3.

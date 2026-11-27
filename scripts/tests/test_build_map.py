@@ -100,7 +100,7 @@ class BuildMap(unittest.TestCase):
         self.assertIn("Persist the decision", record)
         self.assertNotIn("Reject an unknown booking", record)
         self.assertIn("Reject an unknown booking", extra)
-        self.assertIn("- Tasks:\n  - T2 Reject an unknown booking\n", extra)
+        self.assertIn("- Tasks:\n  - Reject an unknown booking (T2)\n", extra)
         self.assertNotIn("Delivers", extra)  # 1.185.0
         receipt = text.split("### feat/cancel-booking-send-receipt", 1)[1]
         self.assertIn("Waits for:\n  - feat/cancel-extra", receipt)
@@ -444,7 +444,7 @@ class BuildMap(unittest.TestCase):
         text = result["markdown"]
         row = text.split("### ", 1)[1]
         self.assertIn("### feat/orders-cicd", text)
-        self.assertIn("- Tasks:\n  - T1 Disable pipelines 7\n", row)
+        self.assertIn("- Tasks:\n  - Disable pipelines 7 (T1)\n", row)
         self.assertNotIn("infra/ado", row.split("- Waits for:", 1)[0].split("- Tasks:", 1)[1])
         self.assertNotIn("(host setup)", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
         self.assertNotIn("committed later", row.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
@@ -465,7 +465,7 @@ class BuildMap(unittest.TestCase):
         plan = "# Plan\n\n## Approach\n\n1. Turn the pipelines off. (T1)\n"
         work = "Work item: 44 — task: T1 Turn off pipelines 7 and 24 (ADO: example/orders)\n"
         text = bm.build("cancel-booking", SPEC, plan, tasks, work)["markdown"]
-        self.assertIn("- Tasks:\n  - T1 Turn off pipelines 7 and 24\n", text)
+        self.assertIn("- Tasks:\n  - Turn off pipelines 7 and 24 (T1)\n", text)
         self.assertNotIn("infra/ado", text.split("- Tasks:", 1)[1].split("- Waits for:", 1)[0])
         long = "Persist " + " ".join(["word"] * 40)
         self.assertLessEqual(len(bm.short_name(long)), 80)

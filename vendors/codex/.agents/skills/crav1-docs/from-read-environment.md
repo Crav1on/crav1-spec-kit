@@ -57,4 +57,4 @@ A shared line keeps `shared with prod`. A prod-only line says `Seen in <host> pr
 
 Reference page: [read-environment](reference/skills/crav1-read-environment.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-read-environment.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/from-read-environment.md

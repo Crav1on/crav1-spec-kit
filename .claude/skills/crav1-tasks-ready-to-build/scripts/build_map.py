@@ -238,9 +238,14 @@ def _readable(text):
 
 
 def task_label(task_id, short):
-    """`T#` plus the short name. The Tasks field and the ready check use this."""
+    """The plain name, then the code in parentheses (1.207.0). The Tasks field and the ready check use this."""
+    code = f"T{task_id}"
     name = re.sub(r"\s+", " ", short or "").strip() or "work"
-    return f"T{task_id} {name}"
+    if name.startswith(code + " "):
+        name = name[len(code):].strip() or "work"
+    if name.endswith(f"({code})"):
+        return name
+    return f"{name} ({code})"
 
 
 def ready_next_line(labels, branch_name, slug=None):
@@ -1841,7 +1846,7 @@ def progress_state(directory):
 def map_marks(map_text):
     """The done marks already on build-map.md, as {task id: evidence} (1.173.0)."""
     marks = {}
-    for match in re.finditer(r"~~T(\d+)\b[^~\n]*~~ ✓ done \(", map_text or ""):
+    for match in re.finditer(r"~~(?:T(\d+)\b[^~\n]*|[^~\n]*\(T(\d+)\))~~ ✓ done \(", map_text or ""):
         start = match.end()
         depth = 1
         index = start
@@ -1855,7 +1860,7 @@ def map_marks(map_text):
                 break
             index += 1
         if depth == 0:
-            marks.setdefault(int(match.group(1)), map_text[start:index - 1])
+            marks.setdefault(int(match.group(1) or match.group(2)), map_text[start:index - 1])
     return marks
 
 
@@ -2726,11 +2731,16 @@ def report_by_branch(built, rows, slug=None):
             for task in open_tasks
         ]
         waits = {f"T{task['id']}": wait_reason(task, rows_by_num.get(task["id"])) for task in open_tasks if task["id"] not in ready_ids}
+        known = _ending_mod()._names_from([
+            task.get("run_label") or task.get("label") or task_label(task["id"], task.get("full") or task.get("short"))
+            for task in (group["branch"].get("tasks") or [])
+        ])
+        printed = {key: _ending_mod()._named_reason(value, known) for key, value in waits.items()}
         firsts = [task for task in open_tasks if task["id"] in ready_ids]
         if firsts:
             first = firsts[0]
             labels = [first.get("run_label") or first.get("label") or task_label(first["id"], first.get("full") or first.get("short"))]
-        entries = run_entries(labels, group["branch"]["name"], slug=slug, open_labels=open_labels, about=group["branch"].get("about"), waits=waits)
+        entries = run_entries(labels, group["branch"]["name"], slug=slug, open_labels=open_labels, about=group["branch"].get("about"), waits=printed)
         # next_lines carry the same entries as run_lines (1.155.0).
         for index, entry in enumerate(entries):
             if index == 0:

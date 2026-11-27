@@ -8,6 +8,8 @@
 
 Walk Open questions and Conflict lines in spec.md one by one.
 
+1.207.0: after Answer or Cut from v0, and after a settled Conflict line, `stale_state_lines.py` lists leftover open-state notes and lines that still carry the old value. A quote is excluded. One card, `Mark N notes superseded and update M lines?`, shows the diff. On yes each note gains `Superseded <date> by <decision>.` The batch hint names the item, for example `Cut-off time (Q1) keep`.
+
 1.149.0: the patch, a single named question, a stale research point, and the empty-list ending are references files, each read only when that case applies. The rules are unchanged.
 
 1.141.0: does not walk `## Approval needed` and does not remove an `Approved:` line. Folding an answer still removes that question's `Answered:` line.
@@ -59,7 +61,7 @@ Reads Open questions, unresolved assumptions and **Conflict:** lines in `spec.md
 
 In short: The picked question in the spec (with a linked answer's quote and source), a cleared research mark when no point stays open, and on apply the playbook copy plus a Playbook line on each spec it changed.
 
-Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes `- Blocks: whole slice`. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.
+Writes only the picked question into the spec, a constraint, a non-goal, or an ADR. When that answer settles a stale research point waiting on the question, re-checks the point and clears the mark when no point is open. It does not ask the user. A question with an `Answered:` line shows that answer and offers it first. An answer keeps that quote and source with the decision. After an Answer, a Cut from v0, or a settled Conflict line, `stale_state_lines.py` can append `Superseded <date> by <decision>.` to leftover notes and reword lines that still carry the old value, after the diff card (1.207.0). A verbatim quote is not changed. When `tasks.md` exists, None on a kept-open question writes `Blocks: none`. The whole slice writes `- Blocks: whole slice`. `apply <file>` also copies a filled playbook to `docs/playbooks/<topic>.md` through `scripts/playbook_store.py` and writes a Playbook line for that path on each spec it changed.
 
 ## Does not
 

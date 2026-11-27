@@ -106,8 +106,8 @@ class WalkEnding(unittest.TestCase):
 
     def test_ready_check_snapshot_shows_the_short_name(self):
         reply = (SNAP / "expected/reply.txt").read_text(encoding="utf-8")
-        self.assertIn("- T4 PR 7 takes in develop after PR 6 merges, with the conflicts in app.py and "
-                      "tests/test_store.py resolved — waits for PR 6 to merge\n", reply)
+        self.assertIn("- PR 7 takes in develop after PR 6 merges, with the conflicts in app.py and "
+                      "tests/test_store.py resolved (T4) — waits for PR 6 to merge\n", reply)
         self.assertNotIn("integration —", reply)
         self.assertNotIn("regression", reply)
 

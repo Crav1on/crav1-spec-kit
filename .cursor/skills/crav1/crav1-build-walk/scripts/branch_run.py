@@ -669,10 +669,20 @@ def _label(task) -> str:
     if isinstance(task, dict):
         ident = tid(task.get("id"))
         title = (task.get("title") or "").strip()
-        return f"{ident} {title}".strip()
+        number = int(ident[1:]) if ident[1:].isdigit() else ident
+        if title:
+            return f"{title} ({ident})" if isinstance(number, int) else f"{ident} {title}"
+        return ident
     text = str(task).strip()
+    wrapped = re.search(r"^(.*?)\s*\((T\d+)\)\s*$", text)
+    if wrapped and wrapped.group(1).strip():
+        return text
     match = re.match(r"^T?(\d+)\b\s*(.*)$", text, re.I)
-    return f"T{int(match.group(1))} {match.group(2)}".strip() if match else text
+    if not match:
+        return text
+    title = match.group(2).strip()
+    ident = f"T{int(match.group(1))}"
+    return f"{title} ({ident})" if title else ident
 
 
 _PR_IN_TEXT = re.compile(r"\b(?:PR|pull request)\s+#?(\d+)", re.I)
@@ -696,8 +706,12 @@ def state_from_progress(root: Path, branch: str, notes: list | None = None) -> d
     labels = {row["id"]: row.get("full") or row["label"] for row in plan.get("tasks") or []}
     built = []
     for row in run.get("built") or []:
-        label = labels.get(row["task"], row["task"])
-        title = label[len(row["task"]):].strip() if label.startswith(row["task"]) else ""
+        label = labels.get(row["task"]) or row["task"]
+        title = ""
+        if label.startswith(row["task"]):
+            title = label[len(row["task"]):].strip()
+        elif label.endswith(f"({row['task']})"):
+            title = label[: -len(f"({row['task']})")].strip()
         built.append({**row, "title": title})
     built_ids = {row["task"] for row in built}
     left_open = [tid_ for tid_ in plan.get("open") or [] if tid_ not in built_ids]
@@ -773,7 +787,9 @@ def ending(state: dict) -> dict:
             if row.get("tests"):
                 bits.append(f"tests {row['tests']}")
             tail = (": " + ", ".join(bits)) if bits else ""
-            rows.append(f"- {row.get('task')}{(' ' + row['title']) if row.get('title') else ''}{tail}")
+            shown = row.get("title") or ""
+            name = f"{shown} ({row.get('task')})" if shown else str(row.get("task"))
+            rows.append(f"- {name}{tail}")
     left = []
     if kind != "merge" and stop.get("line"):
         left.append(f"- Stopped: {stop['line']}")

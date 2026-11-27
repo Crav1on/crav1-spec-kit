@@ -114,6 +114,8 @@ a teammate whose repo already has `.githooks/commit-msg` but whose git config do
 
 every Run next example starts with its reason line, for example `The commit is only local.` above `Push the specs repo:` and `git push`.
 
+an unfinished spec walk comes first: `Resume the spec walk:` and `$crav1-tighten-and-plan-ready-to-build orders-api`.
+
 ## 1.199.0 changes
 
 `$crav1-finalize-commit commit-push` commits and then pushes once the fetch check says nothing was lost: one yes for both, never a force push. An `Uncommitted:` line names the command in a code span.
@@ -122,4 +124,4 @@ every Run next example starts with its reason line, for example `The commit is o
 
 `scripts/ending.py --vendor codex` prints the ending from the shared helper, Run next first. When a `design/<topic>` branch is checked out or owns the change, the helper shows a stay card and never offers the default branch.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-commit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/from-commit.md

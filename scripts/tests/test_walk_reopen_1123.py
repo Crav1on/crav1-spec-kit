@@ -8,6 +8,7 @@ The script stamps Done as a full timestamp.
 from __future__ import annotations
 
 import json
+import hashlib
 import re
 import sys
 import unittest
@@ -204,7 +205,8 @@ class InsideWalk(unittest.TestCase):
         ])
         self.assertEqual(code, 1)
         self.assertEqual(payload["code"], "not-reopened")
-        must(["clear", "--root", str(self.root), "--step", "tighten-spec", "--yes"])
+        must(["clear", "--root", str(self.root), "--step", "tighten-spec", "--card",
+              hashlib.sha256(b"reopen\ntighten-spec").hexdigest()[:12], "--yes"])
         text = (self.root / "walk-progress.md").read_text(encoding="utf-8")
         self.assertIn("Result: done", text)
         self.assertEqual(text.count(f"Done: {WHEN}"), 2)
@@ -232,7 +234,8 @@ class InsideWalk(unittest.TestCase):
         self.assertEqual(row["clear"], "nothing new")
         self.assertEqual(row["kind"], "blocker")
         self.assertIn(row, blocked["jump_back"])
-        must(["clear", "--root", str(self.root), "--step", "tighten-spec", "--yes"])
+        must(["clear", "--root", str(self.root), "--step", "tighten-spec", "--card",
+              hashlib.sha256(b"reopen\ntighten-spec").hexdigest()[:12], "--yes"])
         clear = must(["readiness", "--full", "--json", str(rows), "--root", str(self.root)])
         self.assertTrue(clear["ready"])
         self.assertEqual(clear["reopened"], [])

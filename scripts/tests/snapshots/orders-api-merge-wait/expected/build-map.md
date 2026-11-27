@@ -49,8 +49,8 @@ An arrow means the later branch waits for the earlier one.
 ### feat/orders-store
 
 - Tasks:
-  - ~~T1 Add the idempotency key column~~ ✓ done (feat/orders-store)
-  - T2 Store a retried order once
+  - ~~Add the idempotency key column (T1)~~ ✓ done (feat/orders-store)
+  - Store a retried order once (T2)
 - Waits for: none
 - Question: none
 - Ready now: built, waits for PR 11 to merge
@@ -60,8 +60,8 @@ An arrow means the later branch waits for the earlier one.
 ### feat/orders-cicd
 
 - Tasks:
-  - T3 Add the build pipeline
-  - T4 Take in develop after PR 11 merges
+  - Add the build pipeline (T3)
+  - Take in develop after PR 11 merges (T4)
 - Waits for:
   - feat/orders-store
 - Question: none
@@ -72,7 +72,7 @@ An arrow means the later branch waits for the earlier one.
 ### feat/orders-deploy
 
 - Tasks:
-  - T5 Add the deploy stage
+  - Add the deploy stage (T5)
 - Waits for:
   - feat/orders-cicd
 - Question: none

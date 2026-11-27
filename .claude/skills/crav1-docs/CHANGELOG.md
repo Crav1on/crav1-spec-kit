@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.207.0 (2026-11-27)
+
+Decisions are written back through the spec, leftover wording is a patch, and cards name the item.
+
+- **Decisions written back.** After an answer or a settled conflict, a check lists notes that still say the choice is open (`Possible answer`, `Waiting for`, `stands until`, `not a settlement`, a conflict line) and other lines that still carry the old date or the old option. A verbatim quote is left as it is. One card asks to mark the notes superseded and update the other lines, and shows the diff first.
+- **Stale wording is a patch.** A plan-review finding that only restates old wording offers to update that wording, or to keep it as an open point. Yes patches those lines and confirms the diff. It does not rerun the whole spec skill. When only notes or question context changed and the reviewer reported no scope drift, the plan is not reviewed again. A finding about an open question's wording goes to the open-questions step.
+- **Readable names.** A task, constraint, question, finding, or batch row is the plain name first and the code in parentheses, for example `Static-IP notes (P9)` or `Add login page (T3)`. A tight header uses a short name plus the code. The code stays searchable and typeable. A card does not repeat an On yes line that only restates the option. The background sentence is chat text before the card.
+- **No silent clear.** Clearing a reopened step needs the token from that step's own reopen card. The clear is not folded into another step's card. A stale-research mark written since the last walk record counts as stale seen.
+- **The right next step after a commit.** When the spec walk still has a reopened or unfinished step, the ending resumes that walk. Otherwise it resumes the build walk on the working branch, and it does not name main or master unless that branch is the one checked out.
+
+Docs and tests: question cards, the tighten-and-plan walkthrough, glossary, and `scripts/tests/test_kit_1207.py`.
+
 ## 1.206.0 (2026-11-27)
 
 Early-access flags for one repo, kept out of git. With no flag file, an update matches 1.205.0.
@@ -186,16 +198,5 @@ Fixes for spec findings in `/crav1-tighten-and-plan-ready-to-build`, from a live
 - **Add-to-spec before the plan review.** New `walk_progress.py code-drift` reads refs on disk (no fetch): when commits sit after a `Synced at` commit, or a merged pull request is not recorded, the walk asks one add-to-spec yes card before the plan review, and passes the drift to the reviewer as known context, not as a finding to echo.
 - **Merged since sync, one shared check.** New `crav1-add-to-spec` `scripts/merged_since_sync.py check` compares each branch in a spec's `Synced at:` lines with the base (the default branch, found as `design_run.py` does, or `--base`). When a branch merged since the recorded commit it asks ONE yes card: `PR <n> merged at <sha> with <k> commits the spec hasn't recorded. Take them in now?`. Yes runs the add-to-spec PR or branch step inline and `stamp --yes` moves `Synced at` to the merge; nothing is written without the yes, and headless runs only report. Used at the tighten-and-plan walk start, by `/crav1-pr-status`, the specs sweep (auto flow reports only), `/crav1-merge-pr` after a merge and `/crav1-build-walk` when a branch's pull request merged.
 - `scripts/tests/test_kit_1194.py` and the walkthrough `docs/from-tighten-and-plan.md`.
-
-## 1.193.0 (2026-11-19)
-
-Fixes from a review session on the sweep, commit, review-pr, pr-status and add-to-spec.
-
-- **Run next, not Next.** `/crav1-add-to-spec` (stop, PR comments, code-change, dump and meeting endings) and the sweep's `sweep_progress.py ending` end with Run next: `Run next:` first, the reason, the label on its own line and the command alone in its code span. `pr<n> candidates` with none left ends with a Run next naming `/crav1-pr-status pr<n>`. kit-lint fails on any `Next:` line in skill files and any script string that prints one; the skills not moved yet are listed with their counts in `scripts/next-line-baseline.tsv`, which may only shrink.
-- **One candidates rule.** `pr_common.py candidates --note <PR note>` decides spec and decision candidates for both `/crav1-pr-status` and `/crav1-add-to-spec pr<n> candidates`. A newer settled answer on a Point already `in spec <slug>` narrows the tag to `in spec <slug> (question)` (`pr_common.py answered`), so the Point is offered again; taking it writes `in spec <slug> <date>` (`pr_common.py in-spec`).
-- **Nothing in the spec before the yes.** In the sweep's manual flow only the note, the PR note and the Read line are written before the write card. `Synced at` waits for the yes: `sweep_progress.py synced-at` writes nothing without `--yes`, and the notes-only option writes no stamp.
-- **commit-now can ask the mention.** With several Feature lines in `work-item.md` and none clearly matching, `/crav1-finalize-commit commit-now` asks one card from `work_item_pick.py` (at most 4 options plus a typed Other) and never copies a mention from `git log` or the previous commit.
-- **ado_threads.py is the one Azure DevOps way.** New `pr` (description, votes), `iterations`, `changes`, `set-status --yes` (read back from the host) and `since-last` (against the PR note's Read line and saved description, never a temp file); `list` gives thread and comment dates. Output is UTF-8 JSON with accented characters intact. The add-to-spec, pr-status and review-pr docs no longer teach `az rest` or hand-made token calls.
-- `scripts/tests/test_kit_1193.py` (mocked Azure DevOps responses with non-ASCII text); the sweep ending tests use the Run next form. Claim ages read `CRAV1_NOW` when set; snapshot-check and the claim tests pin it, so they no longer fail once a fixture claim is 3 days old.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

@@ -107,10 +107,10 @@ When the code repo's local base branch is behind origin, the walk asks `Your loc
 
 ## 1.201.1 changes
 
-A task name is the outcome after a `` `fix/x` from `develop` `` clause. Parenthesised marks such as `(manual, secret, TEST, after person A's heads-up)` are dropped, so the label and the progress file's Tasks line stay the outcome. `claims.py add` prints the claim and leaves `claims.md` unchanged until the same command is run with `--yes`. A `--text` readiness read that does not pass `--write-map` does not add a `PR author` line. A task that waits on another pull request, `(after: PR 87)` or `after PR 87 merges`, stays held until the host says that pull request is merged. The walk ending says `waits for PR 87 to merge`, the same line as the ready check and the build map.
+A task name is the outcome after a `` `fix/x` from `develop` `` clause. Parenthesised marks such as `(manual, secret, TEST, after person A's heads-up)` are dropped, so the label and the progress file's Tasks line stay the outcome. the label is that name and the code in parentheses, for example `Add login page (T3)`. `claims.py add` prints the claim and leaves `claims.md` unchanged until the same command is run with `--yes`. A `--text` readiness read that does not pass `--write-map` does not add a `PR author` line. A task that waits on another pull request, `(after: PR 87)` or `after PR 87 merges`, stays held until the host says that pull request is merged. The walk ending says `waits for PR 87 to merge`, the same line as the ready check and the build map.
 
 ## 1.199.0 changes
 
 The merge card names a deploy or pipeline side effect only when `pipeline_trigger.py check --repo <code checkout> --branch <base>` in `crav1-merge-pr` finds a pipeline file whose trigger covers the base, and then only as a trigger, never that a deploy starts. `/crav1-open-pr` stops after one host read when the pull request is someone else's and up to date.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-build-walk.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/from-build-walk.md

@@ -171,7 +171,7 @@ class WalkOrder(unittest.TestCase):
     def test_first_listed_is_the_first_task(self):
         block = we.branch_block("feat/x", ["T1 a", "T2 b"], first="T1 a", waits={"T2": "waits on T1"})
         self.assertIn("Run only T1, the first task:", block)
-        self.assertIn("- T2 b (waits on T1)", block)
+        self.assertIn("- T2 b (waits on a (T1))", block)
 
 
 class Separation(unittest.TestCase):
@@ -195,7 +195,7 @@ class EndToEnd(unittest.TestCase):
         self.assertNotIn("merge main into develop", text)
         self.assertNotIn("Person A", text)
         self.assertIn("**feat/orders-api-fixes**\n" + "GetReceipts answers 404 for a cursor that matches no stored receipt." + "\n2 open tasks:", text)
-        self.assertIn("**feat/orders-cicd**\nOrders CI/CD: infra for dev, test and prod and pipeline with three stages.\n2 open tasks:", text)  # 1.171.0
+        self.assertIn("**feat/orders-cicd**\nOrders CI/CD: infra for dev, test and prod and pipeline with three stages.\n2 open tasks:", text)
         # 2: the long question is whole or cut at a word, never mid-word.
         line = next(row for row in text.splitlines() if "T25" in row and "open question" in row)
         quoted = line.split('"')[1]
@@ -204,8 +204,8 @@ class EndToEnd(unittest.TestCase):
         self.assertNotIn('"Client certificate."', text)
         self.assertIn('"Which certificate does the partner send when the gateway ends TLS?"', text)
         # 4: walk order, the reason, and the first task that can start.
-        self.assertIn("- T43 Incoming JSON body with only tag and content\n- T8 ", text)
-        self.assertRegex(text, r"- T8 [^\n]*\(waits on T5\)")
+        self.assertIn("- Incoming JSON body with only tag and content (T43)\n- Take in develop", text)
+        self.assertRegex(text, r"- Take in develop[^\n]*\(T8\) \(waits on T5\)")
         self.assertIn("Run only T43, the first task:", text)
         # 6: a rule between blocks.
         self.assertEqual(text.split("Held:")[0].count("\n\n---\n\n"), 2)

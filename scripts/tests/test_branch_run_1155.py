@@ -329,7 +329,7 @@ class EndingTests(unittest.TestCase):
         self.assertIn("Merge PR 12 into develop, after your yes:\n`/crav1-build-walk orders-api feat/orders-cicd`", text)
         self.assertIn("**feat/orders-dev-switch**\n1 open task:\n- T7\n\nRun T7:\n`/crav1-build-walk orders-api T7`", text)
         self.assertNotIn("`/crav1-build-walk orders-api feat/orders-dev-switch`", text)
-        self.assertIn("- T2 Add the build pipeline: commit a1b2c3d, tests green", text)
+        self.assertIn("- Add the build pipeline (T2): commit a1b2c3d, tests green", text)
         self.assertIn("- Skipped T4: open question", text)
         self.assertFalse(out["merges"])
         for line in text.splitlines():

@@ -13,10 +13,10 @@ Ask the PR owners to merge, in this order:
 
 Held:
 - `feat/orders-cicd` (wave 1):
-  - T43 Add the build pipeline — waits for PR 21 to merge
-  - T47 Add the deploy stage — waits for PR 21 to merge
+  - Add the build pipeline (T43) — waits for PR 21 to merge
+  - Add the deploy stage (T47) — waits for PR 21 to merge
 - `feat/orders-smoke` (wave 2):
-  - T48 Add smoke tests — held, waits on PR 21 to merge (T47, recorded)
+  - Add smoke tests (T48) — held, waits on PR 21 to merge (T47, recorded)
 
 Merge these PRs, in this order:
 1. PR 21 (Person A's, you added T47, feat/orders-cicd): ticks T43 and T47, then T48 can start.

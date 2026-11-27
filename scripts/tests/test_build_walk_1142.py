@@ -107,9 +107,9 @@ class SingleNext(unittest.TestCase):
             ],
         })
         self.assertEqual(result["count"], 2)
-        self.assertIn("T3 Apply the CI build policy", result["next"][0])
+        self.assertIn("Apply the CI build policy (T3)", result["next"][0])
         self.assertIn(BRANCH, result["next"][0])
-        self.assertIn("T5 Note the policy", result["next"][1])
+        self.assertIn("Note the policy (T5)", result["next"][1])
         self.assertIn(NOTE, result["next"][1])
         for line in result["next"]:
             self.assertNotIn("Next:", line)
@@ -371,9 +371,9 @@ class Command(unittest.TestCase):
 
 class RunNext(unittest.TestCase):
     def test_t_prefix_is_not_doubled(self):
-        self.assertEqual(bw._task_label({"id": "T27", "title": "Record the decision"}), "T27 Record the decision")
-        self.assertEqual(bw._task_label({"id": 27, "title": "Record the decision"}), "T27 Record the decision")
-        self.assertEqual(bw._task_label({"id": "27", "title": "Record the decision"}), "T27 Record the decision")
+        self.assertEqual(bw._task_label({"id": "T27", "title": "Record the decision"}), "Record the decision (T27)")
+        self.assertEqual(bw._task_label({"id": 27, "title": "Record the decision"}), "Record the decision (T27)")
+        self.assertEqual(bw._task_label({"id": "27", "title": "Record the decision"}), "Record the decision (T27)")
         self.assertNotIn("TT27", bw._task_label({"id": "T27", "title": "Record the decision"}))
 
     def test_in_walk_ending_puts_the_command_alone_then_the_branch(self):
@@ -385,7 +385,8 @@ class RunNext(unittest.TestCase):
         self.assertEqual(commands, ["`/crav1-build-walk orders-api T3`"])
         # 1.176.0: the label sits above the command, nothing lowercase under it.
         label = ending.splitlines()[ending.splitlines().index(commands[0]) - 1]
-        self.assertTrue(label.startswith("Verify T3 "))  # 1.198.0: the label follows the phase
+        self.assertTrue(label.startswith("Verify "))  # 1.198.0: the label follows the phase
+        self.assertIn("(T3)", label)
         self.assertTrue(label.endswith(f" on {BRANCH}:"))
         self.assertIn("Apply the CI build policy", label)
         self.assertNotIn("because", commands[0])

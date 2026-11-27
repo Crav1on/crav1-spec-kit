@@ -153,7 +153,7 @@ class WalkEndingRunNextOnly(unittest.TestCase):
     def test_held_step_says_why_on_waiting(self):
         out = bw.next_for(state(phase="approval"))
         self.assertIn("`/crav1-show-or-ask-open-questions`", out["ending"])
-        self.assertIn("Waiting: an answer on the approval that holds T3 Apply the CI build policy.",  # plain Waiting line, 1.164.0
+        self.assertIn("Waiting: an answer on the approval that holds Apply the CI build policy (T3).",
                       out["ending"])
         merge = bw.next_for(state(phase="wait-merge", owner="other"))
         self.assertIn("Waiting: pull request 51 to be merged, then the tasks on feat/orders-host-setup-scripts are ticked.",  # 1.164.0

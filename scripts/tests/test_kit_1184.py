@@ -90,16 +90,16 @@ class WalkNamesEveryTask(unittest.TestCase):
                                "--step", "wait-merge", "--result", "waits for PR 73 to merge", "--yes")
             self.assertEqual(code, 0, out)
             text = (root / "build-progress/feat--orders-cicd.md").read_text(encoding="utf-8")
-            self.assertIn("Tasks: T43 Add the build pipeline, T47 Add the deploy stage\n", text)
+            self.assertIn("Tasks: Add the build pipeline (T43), Add the deploy stage (T47)\n", text)
             self.assertIn("Result: done (T47: orders-api af772f5", text)
 
 
 class ReadyCheck(unittest.TestCase):
     def test_snapshot_reply(self):
         reply = (SNAP / "expected/reply.txt").read_text(encoding="utf-8")
-        self.assertIn("T47 Add the deploy stage — waits for PR 73 to merge", reply)
+        self.assertIn("Add the deploy stage (T47) — waits for PR 73 to merge", reply)
         self.assertIn("ticks T43 and T47, then T8 can start.", reply)
-        self.assertIn("T8 Add smoke tests — held, waits on PR 73 to merge (T47, recorded)", reply)
+        self.assertIn("Add smoke tests (T8) — held, waits on PR 73 to merge (T47, recorded)", reply)
         self.assertNotIn("is yours; the walk resumes it", reply)
         self.assertNotIn("/crav1-build-walk orders-api-old-build-step T47", reply)
 

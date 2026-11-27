@@ -53,6 +53,8 @@ A mail, a transcript, a chat, a screenshot, or another original that is quoted i
 
 No `plan.md`. No `tasks.md`. No application code. A missing `docs/system/` is not seeded here. This command does not create `glossary.md`. When that file already exists, a new row from the new information can be one of the listed edits. It is not written unless apply is chosen. A meaning the new information does not state is `to be researched`. Existing rows are not rewritten. A quote that is a yes for an `## Approval needed` item is not written as `Answered:` or `Approved:` (1.141.0). Name [Record a person's yes](from-record-approval.md).
 
+Since 1.207.0 a clear answer also runs the stale-state check. Notes that still say the choice is open, and lines that still carry the old value, are one card with a diff. On yes each note gains `Superseded <date> by <decision>.` A verbatim quote is left as it is.
+
 ## After
 
 When this changed an existing spec, the run ends as [How a run ends](reference/run-ending.md) says:

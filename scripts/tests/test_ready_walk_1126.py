@@ -400,7 +400,7 @@ class WalkWording(unittest.TestCase):
         self.assertIn("/crav1-show-or-ask-open-questions <slug>", readiness)
         self.assertIn("does not write `Reviewed:`", readiness)
         self.assertIn("even for a small patch", steps)
-        self.assertIn("clear --step <id> --yes", steps)
+        self.assertIn("clear --step <id> --card <token> --yes", steps)
         self.assertIn("keeps an earlier `done` Result", steps)
         self.assertIn("One `record` call per step", steps)
         self.assertIn("refuses more than one step", common)

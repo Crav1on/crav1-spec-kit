@@ -130,16 +130,16 @@ class ReadyPartial(unittest.TestCase):
         self.assertEqual(payload["can_start"], ["T1", "T2"])
         self.assertEqual(payload["held"], ["T3", "T4", "T5"])
         self.assertIn("Ready now", payload["line"])
-        self.assertIn("T1 Record the decision", payload["line"])
-        self.assertIn("T2 Store the card", payload["line"])
+        self.assertIn("Record the decision (T1)", payload["line"])
+        self.assertIn("Store the card (T2)", payload["line"])
         self.assertIn("Held", payload["line"])
-        self.assertIn("T3 Choose the currency", payload["line"])
+        self.assertIn("Choose the currency (T3)", payload["line"])
         self.assertIn("held, waits on T3", payload["line"])
         self.assertNotIn("Held from", payload["line"])
         self.assertIn("`/crav1-build-walk", payload["ending"])
-        self.assertIn("T1 Record the decision", payload["ending"])
-        self.assertIn("T2 Store the card", payload["ending"])
-        self.assertNotIn("Next: /crav1-build-walk T1 Record the decision", payload["ending"])
+        self.assertIn("Record the decision (T1)", payload["ending"])
+        self.assertIn("Store the card (T2)", payload["ending"])
+        self.assertNotIn("Next: /crav1-build-walk Record the decision (T1)", payload["ending"])
         self.assertIn("/crav1-build-tasks builds one task without the walk.", payload["next"])
         self.assertNotIn("/crav1-build-walk", payload["next"])
         self.assertNotIn("/crav1-build-tasks T1", payload["next"])
@@ -175,7 +175,7 @@ class ReadyPartial(unittest.TestCase):
         self.assertTrue(payload["ready"])
         self.assertEqual(payload["can_start"], ["T1"])
         self.assertIn("/crav1-build-walk", payload["ending"])
-        self.assertIn("T1 Record the decision", payload["ending"])
+        self.assertIn("Record the decision (T1)", payload["ending"])
         self.assertNotIn("/crav1-build-walk", payload["next"])
         self.assertEqual(payload["held"], [])
         self.assertIsNone(payload["line"])
@@ -293,11 +293,11 @@ Reviewed: 2026-11-11, P# open: 0
 """
         text = self.bm.build("cancel-booking", spec, plan, tasks, "", verify)["markdown"]
         self.assertIn(
-            "~~T1 Persist the decision~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))",
+            "~~Persist the decision (T1)~~ ✓ done ([PR 12](https://github.com/contoso/orders-api/pull/12))",
             text,
         )
-        self.assertIn("~~T2 Store the card~~ ✓ done (feat/orders-card)", text)
-        self.assertIn("T3 Email the receipt", text)
+        self.assertIn("~~Store the card (T2)~~ ✓ done (feat/orders-card)", text)
+        self.assertIn("Email the receipt (T3)", text)
         self.assertNotIn("Nothing left to build.", text)
         tasks_lines = [line for line in text.splitlines() if line.startswith("- Tasks:")]
         self.assertTrue(tasks_lines)
@@ -319,8 +319,8 @@ Reviewed: 2026-11-11, P# open: 0
         self.assertIn("## Wave 1:", body)
         self.assertIn("### feat/orders-retry", body)
         self.assertIn("### feat/orders-card", body)
-        self.assertIn("~~T1 Persist the decision~~", body)  # 1.185.0: from Tasks, Delivers is gone
-        self.assertIn("~~T2 Store the card~~", body)
+        self.assertIn("~~Persist the decision (T1)~~", body)  # 1.185.0: from Tasks, Delivers is gone
+        self.assertIn("~~Store the card (T2)~~", body)
         self.assertIn(", 2 done", body)
         outside = text.split("</details>", 1)[1]
         self.assertIn("### feat/cancel-booking-send-receipt", outside)

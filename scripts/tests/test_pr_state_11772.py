@@ -151,7 +151,7 @@ class MergedOnHost(unittest.TestCase):
             self.assertEqual(rows["T5"]["bucket"], "done")
             self.assertNotEqual(rows["T6"]["bucket"], "waiting")
             build_map = (root / "build-map.md").read_text(encoding="utf-8")
-            self.assertIn("~~T5 Orders README~~ ✓ done", build_map)
+            self.assertIn("~~Orders README (T5)~~ ✓ done", build_map)
             self.assertEqual(wp.map_mod().progress_shas(root).get(5), SHA[:12])
             self.assertIn("Build map: docs/specs/orders/build-map.md (updated)", text)
             # The next run finds nothing new: no second merge result, map unchanged.

@@ -323,6 +323,7 @@ marks:
 - label-inferred | `**Inferred:** <connection the source does not state>` | docs/specs/<slug>/spec.md | A connection the kit drew. Not an accepted fact. | write: add-to-spec | read: — | 1.0.0
 - full-source | `Full source: docs/notes/YYYY-MM/<file>.md[; <second note>]` | docs/specs/<slug>/spec.md (after a point) | The note that holds the full input a point came from. | write: add-to-spec, bundle-to-specs, ideas-to-spec, spark-to-spec, tighten-spec, existing-to-specs | read: add-to-spec | 1.60.0
 - conflict | `**Conflict:** "<new words>" (Full source: <note>) vs the line above` | docs/specs/<slug>/spec.md (under the point it disagrees with) | A new source disagrees with a point, or two sides of a merge do; the user decides with $crav1-resolve-open-questions. | write: add-to-spec, finalize-commit | read: resolve-open-questions | 1.61.0
+- superseded | `Superseded <YYYY-MM-DD> by <decision>.` | docs/specs/<slug>/spec.md (on a note under a settled constraint or question) | A sub-note that still described an open choice after that choice was settled. A verbatim quote is not rewritten. | write: resolve-open-questions, add-to-spec | read: resolve-open-questions | 1.207.0
 - source-line | `Source: docs/sources/YYYY-MM-DD-<slug>/` | docs/specs/<slug>/spec.md (after a quote) | The imported original a quote comes from. | write: add-to-spec | read: — | 1.37.0
 - trace | `[- ]Trace: <source> — <what this pass marked new, already there, and inferred>` | docs/specs/<slug>/spec.md (under ## Trace) | One line per pass on what it added. | write: add-to-spec, bundle-to-specs, existing-to-specs | read: — | 1.30.0
 - seen-in | `Seen in <host> <environment>.` | docs/specs/<slug>/spec.md; docs/architecture/spec.md; docs/system/*.md | A fact read from a live environment, with where it was seen. | write: add-to-spec, existing-to-specs, refresh-system-notes | read: read-environment | 1.13.0
@@ -467,4 +468,4 @@ marks:
 
 The old names were removed in 1.58.0; the [renamed skills](../README.md#renamed-skills-1560) table maps each old name to the new one. A merged skill keeps each old skill's rules in `.cursor/skills/crav1/<skill>/branches/<id>/BRANCH.md`.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/concepts/data-layout.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/concepts/data-layout.md

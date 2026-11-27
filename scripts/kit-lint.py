@@ -658,10 +658,22 @@ def card_option_parts(line):
     return rest[:cut].strip(), rest[cut + 2:].strip()
 
 
+_BARE_CODE = re.compile(r"^[TCPQSI]\d+$", re.I)
+
+
+def bare_code(text) -> bool:
+    """True when a card header or question is only a code such as P9 (1.207.0)."""
+    head = str(text or "").strip().strip("`").rstrip("?.")
+    return bool(_BARE_CODE.fullmatch(head))
+
+
 def card_hits(question, options):
     """Problems with one card: its question and its (label, description) options."""
     hits = []
-    if CARD_BRACKETS.search(question):
+    if bare_code(question):
+        hits.append("the question is only a code; name the item and keep the code in parentheses")
+    shown = re.sub(r"\s*\([TCPQSI]\d+\)", "", question, flags=re.I)
+    if CARD_BRACKETS.search(shown):
         hits.append("the question has brackets")
     for word in _jargon(question):
         hits.append(f"the question uses the kit term `{word}`")
@@ -670,6 +682,8 @@ def card_hits(question, options):
     if not options:
         hits.append("the card has no options")
     for index, (label, text) in enumerate(options):
+        if bare_code(label):
+            hits.append(f"option `{label}` is only a code; name the item and keep the code in parentheses")
         if len(re.findall(r"[A-Za-z0-9]+", text)) < 3:
             hits.append(f"option `{label}` does not say what happens")
         for word in _jargon(label + " " + text):

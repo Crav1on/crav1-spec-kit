@@ -141,6 +141,19 @@ def _rows_from_table(table: str) -> list[dict[str, str]]:
     return rows
 
 
+def shown_item(code: str, issue: str) -> str:
+    """Plain name first, the code in parentheses (1.207.0). The table's Id column stays the code."""
+    name = " ".join(str(issue or "").split())
+    code = str(code or "").strip()
+    if code and name.lower().startswith(code.lower() + " "):
+        name = name[len(code):].strip()
+    if name and name[0].islower():
+        name = name[0].upper() + name[1:]
+    if code and f"({code})" in name:
+        return name
+    return f"{name} ({code})" if code else (name or "This item")
+
+
 def card_text(title: str, table: str) -> str:
     """Card question built from table rows. Empty or header-only tables raise.
 
@@ -152,7 +165,7 @@ def card_text(title: str, table: str) -> str:
     rows = _rows_from_table(table)
     if not rows:
         raise BatchOfferError("card text needs the findings table rows")
-    parts = [f"{row['id']} {row['issue']}: {row['recommendation']}" for row in rows]
+    parts = [f"{shown_item(row['id'], row['issue'])}: {row['recommendation']}" for row in rows]
     n = len(rows)
     what = "the recommendation" if n == 1 else f"all {n} recommendations"
     return f"{name}: apply {what}?\nOn yes: " + "; ".join(parts) + "."
@@ -164,7 +177,7 @@ def bullets(items: list) -> str:
     for item in items:
         why = " ".join(str(item.get("why", "")).split())
         yes = plain(item.get("recommendation", ""))
-        line = f"- {item['id']} {' '.join(str(item['issue']).split())}."
+        line = f"- {shown_item(item['id'], item['issue'])}."
         if why:
             line += f" Why: {why.rstrip('.')}."
         line += f" Yes: {yes}."

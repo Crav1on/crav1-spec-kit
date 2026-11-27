@@ -84,8 +84,8 @@ class WaitMergeEnding(unittest.TestCase):
         ]))
         self.assertIn("`/crav1-build-walk orders-api feature/orders-incoming`", out["ending"])
         self.assertNotIn("T43, T8", out["ending"])
-        self.assertIn("- T43 Orders incoming: JSON body, tag and content", out["ending"])
-        self.assertIn("- T8 PR 73: take in develop, resolve conflicts, merge", out["ending"])
+        self.assertIn("- Orders incoming: JSON body, tag and content (T43)", out["ending"])
+        self.assertIn("- PR 73: take in develop, resolve conflicts, merge (T8)", out["ending"])
 
 
 class Lead(unittest.TestCase):
@@ -111,8 +111,9 @@ class FullNames(unittest.TestCase):
 
     def test_task_label_keeps_an_ellipsis(self):
         label = bw._task_label({"id": "T5", "title": "READMEs describe the table and..."})
-        self.assertTrue(label.endswith("..."), label)
-        self.assertEqual(bw._task_label({"id": "T3", "title": "Apply the policy."}), "T3 Apply the policy")
+        self.assertIn("...", label)
+        self.assertTrue(label.endswith("(T5)"), label)
+        self.assertEqual(bw._task_label({"id": "T3", "title": "Apply the policy."}), "Apply the policy (T3)")
 
     def test_ready_branches_use_the_full_name(self):
         src = read("crav1-tasks-ready-to-build/scripts/build_map.py")
@@ -123,7 +124,7 @@ class FullNames(unittest.TestCase):
         title = "Orders incoming: JSON body with only tag and content, metadata read from the header row"
         self.assertGreater(len(title), 80)
         label = bw._task_label({"id": "T43", "title": title})
-        self.assertEqual(label, "T43 " + title)
+        self.assertEqual(label, title + " (T43)")
         block = we.branch_block("feat/orders-incoming", [label], slug="orders-api")
         self.assertIn(title, block)
 

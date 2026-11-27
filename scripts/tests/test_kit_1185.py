@@ -38,8 +38,8 @@ class NestedLists(unittest.TestCase):
                 self.assertNotIn("; ", line)
 
     def test_done_item_on_its_own_sub_bullet(self):
-        self.assertIn("- Tasks:\n  - ~~T1 Add the idempotency key column~~ ✓ done (feat/orders-store)\n"
-                      "  - T2 Store a retried order once\n", MAP)
+        self.assertIn("- Tasks:\n  - ~~Add the idempotency key column (T1)~~ ✓ done (feat/orders-store)\n"
+                      "  - Store a retried order once (T2)\n", MAP)
         self.assertEqual(bm.map_marks(MAP), {1: "feat/orders-store"})
 
     def test_empty_waits_is_one_line(self):
@@ -55,8 +55,8 @@ class NestedLists(unittest.TestCase):
         out = bm.build("orders-api", "# Spec\n", None, tasks)
         text = out["markdown"]
         block = text.split("### feat/x", 1)[1]
-        self.assertIn("  - ~~T1 Add the column~~ ✓ done", block)
-        self.assertIn("  - T2 Store it once", block)
+        self.assertIn("  - ~~Add the column (T1)~~ ✓ done", block)
+        self.assertIn("  - Store it once (T2)", block)
 
     def test_diagram_unchanged_by_the_block_format(self):
         diagram = MAP.split("```mermaid", 1)[1].split("```", 1)[0]

@@ -244,7 +244,7 @@ class RunNextChoiceTests(unittest.TestCase):
                                              "open_tasks": [{"id": "T1", "title": "Add the build pipeline"},
                                                             {"id": "T2", "title": "Add the test stage"}]}]})
         text = out["ending"]
-        self.assertIn("**feat/orders-cicd**\nAdd the build pipeline and add the test stage.\n2 open tasks:\n- T1 Add the build pipeline\n- T2 Add the test stage", text)
+        self.assertIn("**feat/orders-cicd**\nAdd the build pipeline and add the test stage.\n2 open tasks:\n- Add the build pipeline (T1)\n- Add the test stage (T2)", text)
         self.assertIn("Run the whole branch:\n`/crav1-build-walk orders-api feat/orders-cicd`\nRun only T1, the first task:\n`/crav1-build-walk orders-api T1`", text)
 
 
