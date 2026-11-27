@@ -43,4 +43,4 @@ It does not look at how `docs/notes/` is laid out. Notes still flat in `docs/not
 
 Reference page: [refresh-system-notes](reference/skills/crav1-refresh-system-notes.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-refresh-system-notes.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-refresh-system-notes.md

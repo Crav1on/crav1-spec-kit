@@ -44,4 +44,4 @@ runs by itself: On apply, a kept item opens `$crav1-add-to-spec` `references/fac
 you run next: $crav1-ado-sync; $crav1-plan-from-spec
 first: `$crav1-resolve-open-questions @docs/specs/<slug>/spec.md`
 walkthrough: from-draft-spec.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-resolve-open-questions.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-resolve-open-questions.md

@@ -71,4 +71,4 @@ The full rules are in [sources.md](../../.cursor/skills/crav1/crav1-add-to-spec/
 - [Data layout](data-layout.md) for the source folder and its `README.md`.
 - [Glossary](glossary.md).
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/concepts/data-policy.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/concepts/data-policy.md

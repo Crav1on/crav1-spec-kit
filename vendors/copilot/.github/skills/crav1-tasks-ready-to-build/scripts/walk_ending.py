@@ -537,6 +537,11 @@ def question_text(text, limit=160, quote=None):
     units = [unit for unit in units if unit]
     if not units and not (quote or inline):
         return ""
+    # A statement or a raw reply gives way to the question sentence (1.209.0).
+    # A pointer still prefers the quote that follows it.
+    questions = [unit for unit in units if _unquote(unit).endswith("?")]
+    if questions and units and not _unquote(units[0]).endswith("?") and not _pointer(units[0]):
+        return shorten(_unquote(questions[0]), limit)
     real = [u for u in units if not _pointer(u) and (len(u.split()) >= 4 or u.endswith("?"))]
     pointer = any(_pointer(u) for u in units)
     if pointer:
@@ -585,7 +590,21 @@ def _names_from(labels) -> dict:
 
 
 def _named_reason(reason: str, names: dict) -> str:
-    """`waits on T5` prints as `waits on Archive the receipt (T5)` when that name is known."""
+    """A waits-on list stays T numbers: `waits on T3, T5` (1.209.0).
+
+    Readable `Name (T#)` stays on the task itself. A pull-request wait is
+    left as it is. Any other T number becomes `Name (T#)` when that name is known.
+    """
+    if re.search(r"(?i)\bwaits on\s+PR\b", reason):
+        return reason
+    if re.search(r"(?i)\bwaits on\b", reason):
+        ids = list(dict.fromkeys(re.findall(r"\bT\d+\b", reason)))
+        if ids:
+            lead = "held, " if reason.lower().startswith("held,") else ""
+            tail = "".join(f" {token}" for token in ("(recorded)", "(inferred)", "(not built)") if token in reason)
+            return f"{lead}waits on {', '.join(ids)}{tail}"
+        return reason
+
     def repl(match):
         code = match.group(0)
         name = names.get(code)

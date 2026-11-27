@@ -99,4 +99,4 @@ Reference page: [bundle-to-specs](reference/skills/crav1-bundle-to-specs.md)
 
 `$crav1-bundle-to-specs` ends with one plain line, as [How a run ends](reference/run-ending.md) says. `Left: 2 gaps to tighten, 3 open questions. Next: $crav1-tighten-spec orders-retry, because those gaps are still in the spec.` When nothing is left: `Nothing left to tighten. Next: $crav1-plan-from-spec orders-retry, because the spec is tight enough to plan.`
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-bundle-to-specs.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-bundle-to-specs.md

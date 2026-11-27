@@ -171,7 +171,7 @@ class WalkOrder(unittest.TestCase):
     def test_first_listed_is_the_first_task(self):
         block = we.branch_block("feat/x", ["T1 a", "T2 b"], first="T1 a", waits={"T2": "waits on T1"})
         self.assertIn("Run only T1, the first task:", block)
-        self.assertIn("- T2 b (waits on a (T1))", block)
+        self.assertIn("- T2 b (waits on T1)", block)
 
 
 class Separation(unittest.TestCase):

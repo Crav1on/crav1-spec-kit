@@ -54,6 +54,10 @@ QUESTION_TAG = re.compile(r"\(question:\s*([^)]+)\)", re.I)
 NAMED_BLOCKS = re.compile(r"\bblocks:?\s*((?:T\d+\s*(?:,\s*)?)+)", re.I)
 ASKED_WHO = re.compile(r"\bto\s+([^.,;]+)")
 PENDING_WHO = re.compile(r"\bfor\s+([^.,;]+)")
+# The question's own Q/question field is what a held line quotes (1.209.0).
+Q_FIELD = re.compile(r"^(?:q|question)\s*:\s*(.+)$", re.I)
+OWNER_FIELD = re.compile(r"^owner\s*:\s*(.+)$", re.I)
+ASK_FIELD = re.compile(r"^ask\s*:\s*(.+)$", re.I)
 # The question's own "Waiting for <who>" wins over the person named on Asked or Pending.
 WAITING_FOR = re.compile(
     r"\bwaiting for\s+(.+?)(?=\s+(?:to|on|before|until|about)\b|[,.;?!]|$)",
@@ -167,6 +171,35 @@ def _text_tasks(text, known):
 def _first_sentence(text):
     parts = re.split(r"(?<=[.!?])\s+", text.strip(), maxsplit=1)
     return parts[0].strip()
+
+
+def _field_value(pattern, marks):
+    found = None
+    for mark in marks or []:
+        match = pattern.match(str(mark).strip())
+        if match and match.group(1).strip():
+            found = match.group(1).strip().strip("\"'")
+    return found
+
+
+def question_prompt(bullet, marks):
+    """The question's own Q or question field, else None.
+
+    A statement, an answer line, or the user's raw reply on the bullet is
+    not this text (1.209.0).
+    """
+    from_mark = _field_value(Q_FIELD, marks)
+    if from_mark:
+        return from_mark
+    match = Q_FIELD.match(str(bullet or "").strip())
+    if match and match.group(1).strip():
+        return match.group(1).strip().strip("\"'")
+    return None
+
+
+def question_owner(marks):
+    """Who owns the answer, from owner: then Ask:. None when neither is recorded."""
+    return _field_value(OWNER_FIELD, marks) or _field_value(ASK_FIELD, marks)
 
 
 def _who_waiting(text):
@@ -310,9 +343,12 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
                 blocks_slice = True
         mark_who, asked = _who_asked(q["marks"])
         asked = asked or _said_asked(q["text"], q["marks"])
-        who = _who_waiting(q["text"]) or mark_who
+        # Ask/owner wins over Waiting for and over Asked or Pending (1.209.0).
+        field_owner = question_owner(q["marks"])
+        who = field_owner or _who_waiting(q["text"]) or mark_who
         out.append({
             "text": q["text"],
+            "prompt": question_prompt(q["text"], q["marks"]) or "",
             "quote": " ".join(part for part in q.get("quote") or [] if part),
             "key": question_key(q["text"]),
             "stable_key": question_stable_key(q["text"]),
@@ -320,6 +356,7 @@ def kept_open(text, task_ids=None, resolve_recorded=False):
             "tasks": tasks,
             "reason": reason,
             "who": who,
+            "owner_recorded": bool(field_owner),
             "asked": asked,
             "blocks_slice": blocks_slice,
             "inferred": mark == "inferred",

@@ -10,6 +10,9 @@ writes: Writes a list in the chat with summary counts, Ready and Held grouped by
 leaves alone: Leaves every file other than `build-map.md` alone, including `verify.md` and `claims.md`, except the `(map:)` or `(after:)` marks a confirmed `fix-loop` writes in `tasks.md`, and never reads Azure Boards. It fetches the specs repo first. It does not commit the map.
 limits: does not guess a dependency or a blocking link from task text. Where nothing is recorded it uses a fallback and marks the reason inferred. It writes no readiness marks except a confirmed `fix-loop`; review-plan, tighten-plan, plan-from-spec, and resolve-open-questions write them. The map is written only by `scripts/build_map.py --vendor copilot`.
 flow:
+- a held task quotes the question's own `Q` or `question` line, not a statement or a reply.
+- A waits-on list is T numbers only, for example `waits on T3, T5`.
+- Who is the `Ask` or `owner` line, and the runner only when none is recorded.
 - Held lists every held task, including one whose only wait is an `(after:)` on a task that is not built yet.
 - the readiness ending leaves out `/crav1-build-tasks builds one task without the walk.`; `/crav1-help status` names it.
 - when the merge list holds a pull request you opened, Run next leads with it, for example `Merge your PRs 71 and 73 first:` above `/crav1-merge-pr 71`, above the entry that resumes the walk; with none of yours nothing is added.
@@ -240,4 +243,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-build-walk; /crav1-build-tasks
 first: `/crav1-tasks-ready-to-build @docs/specs/<slug>/`
 walkthrough: from-tasks-ready-to-build.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-tasks-ready-to-build.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-tasks-ready-to-build.md

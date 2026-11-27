@@ -8,6 +8,8 @@
 
 List the tasks ready to build, for one spec or all, and why the others are blocked. Rewrites each slice build map.
 
+1.209.0: a held task quotes the question's own `Q` or `question` line, not a statement or a reply. A waits-on list is T numbers only, for example `waits on T3, T5`. Who is the `Ask` or `owner` line, and the runner only when none is recorded.
+
 1.202.0: Held lists every held task, including one whose only wait is an `(after:)` on a task that is not built yet. The reason is on that line.
 
 1.176.0: the readiness ending leaves out [`/crav1-build-tasks`](crav1-build-tasks.md) builds one task without the walk.`; [`/crav1-help`](crav1-help.md) status` names it.

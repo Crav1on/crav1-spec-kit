@@ -57,4 +57,4 @@ No `plan.md`. No `tasks.md`. A missing `docs/system/` is not seeded here.
 
 Reference page: [review-security](reference/skills/crav1-review-security.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-review-security.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-review-security.md

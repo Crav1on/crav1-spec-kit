@@ -60,4 +60,4 @@ runs by itself: Calls no skill. Runs `scripts/update_kit.py --vendor codex`.
 you run next: nothing needed now
 first: `$crav1-update-kit Update the kit in this consumer project.`
 walkthrough: from-update-kit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-update-kit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-update-kit.md
