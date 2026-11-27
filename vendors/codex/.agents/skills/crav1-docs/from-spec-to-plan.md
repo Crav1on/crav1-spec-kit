@@ -70,4 +70,4 @@ The run ends as [How a run ends](reference/run-ending.md) says: Run next, never 
 
 A task listed in `docs/specs/<slug>/claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md`, the plan step preserves those lines and says once which claimed tasks were kept.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-spec-to-plan.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-spec-to-plan.md

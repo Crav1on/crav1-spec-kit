@@ -43,4 +43,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-review-plan; /crav1-ado-sync; /crav1-tasks-ready-to-build; /crav1-build-tasks
 first: `/crav1-plan-from-spec @docs/specs/<slug>/ The spec is accepted. Write plan.md and tasks.md. Do not write code.`
 walkthrough: from-spec-to-plan.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-plan-from-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-plan-from-spec.md

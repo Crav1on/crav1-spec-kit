@@ -6,10 +6,18 @@ lane: cross-cutting | group: Start | starter: no | stage: stable | since: 1.131.
 purpose: Update the installed kit on the current branch to a published release.
 use_when: The installed kit should move to a published release, or an early-access flag should be listed or changed
 reads: Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, `.crav1/kit.json` when it exists, `.crav1/flags.local.json` when it exists, and the working tree. It does not read a branch or an open pull request as a target.
-writes: Writes kit-owned files on the current branch after a yes, including the Codex tree under `.agents/skills/` when Codex is selected, writes `.crav1/kit.json`, writes `.crav1/flags.local.json` and `.crav1/.gitignore` for `flags-on` and `flags-off`, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. `add codex` commits `Add CRAV1 kit vendor codex vX.Y.Z`. `remove codex` commits `Remove CRAV1 kit vendor codex vX.Y.Z`. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged. When `kit2` is on, the update installs kit 2.0 at user level from that same release.
+writes: Writes kit-owned files on the current branch after a yes, including the Codex tree under `.agents/skills/` when Codex is selected, writes `.crav1/kit.json`, writes `.crav1/flags.local.json` and `.crav1/.gitignore` for `flags-on` and `flags-off`, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. `add codex` commits `Add CRAV1 kit vendor codex vX.Y.Z`. `remove codex` commits `Remove CRAV1 kit vendor codex vX.Y.Z`. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged. When `kit2` is on, the update installs kit 2.0 at user level from the newest published `v2.0.0-*` pre-release, and from the bundled tree when that lookup or fetch fails.
 leaves alone: Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, the project's `.gitignore`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. A `crav1-2-` skill or agent, `.crav1-2/`, and `sot/` stay. Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit. With no flag file, kit 2.0 is not mentioned.
 limits: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 flow:
+- when `kit2` is on, plan and apply install kit 2.0 from the newest published `v2.0.0-*` pre-release.
+- The fetch uses the same short temp folder, `core.longpaths=true`, `core.autocrlf=false`, and clean check as `fetch`.
+- A failed lookup or fetch uses the bundled tree and `kit2_line` says a newer 2.0 may exist.
+- `kit2_line` names the version that will be installed and the version installed now.
+- When that engine already matches and `repo_writes` is 0, `card` is null and the ending says the repo kit is current and kit 2.0 is current, with nothing to do and no reload line.
+- The plan `files` object carries counts and the changed lists.
+- The unchanged list is omitted unless `--list-unchanged`.
+- Never pipe or redirect plan or apply output.
 - Pass apply `ending_args` to `update_kit.py ending`.
 - A user-level kit 2.0 install with no repo files changed says `Kit 2.0 installed in your user folder; reload to load its skills.` The plan `card` omits commit options when `repo_writes` is 0.
 - That card is `install-kit2` or `stop`.
@@ -60,4 +68,4 @@ runs by itself: Calls no skill. Runs `scripts/update_kit.py`.
 you run next: nothing needed now
 first: `/crav1-update-kit Update the kit in this consumer project.`
 walkthrough: from-update-kit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-update-kit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-update-kit.md

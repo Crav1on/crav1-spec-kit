@@ -17,4 +17,4 @@ runs by itself: Calls no skill.
 you run next: The lane it names (Specify, Plan, or Build)
 first: `/crav1-fix-bug Bug: <what is wrong> Seen: <verify | a report | production> Name the lane. Do not edit code. Do not open a pull request.`
 walkthrough: from-fix-bug.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-fix-bug.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-fix-bug.md

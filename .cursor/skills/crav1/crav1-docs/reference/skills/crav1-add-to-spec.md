@@ -88,4 +88,4 @@ runs by itself: A fact: Calls no skill. A dump: Calls no skill. A code change: C
 you run next: /crav1-tighten-spec; /crav1-finalize-commit
 first: `/crav1-add-to-spec @docs/specs/<slug>/ <the new information, in your words> Add this to that spec. Do not write code. Do not plan.`
 walkthrough: from-add.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-add-to-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-add-to-spec.md

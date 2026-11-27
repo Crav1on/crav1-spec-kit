@@ -14,4 +14,4 @@ called_by: Called by the user.
 runs by itself: Calls no skill.
 you run next: nothing in particular
 first: `$crav1-export-spec @docs/specs/<slug>/spec.md Export as EARS.`
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-export-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-export-spec.md

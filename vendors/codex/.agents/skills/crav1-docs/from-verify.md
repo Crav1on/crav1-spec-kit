@@ -85,4 +85,4 @@ there is one wording for evidence that passed while the row is still `[ ]`: `Imp
 
 When a test dependency is down, `$crav1-verify-build-against-spec` runs `scripts/dep_check.py containers --service <name>` first: a stopped docker or podman container, or a stopped podman machine, gets its start commands (`podman machine start`, `podman start <name>`), and an install is offered only when no runtime or container exists.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-verify.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-verify.md

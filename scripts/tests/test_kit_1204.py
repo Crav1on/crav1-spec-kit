@@ -288,6 +288,8 @@ class CodexRoundTrip(unittest.TestCase):
         body = json.loads(plan.stdout)
         paths = []
         for items in body["files"].values():
+            if not isinstance(items, list):
+                continue
             for item in items:
                 paths.append(item["path"] if isinstance(item, dict) else item)
         self.assertTrue(any(path.startswith(".cursor/") for path in paths))

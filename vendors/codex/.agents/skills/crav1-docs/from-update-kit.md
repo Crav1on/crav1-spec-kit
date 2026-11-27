@@ -33,7 +33,7 @@ A version looks like `$crav1-update-kit to v1.129.0`. `main`, a branch name, a c
 | --- | --- | --- |
 | Detect | — | Reads the installed version from `plugin.json` or the `Kit version:` line. Resolves the target tag. Refuses anything that is not a published release |
 | Heads-up | Read which branch you are on | Shows the branch, that only this branch gets the new kit, and that other branches stay on the old kit until you merge this branch into them. Says merge develop into the branch, and never rebase. Suggests merging first or switching branch when this branch should not move. Warns about uncommitted changes. Writes nothing until you answer |
-| Confirm | The plan's `card`. When repo files will change: `yes, write and commit (Recommended)`, `write only`, or `stop`. When the only change is kit 2.0 in the user folder: `install-kit2 (Recommended)` or `stop`. When `card` is null, there is nothing to commit and there is no card | A clash is on that same card. The recommendation keeps your edit. The free-text answer can say `path: keep` or `path: take` |
+| Confirm | The plan's `card`. When repo files will change: `yes, write and commit (Recommended)`, `write only`, or `stop`. When the only change is a newer kit 2.0 in the user folder: `install-kit2 (Recommended)` or `stop`. When `card` is null, there is nothing to commit and there is no card. When kit 2.0 is already current, that null card is not an install card | A clash is on that same card. The recommendation keeps your edit. The free-text answer can say `path: keep` or `path: take` |
 | Replace | — | Replaces kit files. Auto-merges edits that do not overlap. CRLF and LF compare equal, so a line-ending-only difference is an update, not a clash. The written file keeps the local line endings. Leaves specs, walk-progress, build-progress, plans, notes, and the build map alone. Updates a copied template only when it still matches the old kit apart from line endings |
 | Migrate | `apply (Recommended)` or `leave` | Dry-runs the version steps for this jump, lists them, and writes them only after `apply` |
 | Commit | — | On yes, one commit: `Update CRAV1 kit vA to vB`. Does not push unless you already said to push in this run |
@@ -44,7 +44,18 @@ A version looks like `$crav1-update-kit to v1.129.0`. `main`, a branch name, a c
 Run next: nothing needed now.
 ```
 
-Only a user-level kit 2.0 install: `Kit 2.0 installed in your user folder; reload to load its skills.` When files were written and not committed, the run adds one `Uncommitted:` line.
+Only a user-level kit 2.0 install: `Kit 2.0 installed in your user folder; reload to load its skills.` When the repo kit and kit 2.0 are both already current, the ending says so and has no reload line. When files were written and not committed, the run adds one `Uncommitted:` line.
+
+## 1.210.0 changes
+
+When `kit2` is on, the update installs kit 2.0 from the newest published `v2.0.0-*` pre-release. The script fetches that tag the same way it fetches a 1.x release: a short temp folder, long paths on, and autocrlf off, then a clean checkout check. When that lookup or fetch fails, the update uses the kit 2.0 tree bundled in the 1.x release and the line says a newer 2.0 may exist.
+
+```text
+Run next:
+The repo kit is current and kit 2.0 is current. Nothing to do.
+```
+
+`--list-unchanged` prints those paths. Do not pipe or redirect the plan or apply output (`| python -c`, `| head`, `>`).
 
 ## 1.208.0 changes
 
@@ -78,7 +89,7 @@ A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor
 
 `$crav1-update-kit` also takes `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. `flags-on kit2` turns on kit 2.0 for this repo. The kit writes `.crav1/flags.local.json` and lists `flags.local.json` in `.crav1/.gitignore`. The project's `.gitignore` is not changed.
 
-The next update installs kit 2.0 at user level from that same release when `kit2` is on. When `kit2` is off and kit 2.0 is installed, the update offers `uninstall-kit2` or `keep-kit2`. With no flag file, the update does not mention kit 2.0.
+The next update installs kit 2.0 at user level from the newest published `v2.0.0-*` pre-release when `kit2` is on. When `kit2` is off and kit 2.0 is installed, the update offers `uninstall-kit2` or `keep-kit2`. With no flag file, the update does not mention kit 2.0.
 
 ## 1.206.0 changes
 
@@ -88,4 +99,4 @@ The words are `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. `kit2` in
 
 A `crav1-` name pattern is not the list. A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are left alone: the update does not write, stage, or delete them. With no version, the target is the newest published 1.x tag. A `v2` tag, including `v2.0.0-alpha.1`, is not offered.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-update-kit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-update-kit.md

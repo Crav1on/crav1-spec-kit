@@ -279,6 +279,8 @@ class Kit2Install(unittest.TestCase):
         seed_kit(new, "1.205.0")
         seed_kit(root, "1.205.0")
         shutil.copytree(ROOT / "v2", new / "v2", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+        releases = base / "releases.txt"
+        releases.write_text("v1.205.0\n", encoding="utf-8")
         spec = root / "docs/specs/orders-api/spec.md"
         write(spec, "Orders for partner B.\n")
         write(root / "sot/index.md", "project source\n")
@@ -293,11 +295,11 @@ class Kit2Install(unittest.TestCase):
         write(plain_root / ".gitignore", "build/\n")
         plain = run_kit([
             "plan", "--old", str(old), "--new", str(new), "--to-version", "1.205.0",
-            "--root", str(plain_root), "--home", str(home),
+            "--root", str(plain_root), "--home", str(home), "--releases-file", str(releases),
         ])
         flagged = run_kit([
             "plan", "--old", str(old), "--new", str(new), "--to-version", "1.205.0",
-            "--root", str(root), "--home", str(home),
+            "--root", str(root), "--home", str(home), "--releases-file", str(releases),
         ])
         self.assertEqual(plain.returncode, 0, plain.stderr)
         self.assertEqual(flagged.returncode, 0, flagged.stderr)
@@ -305,9 +307,12 @@ class Kit2Install(unittest.TestCase):
         self.assertEqual(plain_body["files"], flagged_body["files"])
         self.assertNotIn("kit2_line", plain_body)
         self.assertIn("Kit 2.0: dry-run ", flagged_body["kit2_line"])
+        self.assertIn("Will install ", flagged_body["kit2_line"])
+        self.assertIn("installed now none", flagged_body["kit2_line"])
+        self.assertIn("A newer 2.0 may exist.", flagged_body["kit2_line"])
         applied = run_kit([
             "apply", "--old", str(old), "--new", str(new), "--yes",
-            "--root", str(root), "--home", str(home),
+            "--root", str(root), "--home", str(home), "--releases-file", str(releases),
         ])
         self.assertEqual(applied.returncode, 0, applied.stderr)
         applied_body = json.loads(applied.stdout)
@@ -324,7 +329,7 @@ class Kit2Install(unittest.TestCase):
         self.assertTrue((home / ".crav1-2" / "installed.json").is_file())
         offered = run_kit([
             "plan", "--old", str(old), "--new", str(new), "--to-version", "1.205.0",
-            "--root", str(root), "--home", str(home),
+            "--root", str(root), "--home", str(home), "--releases-file", str(releases),
         ])
         self.assertIn("uninstall offered", json.loads(offered.stdout)["kit2_line"])
         self.assertEqual(json.loads(offered.stdout)["files"], plain_body["files"])
@@ -382,7 +387,15 @@ class DryRunFlags(unittest.TestCase):
         write(proj / "docs/specs/orders-api/spec.md", "# Orders API\n")
         subprocess.run([*G, "-C", str(proj), "add", "-A"], check=True)
         subprocess.run([*G, "-C", str(proj), "commit", "-qm", "start"], check=True)
-        env = dict(os.environ, CRAV1_DRY_RUN_NO_CLIPBOARD="1", PYTHONUTF8="1", HOME=str(base / "home"))
+        releases = base / "releases.txt"
+        releases.write_text("v1.0.0\n", encoding="utf-8")
+        env = dict(
+            os.environ,
+            CRAV1_DRY_RUN_NO_CLIPBOARD="1",
+            PYTHONUTF8="1",
+            HOME=str(base / "home"),
+            CRAV1_KIT_RELEASES_FILE=str(releases),
+        )
         (base / "home").mkdir()
         first = subprocess.run(
             [sys.executable, "-X", "utf8", str(DRY), "--branch", "feat/kit-test", "--spec", "orders-api",

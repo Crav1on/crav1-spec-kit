@@ -42,4 +42,4 @@ Run next, with the reason "that approval is on record and the task can start" an
 
 Reference page: [record-approval](reference/skills/crav1-record-approval.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-record-approval.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-record-approval.md

@@ -165,6 +165,20 @@ _PLAN_KINDS = ("update", "add", "merge", "delete", "clash", "unchanged", "left_e
 _PLAN_SAMPLES = ("update", "add", "merge", "delete", "clash")
 
 
+def _plan_count(files: dict, kind: str) -> tuple[int, list]:
+    """Count one plan kind. A missing list uses ``files['counts']`` (1.210.0)."""
+    raw = files.get(kind)
+    if isinstance(raw, list):
+        return len(raw), raw
+    counts = files.get("counts")
+    if isinstance(counts, dict) and kind in counts:
+        try:
+            return int(counts[kind]), []
+        except (TypeError, ValueError):
+            return 0, []
+    return 0, []
+
+
 def _plan_summary(code: int, text: str) -> str:
     """Counts by kind, then at most 10 changed paths (1.201.0). Unchanged stays a count."""
     try:
@@ -179,10 +193,8 @@ def _plan_summary(code: int, text: str) -> str:
     samples: list[str] = []
     changed = 0
     for kind in _PLAN_KINDS:
-        items = files.get(kind) or []
-        if not isinstance(items, list):
-            items = []
-        counts.append(f"{kind} {len(items)}")
+        count, items = _plan_count(files, kind)
+        counts.append(f"{kind} {count}")
         if kind not in _PLAN_SAMPLES:
             continue
         for item in items:

@@ -2,6 +2,17 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.210.0 (2026-11-27)
+
+Kit 2.0 follows the newest published pre-release, and an update plan stays small.
+
+- **Kit 2.0 pre-release.** When `kit2` is on, plan and apply install kit 2.0 from the newest published `v2.0.0-*` tag. The fetch uses the same short temp folder, `core.longpaths=true`, `core.autocrlf=false`, and clean check as `fetch`. When that lookup or fetch fails, the run uses the bundled tree and `kit2_line` says a newer 2.0 may exist. The line names the version that will be installed and the version installed now.
+- **Already current.** When the installed `~/.crav1-2` engine already equals that version and `repo_writes` is 0, `card` is null. There is no install card. The ending says the repo kit is current and kit 2.0 is current, with nothing to do and no reload line.
+- **Compact plan.** `files` carries the counts plus the changed lists (`update`, `merge`, `add`, `delete`, `clash`, `left_extra`). The unchanged list is omitted unless `--list-unchanged`. A plan where nothing changes stays under about 20 KB.
+- **Script output.** Next to plan and apply, the update skill repeats the rule: never pipe or redirect the script output (`| python -c`, `| head`, `>`). Read it directly.
+
+Docs and tests: update-kit walkthrough, glossary, data layout, and `scripts/tests/test_kit_1210.py`.
+
 ## 1.209.0 (2026-11-27)
 
 Findings keep a topic, a held task quotes the question, and a dry run of a branch behind main does not pretend main-only files were deleted.
@@ -177,20 +188,5 @@ Fixes from a live spec walk: cleaner batch cards, a prod lint that judges each c
 - **Bare PR numbers from a specs-only checkout.** When no record names the number and this checkout holds no code, `pr_common.py resolve` checks the code repos in `repos.md` read-only and uses the single match, otherwise asks with those repos listed. It never suggests installing a CLI before the host is known. `/crav1-review-pr` ends with a Run next block when the host is still unknown.
 
 Docs and tests: the spec walk walkthrough, question cards, pr-common and marks; `scripts/tests/test_kit_1197.py`.
-
-## 1.196.0 (2026-11-20)
-
-Start checks that trust origin, claims that clear themselves, and fewer, plainer walk cards.
-
-- **Shared start check.** New `crav1-add-to-spec` `scripts/start_check.py`: one quiet `git fetch --prune origin` per checkout, `origin/<branch>` before a stale local branch, and a tip that is already merged is found with its merge commit and PR. `merged_since_sync.py check` and `walk_progress.py code-drift` use it; `--no-fetch` skips the fetch.
-- **Claims prune.** New `claims.py prune` clears claims whose tasks are all ticked or whose branch is merged into `origin/<base>`, with one summary line. It runs at the walk start and after `/crav1-merge-pr`. Unfinished claims are never cleared, finished claims get no age warning, and the "kept unchanged" lines are gone.
-- **Prod verify rule.** Verify runs on DEV or TEST; prod checks are read-only (health, version, config, existence). A prod-write check is its own task with an owner, the user's yes and a Risks line. New `plan_check.py lint` flags both; tighten-plan recommends DEV or TEST.
-- **Fewer cards.** `readiness --covered <step>` drops the reopen card when the reopen came only from a fact the walk just recorded and a finding covers it. Tighten-plan housekeeping applies with one summary line. The save rides on the step's last yes.
-- **Plain walk cards.** Batch cards show one background bullet per item, a short question and an `On yes:` line. Labels are plain words with no letters or internal names (label maps in `plan_check`, `batch_offer` and `walk_progress`). `suggest` is offered only for wording findings.
-- **Tickable at the start.** New `walk_progress.py tickable` ticks acceptance items whose verify row passes with evidence, in one line; when an open task touches the evidence it ticks now and adds a recheck line to that task's verify note.
-- **Endings.** The run ending prints the script's block exactly, Catch up first included; tighten-spec's last `Next:` lines became Run next blocks.
-- **Walk fixes.** A locked skill inside the walk prints no Run next or `Uncommitted:` line; `spec-finding` asks a `kind-conflict` card when code-drift text is passed as spec text; after a jump-back the walk follows its `continue` list; the plan reviewer runs in the foreground; the uncommitted count includes changed notes and sources.
-
-Docs and tests: walkthroughs for the build walk and the spec walk; `scripts/tests/test_kit_1196.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

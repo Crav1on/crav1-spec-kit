@@ -26,13 +26,13 @@ Known flags live in `scripts/flags.py` as `REGISTRY`. Each entry has a one-line 
 
 | Flag | Status | What it does |
 | --- | --- | --- |
-| `kit2` | experimental | On an update, install kit 2.0 at user level from that same release, through `v2/install.py`. Off, when `~/.crav1-2/installed.json` exists, offer uninstall |
+| `kit2` | experimental | On an update, install kit 2.0 at user level from the newest published `v2.0.0-*` pre-release, through `v2/install.py`. Off, when `~/.crav1-2/installed.json` exists, offer uninstall |
 
 ## kit2 on an update
 
-After `flags-on kit2`, continue the normal update on this branch (detect, plan, apply). The update installs kit 2.0, or updates it, from the release in `--new`. There is no separate clone.
+After `flags-on kit2`, continue the normal update on this branch (detect, plan, apply). `plan` and `apply` fetch the newest published `v2.0.0-*` pre-release and run `v2/install.py` from that tag. The script does that fetch. Do not clone it yourself. When the lookup or the fetch fails, they use the bundled tree in `--new` and the line says a newer 2.0 may exist. Never pipe or redirect the `plan` or `apply` output (`| python -c`, `| head`, `>`). Read it directly.
 
-The plan is a dry run of that install (`install dry-run`). Apply runs `install` after the kit files are written. The result is one `kit2_line`. The counts under `files` (`update`, `add`, `unchanged`, and the rest) do not change. Say the line once.
+The plan is a dry run of that install (`install dry-run`). Apply runs `install` after the kit files are written. The result is one `kit2_line`. It names the version that will be installed and the version installed now. When the installed engine already equals that version and `repo_writes` is 0, `card` is null. Do not show an install card. The counts under `files` stay the same. Say the line once.
 
 When `kit2` is false and `~/.crav1-2/installed.json` exists, the same line is the offer. Ask one card. Do not uninstall on the update yes.
 

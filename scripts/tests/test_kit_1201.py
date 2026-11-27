@@ -185,10 +185,18 @@ class GoldenPlanApply(unittest.TestCase):
             self.assertTrue(got.pop("card")["commits"])
             self.assertIn(".crav1/kit.json", got["files"]["add"])
             got["files"]["add"].remove(".crav1/kit.json")
+            counts = got["files"].get("counts")
+            if isinstance(counts, dict):
+                counts["add"] -= 1
             self.assertEqual(got, want)
-            self.assertFalse(any(path.startswith(".agents/") for paths in got["files"].values() for path in (
-                [item["path"] for item in paths] if paths and isinstance(paths[0], dict) else paths
-            )))
+            self.assertNotIn("unchanged", got["files"])
+            self.assertEqual(got["files"]["counts"]["unchanged"], 6)
+            self.assertFalse(any(
+                str(item["path"] if isinstance(item, dict) else item).startswith(".agents/")
+                for items in got["files"].values()
+                if isinstance(items, list)
+                for item in items
+            ))
             spec = (proj / "docs/specs/orders-api/spec.md").read_bytes()
             readme = (proj / "README.md").read_bytes()
             handmade = (proj / ".agents/skills/crav1-help/SKILL.md").read_bytes()
@@ -343,10 +351,18 @@ class VendorPrefix(unittest.TestCase):
 class PlanSummary(unittest.TestCase):
     def test_counts_by_kind_and_at_most_ten_paths(self):
         dry = load(DRY, "kit_dry_run_1201")
-        files = {kind: [] for kind in dry._PLAN_KINDS}
-        files["unchanged"] = [f".cursor/skills/crav1/crav1-help/f{i}.md" for i in range(30)]
+        files = {kind: [] for kind in ("update", "add", "merge", "delete", "clash", "left_extra")}
         files["update"] = [f".cursor/skills/crav1/crav1-docs/n{i}.md" for i in range(12)]
         files["add"] = [".cursor/skills/crav1/crav1-help/extra.md"]
+        files["counts"] = {
+            "update": 12,
+            "add": 1,
+            "merge": 0,
+            "delete": 0,
+            "clash": 0,
+            "left_extra": 0,
+            "unchanged": 30,
+        }
         payload = json.dumps({"files": files})
         text = dry._plan_summary(0, payload)
         self.assertIn("unchanged 30", text)

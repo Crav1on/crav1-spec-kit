@@ -148,4 +148,4 @@ The `$crav1-tighten-and-plan-ready-to-build` ready check names the hard hit when
 
 The next `start` derives one from the finding text, the same way a new finding gets a topic, writes it back, and the reply says that one line, `Filled finding topics: Static-IP notes (P9).` A later start does not say it again. The ready check in this walk quotes a held task's own `Q` or `question` line, keeps a waits-on list as T numbers, and names the `Ask` or `owner` on the question.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-tighten-and-plan.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-tighten-and-plan.md

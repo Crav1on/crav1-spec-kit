@@ -16,19 +16,20 @@
         "path": ".claude/CLAUDE.md"
       }
     ],
+    "counts": {
+      "add": 1,
+      "clash": 1,
+      "delete": 1,
+      "left_extra": 0,
+      "merge": 0,
+      "unchanged": 6,
+      "update": 4
+    },
     "delete": [
       ".cursor/rules/crav1.mdc"
     ],
     "left_extra": [],
     "merge": [],
-    "unchanged": [
-      ".claude/agent-assets/README.md",
-      ".claude/agent-assets/crav1-spec-reviewer-agent/prompt.md",
-      ".claude/agents/crav1-spec-reviewer-agent.md",
-      ".cursor/agent-assets/README.md",
-      ".cursor/agent-assets/crav1-spec-reviewer-agent/prompt.md",
-      ".cursor/agents/crav1-spec-reviewer-agent.md"
-    ],
     "update": [
       ".claude/skills/crav1-docs/reference/workflow.md",
       ".claude/skills/crav1-help/SKILL.md",

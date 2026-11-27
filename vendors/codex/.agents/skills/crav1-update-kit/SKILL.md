@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   crav1-vendor: codex
-  crav1-version: 1.209.0
+  crav1-version: 1.210.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.
@@ -27,7 +27,7 @@ The script is `scripts/update_kit.py --vendor codex` in this skill's folder. The
 
 1. Read [references/heads-up.md](references/heads-up.md) every run, before any write.
 2. Run `detect`, then `resolve-target`. A target that is not a published `vX.Y.Z` tag stops with the script's one-line reason. Do not offer another target.
-3. Drop-in (`writes_kit_files` true): read [references/overlay.md](references/overlay.md) and follow it.
+3. Drop-in (`writes_kit_files` true): read [references/overlay.md](references/overlay.md) and follow it. That page runs `plan`, then `apply` after the yes. Never pipe or redirect the script output (`| python -c`, `| head`, `>`). Read it directly.
 4. Plugin or user scope (`mode` is `plugin`): read [references/plugin.md](references/plugin.md) and follow it. Do not read the overlay page.
 5. When the plan lists a migration id, read [references/migrations.md](references/migrations.md) after the kit files are replaced. When the list is empty, skip that page.
 6. When the user says `add <vendor>` or `remove <vendor>`, read [references/vendors.md](references/vendors.md) and follow it. A plain update does not read that page.
@@ -39,7 +39,7 @@ The heads-up card is not skipped. A word in the opening message is not the yes. 
 
 - When the plan's `repo_writes` is greater than zero, use its `card`: `yes, write and commit (Recommended)`, `write only`, or `stop`.
 - When `repo_writes` is zero and the plan's `card` is the kit 2.0 install: `install-kit2 (Recommended)` or `stop`. That card does not commit.
-- When `card` is null, the repo has nothing to commit. Say so and stop. There is no card.
+- When `card` is null, the repo has nothing to commit. Say so and stop. There is no card. When the installed kit 2.0 engine already matches the version that would be installed, do not show an install card. Print `ending` with the plan's `ending_args`.
 - A clash, on that same card's free-text answer: `keep` or `take`. An item with no answer keeps the local edit.
 - A migration, only when the jump has one: `apply (Recommended)`, `leave`, or `stop`.
 
@@ -50,13 +50,14 @@ The heads-up card is not skipped. A word in the opening message is not the yes. 
 - Files updated, merged, deleted, left alone, and any clash.
 - The commit `Update CRAV1 kit vA to vB`, or why there is none.
 - Tell the user to reload the window so the host loads the new skills.
-- When `.crav1/flags.local.json` is present, one line for the kit 2.0 step. With no flag file, that line is absent and kit 2.0 is not mentioned.
+- When `.crav1/flags.local.json` is present, one `kit2_line`. It names the version that will be installed and the version installed now. With no flag file, that line is absent and kit 2.0 is not mentioned.
+- The plan `files` object is the counts plus the changed lists. Unchanged paths are the `unchanged` count unless `--list-unchanged`.
 
 ## Run ending (1.122.0)
 
 End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.
 
-The ending is Run next (1.178.0), never a `Next:` line. Print it with `update_kit.py ending --root <project> --vendor codex`, plus the apply result's `ending_args` (1.190.0, 1.208.0). `--not-updated` means this run wrote no repo files. `--kit2` means kit 2.0 was installed or updated in the user folder. Do not say the kit files changed when no repo file was written.
+The ending is Run next (1.178.0), never a `Next:` line. Print it with `update_kit.py ending --root <project> --vendor codex`, plus the apply result's `ending_args`, or the plan's `ending_args` when `card` is null (1.190.0, 1.208.0, 1.210.0). `--not-updated` means this run wrote no repo files. `--kit2` means kit 2.0 was installed or updated in the user folder. `--kit2-current` means the repo kit and kit 2.0 were already current. Do not say the kit files changed when no repo file was written. Never pipe or redirect that ending (`| python -c`, `| head`, `>`). Read it directly.
 
 After a successful update, the ending names what changed, and names the resume command for each open or parked design topic instead of `nothing needed now`:
 
@@ -87,6 +88,15 @@ When the kit was already current and nothing is open (`ending --not-updated`):
 Run next: nothing needed now.
 ```
 
+When the repo kit and kit 2.0 are both already current (`ending --not-updated --kit2-current`):
+
+```text
+Run next:
+The repo kit is current and kit 2.0 is current. Nothing to do.
+```
+
+There is no reload line in that ending.
+
 When this run wrote files and they are not committed, add one trailing line:
 
 ```text
@@ -101,7 +111,7 @@ Do not push unless the user, in this run, already said to push. Do not add a pus
 
 ## Early-access flags (1.206.0)
 
-`flags-list`, `flags-on <flag>`, and `flags-off <flag>` are [references/flags.md](references/flags.md). One command may name several flags. `flags-on kit2` turns on kit 2.0 for this repo. The update that follows installs it at user level from that same release.
+`flags-list`, `flags-on <flag>`, and `flags-off <flag>` are [references/flags.md](references/flags.md). One command may name several flags. `flags-on kit2` turns on kit 2.0 for this repo. The update that follows installs it at user level from the newest published `v2.0.0-*` pre-release.
 
 ## Hard rules
 

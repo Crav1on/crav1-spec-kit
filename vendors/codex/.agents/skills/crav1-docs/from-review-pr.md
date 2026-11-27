@@ -213,4 +213,4 @@ The run ends as [How a run ends](reference/run-ending.md) says: Run next, never 
 
 `ado_threads.py` takes the Azure DevOps organization, project and repository from the code repo's git remote, so posting the review thread no longer fails with 404 when they are not passed. `--org`, `--project` and `--repo` still override.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-review-pr.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-review-pr.md
