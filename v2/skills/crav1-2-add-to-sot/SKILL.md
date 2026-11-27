@@ -37,6 +37,10 @@ Run `init` once when `.crav1-2/engine.json` is missing. Then run `add-to-sot` an
 
 Print the engine's `ending` first when it is present. It already starts with `Run next:`. Do not add a `Next:` line. Do not add a second step. Do not ask a card about writing the event or the index. Do not tell the user to edit a file.
 
+When that ending names `/crav1-add-to-spec`, print the command and stop. Do not run it. It is a suggestion until kit 2.0 and 1.x split.
+
+A quote in `sot/` keeps the source's words, including people's names. Do not relabel a person as person A, person B, or partner B. Do not write `[redacted: personal data]`. Only a secret value is removed, and the engine does that. Those labels are for kit examples. They are not a reason to rename people in this project.
+
 When `dry_run` is true, print the ending, then `note_markdown`, then `events`. Nothing was written.
 
 When `wrote` is false and `card_text` is set, print `proposal` and `card_text` and stop. The ending waits until the card is answered. Pass `keep-all`, `pick-some`, or `stop` back as a word. `pick-some` takes line numbers, for example `pick-some 1 3`.

@@ -17,8 +17,8 @@ Return one JSON object and no other text.
   "passages": [
     {
       "kind": "mail",
-      "who": "person A",
-      "when": "09:12",
+      "who": "Jordan Example",
+      "when": "2026-11-24 15:57+01:00",
       "quote": "one line, word for word",
       "label": "finding",
       "answers": "the open question's words, only on an answer"
@@ -30,14 +30,17 @@ Return one JSON object and no other text.
 }
 ```
 
+The names in the example are synthetic. A real source keeps the names it uses.
+
 Rules:
 
 - `kind` is `mail`, `chat`, `meeting`, `session`, `document`, or `fact`. Omit `label` and `answers` unless the source is a session.
 - One passage is one mail paragraph, one chat message, one transcript turn, or one session answer.
-- The quote is the source's words. Do not paraphrase. Keep it on one line.
+- The quote is the source's words, including people's names. Do not paraphrase. Do not relabel a person as person A, person B, or partner B. Do not write `[redacted: personal data]`. Keep the quote on one line.
+- For a mail, `when` is the date and time the message was sent: `YYYY-MM-DD HH:MM`, plus a zone when the mail has one (`2026-11-24 15:57+01:00`). Do not drop the day. A same-day chat may use `HH:MM`.
+- `who` is the name the source uses for that speaker. Do not invent a person, and do not replace a real name with a label.
 - `cites` are indexes into `passages`, starting at 0. Do not invent `p-001`.
 - A know-about answer with nothing to cite uses `"cites": []`. Do not set `inferred`. The engine does.
 - For `this-session`, label each kept line `finding`, `answer`, `decision`, `open`, or `todo`. `who` is `user` or `assistant`.
 - On an answer, `answers` is the open question's words. Do not decide that the question is closed.
-- Use person A, person B, and partner B. Do not invent a customer or a person's name.
-- Do not copy a secret value. Replace the value with `[redacted: secret]` and do not repeat it.
+- Do not copy a secret value. Leave the secret out. The engine removes secret values and records the kind. Do not repeat the value.

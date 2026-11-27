@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import unittest
+from datetime import datetime
 
 import support  # noqa: F401  puts v2/ on sys.path before crav1_2 imports
 from crav1_2.cards import build_keep_card, card_problems
@@ -27,14 +28,17 @@ ASSISTANT = "Partner B already signed the gateway change."
 QUESTION = "Who gets the certificate-expiry alert, and how early?"
 
 
-def run(repo, *args, stdin=None):
+def run(repo, *args, stdin=None, env=None):
+    base = {**os.environ, "PYTHONPATH": str(V2)}
+    if env:
+        base.update(env)
     return subprocess.run(
         [sys.executable, "-X", "utf8", "-m", "crav1_2", *args],
         cwd=repo,
         input=stdin,
         text=True,
         capture_output=True,
-        env={**os.environ, "PYTHONPATH": str(V2)},
+        env=base,
     )
 
 
@@ -58,6 +62,12 @@ def init(repo):
     assert built.returncode == 0, built.stderr
 
 
+def git_identity(repo, name="Alex Example"):
+    subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", name], cwd=repo, check=True)
+    subprocess.run(["git", "config", "user.email", "alex@example.com"], cwd=repo, check=True)
+
+
 def body_of(result):
     assert result.returncode == 0, result.stderr
     return json.loads(result.stdout)
@@ -68,6 +78,7 @@ class Capture(unittest.TestCase):
         self.root = temp_dir()
         self.addCleanup(lambda: shutil.rmtree(self.root, ignore_errors=True))
         init(self.root)
+        git_identity(self.root)
 
     def test_session_chat_writes_one_note_one_event_and_the_index(self):
         staging = self.root / "staging"
@@ -84,7 +95,6 @@ class Capture(unittest.TestCase):
         payload = {
             "title": "Outbound messaging channel and gateway options",
             "date": "2026-11-25",
-            "added_by": "person A",
             "slug": "outbound-channel",
             "at": "2026-11-25T11:41:00+01:00",
             "extractor": {
@@ -277,6 +287,7 @@ class ThisSession(unittest.TestCase):
         self.addCleanup(lambda: shutil.rmtree(self.root, ignore_errors=True))
         self.addCleanup(lambda: shutil.rmtree(self.home, ignore_errors=True))
         init(self.root)
+        git_identity(self.root)
         spec = self.root / "docs" / "specs" / "partner-b-feed" / "spec.md"
         spec.parent.mkdir(parents=True)
         spec.write_text(SPEC, encoding="utf-8")
@@ -474,6 +485,234 @@ class Cards(unittest.TestCase):
         short = dict(empty)
         short["options"] = short["options"][:1]
         self.assertTrue(any("2 to 4" in problem for problem in card_problems(short)))
+
+
+class MailCapture(unittest.TestCase):
+    """Mail passages keep their day, the runner, the .eml, and real names."""
+
+    def setUp(self):
+        self.root = temp_dir()
+        self.addCleanup(lambda: shutil.rmtree(self.root, ignore_errors=True))
+        init(self.root)
+        git_identity(self.root)
+        self.inbox = self.root / "inbox"
+        self.inbox.mkdir()
+        self.eml = self.inbox / "thread.eml"
+        self.eml.write_text(
+            "From: Jordan Example <jordan@example.com>\n"
+            "Date: Tue, 24 Nov 2026 15:57:00 +0100\n"
+            "\n"
+            "Jordan Example <jordan@example.com> said the channel is agreed.\n"
+            "api_key=supersecretvalue\n",
+            encoding="utf-8",
+        )
+        self.quote = "Jordan Example <jordan@example.com> said the channel is agreed."
+
+    def _spec(self, slug):
+        path = self.root / "docs" / "specs" / slug / "spec.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("## Constraints\n- The channel stays.\n", encoding="utf-8")
+        return path
+
+    def _payload(self, **extra):
+        payload = {
+            "title": "Outbound channel",
+            "date": "2026-11-24",
+            "slug": "outbound-channel",
+            "source": "inbox/thread.eml",
+            "extractor": {
+                "passages": [
+                    {
+                        "kind": "mail",
+                        "who": "Jordan Example",
+                        "when": "2026-11-24 15:57+01:00",
+                        "quote": self.quote,
+                    },
+                    {
+                        "kind": "mail",
+                        "who": "Jordan Example",
+                        "when": "09:12",
+                        "quote": "The same-day line keeps the clock time.",
+                    },
+                ]
+            },
+        }
+        payload.update(extra)
+        return payload
+
+    def test_mail_keeps_the_day_the_runner_the_file_and_the_names(self):
+        spec = self._spec("partner-b-feed")
+        before_spec = spec.read_bytes()
+        today = datetime.now().astimezone().date().isoformat()
+        dry = body_of(run(self.root, "add-to-sot", "mail", "dry-run", stdin=json.dumps(self._payload())))
+        self.assertFalse(dry["wrote"])
+        self.assertTrue(dry["ending"].startswith("Run next:"))
+        self.assertIn('`/crav1-add-to-spec partner-b-feed mail "inbox/thread.eml"`', dry["ending"])
+        self.assertNotIn("Pick one:", dry["ending"])
+        self.assertNotRegex(dry["ending"], r"(?m)^Next:")
+        self.assertFalse((self.root / "sot").exists() and any((self.root / "sot").rglob("thread.eml")))
+        written = body_of(run(self.root, "add-to-sot", "mail", stdin=json.dumps(self._payload())))
+        self.assertTrue(written["wrote"])
+        self.assertEqual(written["note_id"], "2026-11-24-outbound-channel")
+        note = (self.root / "sot" / written["note_id"] / "note.md").read_text(encoding="utf-8")
+        self.assertIn("Date: 2026-11-24 · Added: %s by Alex Example" % today, note)
+        if today != "2026-11-24":
+            self.assertNotIn("Added: 2026-11-24 by", note)
+        self.assertIn("Jordan Example, 2026-11-24 15:57+01:00", note)
+        self.assertIn("Jordan Example, 09:12", note)
+        self.assertIn(self.quote, note)
+        self.assertIn("Originals: thread.eml", note)
+        self.assertNotIn("[redacted: personal data]", note)
+        copied = (self.root / "sot" / written["note_id"] / "thread.eml").read_text(encoding="utf-8")
+        self.assertIn("Jordan Example", copied)
+        self.assertIn("jordan@example.com", copied)
+        self.assertNotIn("supersecretvalue", copied)
+        self.assertIn("[redacted: secret]", copied)
+        stored = {
+            rel: data
+            for rel, data in snapshot(self.root).items()
+            if rel.startswith("sot/") or rel.startswith(".crav1-2/")
+        }
+        blob = b"".join(stored.values())
+        self.assertNotIn(b"supersecretvalue", blob)
+        self.assertNotIn(b"[redacted: personal data]", blob)
+        self.assertIn(b"supersecretvalue", (self.root / "inbox" / "thread.eml").read_bytes())
+        self.assertEqual(spec.read_bytes(), before_spec)
+        self.assertIn('`/crav1-add-to-spec partner-b-feed mail "inbox/thread.eml"`', written["ending"])
+        self.assertEqual(written["ending"].count("Also recorded:"), 1)
+        event = json.loads((self.root / ".crav1-2" / "events.jsonl").read_text(encoding="utf-8").strip())
+        self.assertEqual(event["data"]["added"], today)
+        self.assertEqual(event["data"]["added_by"], "Alex Example")
+        self.assertEqual(event["data"]["date"], "2026-11-24")
+        self.assertEqual(event["data"]["passage_list"][0]["when"], "2026-11-24 15:57+01:00")
+        self.assertEqual(event["data"]["files"], ["thread.eml"])
+
+    def test_eml_word_is_copied_when_the_extractor_omits_it(self):
+        payload = self._payload()
+        del payload["source"]
+        written = body_of(run(
+            self.root, "add-to-sot", "mail", "inbox/thread.eml", stdin=json.dumps(payload),
+        ))
+        copied = self.root / "sot" / written["note_id"] / "thread.eml"
+        self.assertTrue(copied.is_file())
+        self.assertNotIn("supersecretvalue", copied.read_text(encoding="utf-8"))
+        self.assertIn('mail "inbox/thread.eml"', written["ending"])
+
+    def test_added_by_cannot_be_a_speaker(self):
+        before = snapshot(self.root)
+        refused = run(self.root, "add-to-sot", "mail", stdin=json.dumps(self._payload(added_by="jordan example")))
+        self.assertEqual(refused.returncode, 2)
+        self.assertIn("not a speaker label", refused.stderr)
+        self.assertEqual(changed(before, snapshot(self.root)), [])
+        subprocess.run(["git", "config", "user.name", "Jordan Example"], cwd=self.root, check=True)
+        after_rename = snapshot(self.root)
+        again = run(self.root, "add-to-sot", "mail", stdin=json.dumps(self._payload()))
+        self.assertEqual(again.returncode, 2, again.stderr)
+        self.assertIn("not a speaker label", again.stderr)
+        self.assertEqual(changed(after_rename, snapshot(self.root)), [])
+        named = body_of(run(
+            self.root, "add-to-sot", "mail", stdin=json.dumps(self._payload(added_by="Sam Example")),
+        ))
+        note = (self.root / "sot" / named["note_id"] / "note.md").read_text(encoding="utf-8")
+        self.assertIn("by Sam Example", note)
+        self.assertNotIn("by Jordan Example", note)
+        self.assertNotIn("by Alex Example", note)
+
+    def test_missing_runner_name_is_refused(self):
+        root = temp_dir()
+        home = temp_dir()
+        self.addCleanup(lambda: shutil.rmtree(root, ignore_errors=True))
+        self.addCleanup(lambda: shutil.rmtree(home, ignore_errors=True))
+        init(root)
+        inbox = root / "inbox"
+        inbox.mkdir()
+        (inbox / "thread.eml").write_text("Hello from Jordan Example.\n", encoding="utf-8")
+        payload = {
+            "title": "Outbound channel",
+            "date": "2026-11-24",
+            "slug": "outbound-channel",
+            "source": "inbox/thread.eml",
+            "extractor": {
+                "passages": [{
+                    "kind": "mail",
+                    "who": "Jordan Example",
+                    "when": "2026-11-24 15:57",
+                    "quote": "Hello from Jordan Example.",
+                }]
+            },
+        }
+        refused = run(
+            root,
+            "add-to-sot",
+            "mail",
+            stdin=json.dumps(payload),
+            env={
+                "HOME": str(home),
+                "GIT_CONFIG_GLOBAL": str(home / "none"),
+                "GIT_CONFIG_NOSYSTEM": "1",
+            },
+        )
+        self.assertEqual(refused.returncode, 2, refused.stderr)
+        self.assertIn("git user.name", refused.stderr)
+        self.assertFalse((root / "sot").exists() and any((root / "sot").rglob("note.md")))
+
+    def test_run_next_asks_when_the_spec_is_not_clear(self):
+        self._spec("gateway-options")
+        self._spec("partner-b-feed")
+        vague = body_of(run(self.root, "add-to-sot", "mail", stdin=json.dumps(self._payload())))
+        ending = vague["ending"]
+        self.assertTrue(ending.startswith("Run next:"))
+        self.assertIn('`/crav1-add-to-spec <spec-slug> mail "inbox/thread.eml"`', ending)
+        self.assertIn("Which spec should this mail go into? Pick one: gateway-options, partner-b-feed.", ending)
+        self.assertNotRegex(ending, r"(?m)^Next:")
+        self.assertNotIn("edit ", ending)
+        named = self._payload()
+        named["extractor"]["passages"][0]["quote"] = "The partner-b-feed channel is agreed."
+        clear = body_of(run(self.root, "add-to-sot", "mail", stdin=json.dumps(named)))
+        self.assertIn('`/crav1-add-to-spec partner-b-feed mail "inbox/thread.eml"`', clear["ending"])
+        self.assertNotIn("Pick one:", clear["ending"])
+        self.assertNotIn("<spec-slug>", clear["ending"])
+
+    def test_fact_suggestion_has_no_file_and_names_are_not_redacted(self):
+        from crav1_2.redact import redact_text
+
+        self._spec("partner-b-feed")
+        text, kinds = redact_text("Jordan Example <jordan@example.com> set api_key=supersecretvalue")
+        self.assertIn("Jordan Example", text)
+        self.assertIn("jordan@example.com", text)
+        self.assertNotIn("supersecretvalue", text)
+        self.assertNotIn("[redacted: personal data]", text)
+        self.assertEqual(kinds, ["secret"])
+        payload = {
+            "title": "Outbound channel",
+            "date": "2026-11-24",
+            "slug": "outbound-channel",
+            "extractor": {"passages": [{
+                "kind": "fact",
+                "who": "Jordan Example",
+                "quote": "Jordan Example keeps the channel on the current path.",
+            }]},
+        }
+        written = body_of(run(self.root, "add-to-sot", "fact", stdin=json.dumps(payload)))
+        self.assertIn("`/crav1-add-to-spec partner-b-feed fact`", written["ending"])
+        self.assertNotIn(".eml", written["ending"])
+        note = (self.root / "sot" / written["note_id"] / "note.md").read_text(encoding="utf-8")
+        self.assertIn("Jordan Example keeps the channel", note)
+
+    def test_instructions_keep_names_and_do_not_run_the_suggestion(self):
+        skill = (V2 / "skills" / "crav1-2-add-to-sot" / "SKILL.md").read_text(encoding="utf-8")
+        capture = (V2 / "skills" / "crav1-2-add-to-sot" / "references" / "capture.md").read_text(encoding="utf-8")
+        agent = (V2 / "agents" / "crav1-2-source-extractor-agent.md").read_text(encoding="utf-8")
+        self.assertIn("Do not run it.", skill)
+        self.assertIn("personal data]", skill)
+        self.assertIn("YYYY-MM-DD HH:MM", capture)
+        self.assertIn("HH:MM", capture)
+        self.assertIn("`source`", capture)
+        self.assertIn("git config user.name", capture)
+        self.assertNotIn("Use person A, person B", capture)
+        self.assertIn("YYYY-MM-DD HH:MM", agent)
+        self.assertIn("[redacted: personal data]", agent)
+        self.assertNotIn("Use person A, person B, and partner B.", agent)
 
 
 class OneX(unittest.TestCase):

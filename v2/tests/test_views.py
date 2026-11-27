@@ -96,6 +96,7 @@ class Render(unittest.TestCase):
         files = view_files(fold_events(_events()))
         note = files["sot/2026-11-25-outbound-channel/note.md"]
         self.assertIn('<a id="p-001"></a>**p-001** · chat · person A, 09:12 · "Agreed long term, likely before go-live, not in this slice."', note)
+        self.assertIn("Date: 2026-11-25 · Added: 2026-11-25 by person A", note)
         self.assertIn('<a id="p-017"></a>**p-017** · session · person A · "Not in this slice."', note)
         self.assertIn("## Know about this", note)
         self.assertIn("### Which options are realistic before go-live?", note)

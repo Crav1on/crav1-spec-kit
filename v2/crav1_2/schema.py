@@ -1,9 +1,10 @@
 """events.jsonl schema version 1.
 
 Required fields are the phase-1 design. ``note.added`` also accepts optional
-``title``, ``added_by``, ``passage_list``, and ``know`` so a note page can be
+``title``, ``added_by``, ``added``, ``passage_list``, and ``know`` so a note page can be
 rebuilt from the log, plus ``vendor``, ``captured_from``, ``session_id``,
-``quotes``, and ``redactions`` for this-session. ``note.extended`` appends
+``quotes``, and ``redactions`` for this-session. ``added`` is the date the note
+was written. ``date`` stays the source date. ``note.extended`` appends
 passages to a note. ``answer.matched`` records an open-question match and does
 not close the question. ``note.read`` records that a note was read against one
 spec. Unknown fields are refused.
@@ -42,13 +43,18 @@ HYPHEN_WORD = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 FILE_NAME = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$")
 SPEC_SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 BY_AGENT = re.compile(r"^crav1-2-[a-z0-9][a-z0-9-]*$")
-WHEN = re.compile(r"^\d{2}:\d{2}$")
+_WHEN_CLOCK = re.compile(r"^(\d{2}):(\d{2})$")
+# Date and time, optional zone: Z, +HH:MM, +HHMM, or a space before the offset.
+_WHEN_STAMP = re.compile(
+    r"^(\d{4}-\d{2}-\d{2}) (\d{2}):(\d{2})(?:[Zz]| ?([+-])(\d{2}):?(\d{2}))?$"
+)
+WHEN_PROBLEM = "a passage time must be HH:MM or YYYY-MM-DD HH:MM, with an optional zone."
 LINE_SPAN = re.compile(r"^L\d+-L\d+$")
 
 TOP_KEYS = ("v", "id", "at", "by", "run", "type", "data")
 NOTE_KEYS = (
     "note", "kinds", "date", "files", "from_sources", "passages",
-    "title", "added_by", "passage_list", "know",
+    "title", "added_by", "added", "passage_list", "know",
     "vendor", "captured_from", "session_id", "quotes", "redactions",
 )
 PASSAGE_KEYS = ("id", "kind", "who", "when", "quote", "path", "lines", "label", "verified", "weak", "answers")
@@ -93,6 +99,34 @@ def parse_at(value: str) -> datetime:
 
 def now_iso() -> str:
     return datetime.now().astimezone().replace(microsecond=0).isoformat()
+
+
+def passage_when_problem(value: object) -> str | None:
+    """None when ``value`` is HH:MM or a date and time, optionally with a zone.
+
+    HH:MM stays valid. A mail that spans days uses ``YYYY-MM-DD HH:MM``,
+    for example ``2026-11-24 15:57`` or ``2026-11-24 15:57+01:00``.
+    The stored text is the value as given, not a trimmed clock time.
+    """
+    if not isinstance(value, str) or not value:
+        return WHEN_PROBLEM
+    clock = _WHEN_CLOCK.fullmatch(value)
+    if clock:
+        if int(clock.group(1)) > 23 or int(clock.group(2)) > 59:
+            return WHEN_PROBLEM
+        return None
+    stamp = _WHEN_STAMP.fullmatch(value)
+    if stamp is None:
+        return WHEN_PROBLEM
+    try:
+        datetime.fromisoformat(stamp.group(1))
+    except ValueError:
+        return WHEN_PROBLEM
+    if int(stamp.group(2)) > 23 or int(stamp.group(3)) > 59:
+        return WHEN_PROBLEM
+    if stamp.group(4) is not None and (int(stamp.group(5)) > 23 or int(stamp.group(6)) > 59):
+        return WHEN_PROBLEM
+    return None
 
 
 def origin_problem(origin: str, refs: list) -> str | None:
@@ -276,13 +310,13 @@ def _rel_path(value: object, key: str, fail) -> str:
     return value
 
 
-def _date(value: str, fail) -> str:
+def _date(value: str, fail, key: str = "date") -> str:
     if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
-        fail("date must be YYYY-MM-DD.")
+        fail(f"{key} must be YYYY-MM-DD.")
     try:
         datetime.fromisoformat(value)
     except ValueError:
-        fail("date must be YYYY-MM-DD.")
+        fail(f"{key} must be YYYY-MM-DD.")
     return value
 
 
@@ -321,6 +355,8 @@ def _note(data: dict, fail) -> dict:
         cleaned["title"] = _text(data, "title", fail)
     if "added_by" in data:
         cleaned["added_by"] = _text(data, "added_by", fail)
+    if "added" in data:
+        cleaned["added"] = _date(_text(data, "added", fail), fail, key="added")
     if "passage_list" in data:
         cleaned["passage_list"] = _passages(data["passage_list"], fail)
         if passages != len(cleaned["passage_list"]):
@@ -439,8 +475,9 @@ def _passages(value: object, fail) -> list[dict]:
             cleaned["kind"] = item["kind"]
             cleaned["who"] = who
         if "when" in item:
-            if not isinstance(item["when"], str) or not WHEN.fullmatch(item["when"]):
-                fail("a passage time must be HH:MM.")
+            problem = passage_when_problem(item["when"])
+            if problem:
+                fail(problem)
             cleaned["when"] = item["when"]
         if "label" in item:
             if item["label"] not in LABELS:

@@ -10,7 +10,7 @@ Phase 1 is complete in this alpha: add-to-sot, show-sot, and link-to-spec. Nothi
 
 Capture one source as one note. Words: `mail`, `chat`, `meeting`, `session`, `document`, `fact`, `from-sources`, `this-session`, and `dry-run`. Kind words combine into one note. A word in the invocation is taken as given. A missing word stops and lists those words.
 
-The engine checks the source-extractor JSON, assigns passage ids (`p-001` upward), copies originals after secret redaction (the value is dropped, the kind is kept), appends one `note.added` event, and rebuilds the views. `from-sources` writes a thin note that points at `docs/sources/<folder>/` and copies nothing. `dry-run` prints the note and the events and writes nothing.
+The engine checks the source-extractor JSON, assigns passage ids (`p-001` upward), copies originals after secret redaction (the value is dropped, the kind is kept), appends one `note.added` event, and rebuilds the views. A mail file passed as `source` (or as a `.eml` word) is copied the same way, so the note points back at it. A passage time may be `HH:MM` or `YYYY-MM-DD HH:MM` with an optional zone, and the note shows that full value. The Added line uses the engine's clock and `git config user.name` (or the name the skill passes), never a speaker. Quotes keep the names in the source; only secret values are removed. `from-sources` writes a thin note that points at `docs/sources/<folder>/` and copies nothing. `dry-run` prints the note and the events and writes nothing. When the note does not already hold a matched answer, the ending suggests the matching `/crav1-add-to-spec` command and does not run it.
 
 ## this-session
 

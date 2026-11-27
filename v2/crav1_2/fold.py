@@ -109,7 +109,7 @@ def _apply(state: dict, event: dict) -> None:
             "at": event["at"],
         }
         for key in (
-            "title", "added_by", "passage_list", "know",
+            "title", "added_by", "added", "passage_list", "know",
             "vendor", "captured_from", "session_id", "quotes", "redactions",
         ):
             if key in data:
