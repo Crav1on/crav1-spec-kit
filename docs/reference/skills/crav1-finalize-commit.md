@@ -8,6 +8,8 @@
 
 Draft the commit message, then commit, copy, change, or stop.
 
+1.208.0: installed kit copies that conflict, and both sides are pristine published releases, are settled by `scripts/kit_merge.py settle` to the newer release, including a file that release adds or deletes. The tree is checked against that release, `nothing_lost.py` runs, and the paths are staged. One line reports it. A hand-edited kit file is named and left. The merge commit is `scripts/kit_merge.py commit` (`git commit --no-edit --cleanup=strip`), so a `# Conflicts:` list is not kept. The same commands apply when open-pr or merge-pr says to merge the base in.
+
 1.207.0: `--walk` reads `walk-progress.md`. A reopened or unfinished spec walk prints `Resume the spec walk:` and [`/crav1-tighten-and-plan-ready-to-build`](crav1-tighten-and-plan-ready-to-build.md) <slug>`. Otherwise the build walk uses the working branch, never main or master unless that branch is checked out.
 
 1.200.0: `scripts/ending.py` prints the ending from the shared run-ending helper, Run next first. A failed commit has no Run next. Before a write, the same helper's stay card applies when a `design/<topic>` branch is checked out or owns the change, and the card never offers a switch to the default branch.

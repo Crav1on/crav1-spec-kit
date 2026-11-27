@@ -10,6 +10,10 @@ writes: Writes kit-owned files on the current branch after a yes, including the 
 leaves alone: Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, the project's `.gitignore`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. A `crav1-2-` skill or agent, `.crav1-2/`, and `sot/` stay. Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit. With no flag file, kit 2.0 is not mentioned.
 limits: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 flow:
+- Pass apply `ending_args` to `update_kit.py ending`.
+- A user-level kit 2.0 install with no repo files changed says `Kit 2.0 installed in your user folder; reload to load its skills.` The plan `card` omits commit options when `repo_writes` is 0.
+- That card is `install-kit2` or `stop`.
+- A null card means the repo has nothing to commit.
 - early-access flags live in `.crav1/flags.local.json` for one repo.
 - `.crav1/.gitignore` lists `flags.local.json`.
 - The project `.gitignore` is not changed.
@@ -56,4 +60,4 @@ runs by itself: Calls no skill. Runs `scripts/update_kit.py`.
 you run next: nothing needed now
 first: `/crav1-update-kit Update the kit in this consumer project.`
 walkthrough: from-update-kit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-update-kit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-update-kit.md

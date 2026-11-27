@@ -28,4 +28,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-build-tasks; /crav1-finalize-commit
 first: `/crav1-record-approval Person: <who> Source: <link, or mail, or meeting> <date> Quote: "<their words>"`
 walkthrough: from-record-approval.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-record-approval.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-record-approval.md

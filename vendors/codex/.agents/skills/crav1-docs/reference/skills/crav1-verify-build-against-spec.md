@@ -51,4 +51,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-fix-build-gaps; $crav1-finalize-commit
 first: `$crav1-verify-build-against-spec @docs/specs/<slug>/`
 walkthrough: from-verify.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-verify-build-against-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-verify-build-against-spec.md

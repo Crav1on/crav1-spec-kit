@@ -18,4 +18,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-finalize-commit
 first: `$crav1-refresh-system-notes @docs/system/ @docs/specs/ Add what the specs already state to the picture. Do not rewrite what is already there. Do not write code.`
 walkthrough: from-refresh-system-notes.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-refresh-system-notes.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-refresh-system-notes.md

@@ -61,7 +61,7 @@ A build walk's claim is an `In progress:` line in `docs/specs/<slug>/claims.md` 
 
 ## Behind the base, and catching up
 
-`<interpreter> -X utf8 scripts/pr_common.py behind --head <head> --base <base>` counts the commits the head is behind and ahead of the base. A branch that is behind, or has conflicts, catches up by merging the base into it: `git merge <base>` on the head, or `git pull --no-rebase`, resolve any conflicts, then push. Never suggest a rebase, `pull --rebase`, or a force-push. A rejected push is fixed by pulling with a merge.
+`<interpreter> -X utf8 scripts/pr_common.py behind --head <head> --base <base>` counts the commits the head is behind and ahead of the base. A branch that is behind, or has conflicts, catches up by merging the base into it: `git merge <base>` on the head, or `git pull --no-rebase`, resolve any conflicts, then push. Never suggest a rebase, `pull --rebase`, or a force-push. A rejected push is fixed by pulling with a merge. Since 1.208.0 a conflict in pristine installed kit copies is `kit_merge.py settle`, and that merge commit is `kit_merge.py commit` (`git commit --no-edit --cleanup=strip`), as `$crav1-finalize-commit` `references/pull.md` says.
 
 ## Signing in and secrets
 

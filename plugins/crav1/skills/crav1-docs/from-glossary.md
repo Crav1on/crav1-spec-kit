@@ -52,4 +52,4 @@ Only rows in `docs/system/glossary.md`, the ignored `.crav1/glossary-list.md` in
 
 `Run next: nothing needed now.` When a row changed: `Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.` See [How a run ends](reference/run-ending.md) and the [skill page](reference/skills/crav1-glossary.md).
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/from-glossary.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-glossary.md

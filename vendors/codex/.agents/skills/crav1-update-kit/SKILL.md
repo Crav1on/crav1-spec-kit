@@ -8,7 +8,7 @@ description: >-
 license: MIT
 metadata:
   crav1-vendor: codex
-  crav1-version: 1.207.0
+  crav1-version: 1.208.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.
@@ -37,7 +37,9 @@ The script is `scripts/update_kit.py --vendor codex` in this skill's folder. The
 
 The heads-up card is not skipped. A word in the opening message is not the yes. The yes is the user's answer after the branch is shown.
 
-- Update on this branch: `yes, write and commit (Recommended)`, `write only`, or `stop`.
+- When the plan's `repo_writes` is greater than zero, use its `card`: `yes, write and commit (Recommended)`, `write only`, or `stop`.
+- When `repo_writes` is zero and the plan's `card` is the kit 2.0 install: `install-kit2 (Recommended)` or `stop`. That card does not commit.
+- When `card` is null, the repo has nothing to commit. Say so and stop. There is no card.
 - A clash, on that same card's free-text answer: `keep` or `take`. An item with no answer keeps the local edit.
 - A migration, only when the jump has one: `apply (Recommended)`, `leave`, or `stop`.
 
@@ -54,9 +56,9 @@ The heads-up card is not skipped. A word in the opening message is not the yes. 
 
 End as [run-ending.md](../crav1-docs/reference/run-ending.md) says.
 
-The ending is Run next (1.178.0), never a `Next:` line. Print it with `update_kit.py ending --root <project> [--uncommitted N] --vendor codex` (1.190.0).
+The ending is Run next (1.178.0), never a `Next:` line. Print it with `update_kit.py ending --root <project> --vendor codex`, plus the apply result's `ending_args` (1.190.0, 1.208.0). `--not-updated` means this run wrote no repo files. `--kit2` means kit 2.0 was installed or updated in the user folder. Do not say the kit files changed when no repo file was written.
 
-After a successful update that wrote kit files or changed the plugin, the ending tells the user to reload the window, and names the resume command for each open or parked design topic instead of `nothing needed now`:
+After a successful update, the ending names what changed, and names the resume command for each open or parked design topic instead of `nothing needed now`:
 
 ```text
 Run next:
@@ -66,7 +68,17 @@ Reload the window from the command palette:
 `Developer: Reload Window`
 
 Go on with the orders platform design topic:
-`$crav1-design-architecture resume orders-platform`
+`$crav1-design-architecture orders-platform`
+```
+
+When only the user-level kit 2.0 install changed (`ending --not-updated --kit2`):
+
+```text
+Run next:
+Kit 2.0 installed in your user folder; reload to load its skills.
+
+Reload the window from the command palette:
+`Developer: Reload Window`
 ```
 
 When the kit was already current and nothing is open (`ending --not-updated`):

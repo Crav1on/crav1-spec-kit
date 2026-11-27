@@ -8,6 +8,8 @@
 
 Update the installed kit on the current branch to a published release.
 
+1.208.0: the ending names what changed. Pass apply `ending_args` to `update_kit.py ending`. A user-level kit 2.0 install with no repo files changed says `Kit 2.0 installed in your user folder; reload to load its skills.` The plan `card` omits commit options when `repo_writes` is 0. That card is `install-kit2` or `stop`. A null card means the repo has nothing to commit.
+
 1.206.0: early-access flags live in `.crav1/flags.local.json` for one repo. `.crav1/.gitignore` lists `flags.local.json`. The project `.gitignore` is not changed. Words are `flags-list`, `flags-on <flag>`, and `flags-off <flag>`, and one command may name several flags. An unknown name is refused in one line that names the known flags; known names are still applied. A flag in the file that the registry does not know is kept and reported. A file that cannot be read is one plain line, and the update continues with no flags. `kit2` (experimental) installs kit 2.0 at user level from the same release through `v2/install.py` when it is on. When it is off and kit 2.0 is installed, the update offers `uninstall-kit2` or `keep-kit2`. The kit 2.0 result is one line. Update, add, and unchanged counts stay the same. With no flag file, nothing about kit 2.0 is printed.
 
 1.205.0: the commit stages files the release trees ship. Pass `--old` and `--new` (or `--new` on add, `--old` on remove). A `crav1-` name pattern is not the list. A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are not written, staged, or deleted. With no version, the target is the latest published 1.x tag. `v2.0.0` and `v2.0.0-alpha.1` are not offered.

@@ -9,7 +9,7 @@ license: MIT
 disable-model-invocation: true
 metadata:
   crav1-vendor: codex
-  crav1-version: 1.207.0
+  crav1-version: 1.208.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.

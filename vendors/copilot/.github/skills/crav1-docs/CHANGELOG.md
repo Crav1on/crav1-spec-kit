@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.208.0 (2026-11-27)
+
+Parallel kit updates settle on their own, a merge message stays clean, and an update ending says what changed.
+
+- **Kit copies.** When a merge conflicts in installed kit copies and both sides are pristine published releases, `kit_merge.py settle` writes the newer release, including a file that release adds or deletes, checks the tree matches, runs the nothing-lost check, stages those paths, and says so in one line. A kit file that was edited by hand is named and left. The same command applies when `/crav1-open-pr` or `/crav1-merge-pr` says to merge the base in.
+- **Merge message.** A merge the kit finishes is `kit_merge.py commit`: `git commit --no-edit --cleanup=strip`, so git's `# Conflicts:` list does not stay in the message.
+- **Update ending.** The ending names what changed. A user-level kit 2.0 install with no repo files changed says kit 2.0 was installed in the user folder. The yes card does not offer a commit when the repo has nothing to commit.
+
+Docs and tests: commit and update-kit walkthroughs, glossary, data layout, and `scripts/tests/test_kit_1208.py`.
+
 ## 1.207.0 (2026-11-27)
 
 Decisions are written back through the spec, leftover wording is a patch, and cards name the item.
@@ -188,15 +198,5 @@ Fixes from two live sessions: meeting imports, the spec walk's code checks, and 
 - **Tighten-plan batch cap.** `plan_check.py batch --vendor copilot` puts at most 8 findings on one card and names the rest for the next card. A finding with `changes_tasks` (adds, removes or reorders tasks) never goes on a yes-to-all card; it gets its own card.
 
 Docs and tests: walkthroughs for meetings, commit and the spec walk; data layout, glossary and marks; `scripts/tests/test_kit_1195.py`.
-
-## 1.194.0 (2026-11-19)
-
-Fixes for spec findings in `/crav1-tighten-and-plan-ready-to-build`, from a live walk.
-
-- **The right owner on the jump-back card.** `walk_progress.py spec-finding --vendor copilot` no longer always recommends `/crav1-tighten-spec`. A finding about code the spec has not recorded (unrecorded commits, a merged pull request, `Synced at` or `In the code` drift, new PR comments) recommends `/crav1-add-to-spec` with that pull request or branch; wording, structure, diagrams and constraints stay with tighten-spec, the default when unclear. `--kind code-drift|spec-text` is the hint, `--pr` or `--branch` the target; the recommended label, its text and the opened path name the right command.
-- **Already fixed, no card.** Before the card, spec-finding re-reads `spec.md` and its `Synced at:` lines. A finding the spec already covers (the branch's `Synced at` shows the merge commit or later, `--code-repo` for later; or `--expect` words present) returns `already-fixed` with a one-line note and no card. A typed "already done" (`--choice already-done`) closes the finding only when the spec shows it, and otherwise returns the card with what is still missing.
-- **Add-to-spec before the plan review.** New `walk_progress.py code-drift --vendor copilot` reads refs on disk (no fetch): when commits sit after a `Synced at` commit, or a merged pull request is not recorded, the walk asks one add-to-spec yes card before the plan review, and passes the drift to the reviewer as known context, not as a finding to echo.
-- **Merged since sync, one shared check.** New `crav1-add-to-spec` `scripts/merged_since_sync.py check` compares each branch in a spec's `Synced at:` lines with the base (the default branch, found as `design_run.py --vendor copilot` does, or `--base`). When a branch merged since the recorded commit it asks ONE yes card: `PR <n> merged at <sha> with <k> commits the spec hasn't recorded. Take them in now?`. Yes runs the add-to-spec PR or branch step inline and `stamp --yes` moves `Synced at` to the merge; nothing is written without the yes, and headless runs only report. Used at the tighten-and-plan walk start, by `/crav1-pr-status`, the specs sweep (auto flow reports only), `/crav1-merge-pr` after a merge and `/crav1-build-walk` when a branch's pull request merged.
-- `scripts/tests/test_kit_1194.py` and the walkthrough `docs/from-tighten-and-plan.md`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

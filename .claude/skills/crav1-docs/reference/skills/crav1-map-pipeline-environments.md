@@ -26,4 +26,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-read-environment
 first: `/crav1-map-pipeline-environments Azure DevOps. Org: <org>. Project: <project>. Read the pipeline definitions. Do not run a pipeline. Do not guess the org.`
 walkthrough: from-map-pipeline-environments.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-map-pipeline-environments.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-map-pipeline-environments.md

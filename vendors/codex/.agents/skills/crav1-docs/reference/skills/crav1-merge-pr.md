@@ -10,6 +10,7 @@ writes: Writes a merge commit on the host, and fast-forwards local default when 
 leaves alone: Leaves squash, rebase, branch deletion, and work-item links alone.
 limits: a required red host check stops it, and so does a PR record whose `Ready` line says no, unless the turn says `anyway`. It does not run `$crav1-review-pr` or `$crav1-pr-status`.
 flow:
+- advice to merge the base in settles pristine kit copies with `kit_merge.py settle` and commits that merge with `kit_merge.py commit` (`git commit --no-edit --cleanup=strip`), as `$crav1-finalize-commit` `references/pull.md` says.
 - a bare number is resolved from the kit's records before this checkout's remote (`pr_common.py resolve`); several candidates are asked, never picked.
 - Only the resolved host's CLI is named, and the ending is Run next, never a `Next:` line.
 - the build walk's merge card names the pull request, for example `Merge PR 71 into develop?`, as the card wording rule in `docs/reference/question-cards.md` says.
@@ -42,4 +43,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-refresh-system-notes after an outside pull request merges; $crav1-finalize-commit
 first: `$crav1-merge-pr <pull request number or URL> Merge this pull request.`
 walkthrough: from-commit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-merge-pr.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-merge-pr.md

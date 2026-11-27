@@ -32,4 +32,4 @@ runs by itself: Calls no skill. It may name `/crav1-add-to-spec`, `/crav1-what-d
 you run next: /crav1-finalize-commit; /crav1-what-do-we-know-about-this report-data-model-full <model>; /crav1-add-to-spec
 first: `/crav1-model-data manual-flow <optional scope, or leave it out>`
 walkthrough: from-model-data.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-model-data.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-model-data.md

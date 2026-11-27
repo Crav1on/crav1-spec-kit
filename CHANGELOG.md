@@ -2,6 +2,16 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.208.0 (2026-11-27)
+
+Parallel kit updates settle on their own, a merge message stays clean, and an update ending says what changed.
+
+- **Kit copies.** When a merge conflicts in installed kit copies and both sides are pristine published releases, `kit_merge.py settle` writes the newer release, including a file that release adds or deletes, checks the tree matches, runs the nothing-lost check, stages those paths, and says so in one line. A kit file that was edited by hand is named and left. The same command applies when `/crav1-open-pr` or `/crav1-merge-pr` says to merge the base in.
+- **Merge message.** A merge the kit finishes is `kit_merge.py commit`: `git commit --no-edit --cleanup=strip`, so git's `# Conflicts:` list does not stay in the message.
+- **Update ending.** The ending names what changed. A user-level kit 2.0 install with no repo files changed says kit 2.0 was installed in the user folder. The yes card does not offer a commit when the repo has nothing to commit.
+
+Docs and tests: commit and update-kit walkthroughs, glossary, data layout, and `scripts/tests/test_kit_1208.py`.
+
 ## 1.207.0 (2026-11-27)
 
 Decisions are written back through the spec, leftover wording is a patch, and cards name the item.

@@ -42,4 +42,4 @@ Reference page: [retire spec](reference/skills/crav1-retire-spec.md)
 
 The run ends as [How a run ends](reference/run-ending.md) says: Run next, never a `Next:` line, `Waiting:` only when a step is blocked, and `Uncommitted:` when files changed and are not committed.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/from-retire-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-retire-spec.md
