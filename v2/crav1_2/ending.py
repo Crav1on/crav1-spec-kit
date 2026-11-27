@@ -128,6 +128,13 @@ def render_settled(recorded: str | None) -> str:
     return text
 
 
+def render_covered() -> str:
+    """Every finder item is covered and there is no card. Same sentence in dry-run."""
+    text = "Run next: nothing needed; the spec already covers this note.\n"
+    _check(text)
+    return text
+
+
 def _check(text: str) -> None:
     if not text.startswith("Run next:"):
         raise EngineError("Refused: the ending must start with Run next.")
