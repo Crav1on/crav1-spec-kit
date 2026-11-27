@@ -8,6 +8,8 @@
 
 Merge one named pull request with a merge commit.
 
+1.208.0: advice to merge the base in settles pristine kit copies with `kit_merge.py settle` and commits that merge with `kit_merge.py commit` (`git commit --no-edit --cleanup=strip`), as [`/crav1-finalize-commit`](crav1-finalize-commit.md) `references/pull.md` says.
+
 1.177.0: a bare number is resolved from the kit's records before this checkout's remote (`pr_common.py resolve`); several candidates are asked, never picked. Only the resolved host's CLI is named, and the ending is Run next, never a `Next:` line.
 
 1.164.0: the build walk's merge card names the pull request, for example `Merge PR 71 into develop?`, as the card wording rule in `docs/reference/question-cards.md` says. That yes is still the explicit ask.

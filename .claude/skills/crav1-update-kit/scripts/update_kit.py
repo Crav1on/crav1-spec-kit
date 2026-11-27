@@ -1619,8 +1619,58 @@ def build_actions(
     }
 
 
+def repo_write_count(actions: dict) -> int:
+    """Repo paths a plan would write, delete, or clash. Zero means nothing to commit."""
+    files = actions.get("files") or {}
+    templates = actions.get("templates") or {}
+    return sum(len(files.get(key) or []) for key in ("update", "add", "merge", "delete", "clash")) + sum(
+        len(templates.get(key) or []) for key in ("update", "delete")
+    )
+
+
+def update_card(repo_writes: int, kit2_install: bool = False, branch: str | None = None) -> dict | None:
+    """The yes card. No commit option when the repo has nothing to commit (1.208.0)."""
+    if repo_writes > 0:
+        shown = branch or "this branch"
+        return {
+            "commits": True,
+            "question": f"Update the kit on {shown}?",
+            "recommended": "yes, write and commit",
+            "words": ["yes, write and commit", "write only", "stop"],
+        }
+    if kit2_install:
+        return {
+            "commits": False,
+            "question": "Install kit 2.0 for this repo?",
+            "recommended": "install-kit2",
+            "words": ["install-kit2", "stop"],
+        }
+    return None
+
+
+def kit2_install_planned(view: dict) -> bool:
+    """True when the plan dry-run will install kit 2.0 in the user folder."""
+    return str(view.get("kit2_line") or "").startswith("Kit 2.0: dry-run ")
+
+
+def kit2_installed(line: str | None) -> bool:
+    text = line or ""
+    return text.startswith("Kit 2.0: installed ") or text.startswith("Kit 2.0: updated ")
+
+
+def ending_args(repo_touched: int, kit2_line: str | None = None) -> list[str]:
+    """Flags for ``ending``. ``--not-updated`` when this run wrote no repo files."""
+    args: list[str] = []
+    if repo_touched <= 0:
+        args.append("--not-updated")
+    if kit2_installed(kit2_line):
+        args.append("--kit2")
+    return args
+
+
 def plan_view(info: dict, actions: dict, target: str | None) -> dict:
     files = actions["files"]
+    writes = repo_write_count(actions)
     return {
         "mode": info["mode"],
         "installed": info.get("version"),
@@ -1633,6 +1683,8 @@ def plan_view(info: dict, actions: dict, target: str | None) -> dict:
         "templates": actions["templates"],
         "style_rules_left": actions.get("style_rules_left", []),
         "project_untouched": True,
+        "repo_writes": writes,
+        "card": update_card(writes, False, info.get("branch")),
         "advice": None,
     }
 
@@ -1816,7 +1868,14 @@ def apply_overlay(
     for path, data in actions["template_payloads"].items():
         _write(root, path, data)
         touched.append(path)
-    return {"touched": sorted(touched), "kept": sorted(keep & clash_paths), "project_untouched": True}
+    touched_sorted = sorted(touched)
+    return {
+        "touched": touched_sorted,
+        "kept": sorted(keep & clash_paths),
+        "project_untouched": True,
+        "repo_touched": len(touched_sorted),
+        "ending_args": ending_args(len(touched_sorted), None),
+    }
 
 
 def _cached_paths(root: Path) -> list[str]:
@@ -1974,13 +2033,20 @@ def open_design_topics(root: Path) -> list[str]:
     return out
 
 
-def ending_text(root: Path, uncommitted: int = 0, updated: bool = True) -> str:
-    """1.190.0: after an update, reload the window; name the resume command for open design topics."""
+def ending_text(root: Path, uncommitted: int = 0, updated: bool = True, kit2: bool = False) -> str:
+    """Name what this run changed. Do not say the kit files changed when none did (1.208.0)."""
     lines = ["Run next:"]
     topics = open_design_topics(root)
+    reasons = []
     if updated:
-        lines += ["The kit files changed; reload the window so the new skills load.", "",
-                  "Reload the window from the command palette:", "`Developer: Reload Window`"]
+        reasons.append("The kit files changed; reload the window so the new skills load.")
+    if kit2:
+        reasons.append("Kit 2.0 installed in your user folder; reload to load its skills.")
+    if reasons:
+        lines.append(reasons[0])
+        for extra in reasons[1:]:
+            lines += ["", extra]
+        lines += ["", "Reload the window from the command palette:", "`Developer: Reload Window`"]
     for topic in topics:
         lines += ["", f"Go on with the {topic.replace('-', ' ')} design topic:", f"`/crav1-design-architecture {topic}`"]
     if len(lines) == 1:
@@ -2148,6 +2214,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--url", default=KIT_REPO)
     parser.add_argument("--uncommitted", type=int, default=0)
     parser.add_argument("--not-updated", action="store_true")
+    parser.add_argument("--kit2", action="store_true", help="User-level kit 2.0 was installed or updated. Repo files may be unchanged.")
     parser.add_argument("--vendor", default=None, help="cursor, claude, codex, or copilot. The default prefix stays /.")
     parser.add_argument("--add", action="append", default=[], help="vendor to install, such as codex. Uses the release tree and does not upgrade other vendors.")
     parser.add_argument("--remove", action="append", default=[], help="vendor to remove. Deletes only kit-owned files that match the release.")
@@ -2198,7 +2265,9 @@ def main(argv: list[str] | None = None) -> int:
                 _print(vendor_change(root, names, adding=adding, tree=tree))
             return 0
         if args.command == "ending":
-            sys.stdout.write(with_vendor(ending_text(root, args.uncommitted, not args.not_updated), args.vendor))
+            sys.stdout.write(
+                with_vendor(ending_text(root, args.uncommitted, not args.not_updated, args.kit2), args.vendor)
+            )
             return 0
         info = detect(root, home)
         if args.command == "plan":
@@ -2219,6 +2288,8 @@ def main(argv: list[str] | None = None) -> int:
                     "files": {"update": [], "add": [], "merge": [], "delete": [], "clash": [], "unchanged": [], "left_extra": []},
                     "templates": {"update": [], "delete": [], "left": []},
                     "project_untouched": True,
+                    "repo_writes": 0,
+                    "card": None,
                     "advice": plugin_advice(info, None if target is None else str(target)),
                 }
                 _print(view)
@@ -2239,7 +2310,9 @@ def main(argv: list[str] | None = None) -> int:
                 ]
             else:
                 view["migration_ids"] = []
-            _print(_attach_early(view, root, Path(args.new), home, True))
+            view = _attach_early(view, root, Path(args.new), home, True)
+            view["card"] = update_card(int(view.get("repo_writes") or 0), kit2_install_planned(view), view.get("branch"))
+            _print(view)
             return 0
         if args.command == "apply":
             if info["mode"] != "drop-in":
@@ -2261,7 +2334,9 @@ def main(argv: list[str] | None = None) -> int:
                 sorted(hosts) if source == "inferred" else names,
             )
             dry = os.environ.get("CRAV1_KIT2_DRY_RUN") == "1"
-            _print(_attach_early(applied, root, Path(args.new), home, dry))
+            merged = _attach_early(applied, root, Path(args.new), home, dry)
+            merged["ending_args"] = ending_args(len(merged.get("touched") or []), merged.get("kit2_line"))
+            _print(merged)
             return 0
         if args.command == "migrations":
             registry = migration_registry(root, Path(args.migrations) if args.migrations else None)

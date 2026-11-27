@@ -10,6 +10,9 @@ writes: Only write the message: Writes a host persist rule only when the user ch
 leaves alone: Only write the message: Leaves the git commit alone. Commit: Leaves push alone.
 limits: Only write the message: commits only when the user also asked to commit in that turn. Commit: the worker commits immediately and skips the menu.
 flow:
+- installed kit copies that conflict, and both sides are pristine published releases, are settled by `scripts/kit_merge.py settle` to the newer release, including a file that release adds or deletes.
+- The tree is checked against that release, `nothing_lost.py` runs, and the paths are staged.
+- The merge commit is `scripts/kit_merge.py commit` (`git commit --no-edit --cleanup=strip`), so a `# Conflicts:` list is not kept.
 - `--walk` reads `walk-progress.md`.
 - A reopened or unfinished spec walk prints `Resume the spec walk:` and `/crav1-tighten-and-plan-ready-to-build <slug>`.
 - Otherwise the build walk uses the working branch, never main or master unless that branch is checked out.
@@ -72,4 +75,4 @@ runs by itself: Only write the message: Calls no skill. Commit: Calls `/crav1-fi
 you run next: /crav1-open-pr
 first: `/crav1-finalize-commit`
 walkthrough: from-commit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-finalize-commit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-finalize-commit.md

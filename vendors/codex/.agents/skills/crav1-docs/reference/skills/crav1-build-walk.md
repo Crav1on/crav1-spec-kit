@@ -104,4 +104,4 @@ runs by itself: Opens `$crav1-build-tasks`, `$crav1-verify-build-against-spec`, 
 you run next: $crav1-build-walk; $crav1-verify-build-against-spec
 first: `$crav1-build-walk @docs/specs/<slug>/`
 walkthrough: from-build-walk.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-build-walk.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-build-walk.md

@@ -8,6 +8,8 @@
 
 Open a pull request for the current change branch, or push to an existing one and update its description or comment (push with explicit yes).
 
+1.208.0: a kit-copy conflict while merging the base in is `kit_merge.py settle` from [`/crav1-finalize-commit`](crav1-finalize-commit.md), and that merge commit is `kit_merge.py commit` (`git commit --no-edit --cleanup=strip`).
+
 1.177.0: an existing pull request named by bare number is resolved from the kit's records first (`pr_common.py resolve`), and only the resolved host's CLI is named. The ending stays Run next, never a `Next:` line.
 
 1.176.0: the body is format B, on GitHub and Azure DevOps: a 2-3 sentence summary, one line per task with its full name and what it does, 1-2 lines on how it was verified, and the work-item mention. No links at all and no per-file detail; detail goes in the commit messages. On Azure DevOps `pr_common.py fit --body <file> --text` is a guard for 4,000 characters: it shortens the task lines and adds `Task lines were shortened to fit.`, with no link.

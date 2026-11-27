@@ -18,4 +18,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-finalize-commit
 first: `/crav1-review-security @docs/system/ Review the whole system. Do not write code. Do not plan.`
 walkthrough: from-review-security.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-review-security.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-review-security.md

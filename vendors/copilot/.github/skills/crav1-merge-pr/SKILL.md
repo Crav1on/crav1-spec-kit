@@ -9,7 +9,7 @@ license: MIT
 disable-model-invocation: true
 metadata:
   crav1-vendor: copilot
-  crav1-version: 1.207.0
+  crav1-version: 1.208.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.
@@ -109,7 +109,7 @@ After a confirmed merge (1.196.0), clear finished claims with no card, as [after
 
 - No merge unless this turn names the pull request and asks to merge it.
 - No squash (`--squash true`, squash merge, `mergeStrategy` `squash`). Azure DevOps complete uses `--squash false`, which is the no-fast-forward merge commit.
-- No rebase (`--rebase`, rebase and fast-forward, semi-linear / `rebaseMerge`). Advice for a branch that is behind or has conflicts says to merge the base into it, never to rebase it.
+- No rebase (`--rebase`, rebase and fast-forward, semi-linear / `rebaseMerge`). Catch up by merging the base in, never a rebase. Kit copies follow `references/pull.md` (1.208.0).
 - No `--admin`, no `--bypass-policy`, no `bypassPolicy`.
 - No second strategy attempt after a refusal or a failed `az repos pr update`.
 - No `git commit`, no stash, no new branch, no force-push.

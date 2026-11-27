@@ -10,6 +10,7 @@ writes: Writes one pull request after an explicit yes to push, or on an existing
 leaves alone: Leaves new commits and the merge alone.
 limits: names `/crav1-review-pr` and `/crav1-merge-pr` and does not run them.
 flow:
+- a kit-copy conflict while merging the base in is `kit_merge.py settle` from `/crav1-finalize-commit`, and that merge commit is `kit_merge.py commit` (`git commit --no-edit --cleanup=strip`).
 - an existing pull request named by bare number is resolved from the kit's records first (`pr_common.py resolve`), and only the resolved host's CLI is named.
 - The ending stays Run next, never a `Next:` line.
 - the body is format B, on GitHub and Azure DevOps: a 2-3 sentence summary, one line per task with its full name and what it does, 1-2 lines on how it was verified, and the work-item mention.
@@ -41,4 +42,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-review-pr; /crav1-pr-status
 first: `/crav1-open-pr @docs/specs/<slug>/`
 walkthrough: from-commit.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-open-pr.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-open-pr.md

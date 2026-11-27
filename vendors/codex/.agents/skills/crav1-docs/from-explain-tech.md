@@ -39,4 +39,4 @@ Say `save` (`$crav1-explain-tech save Service Bus in orders-api`), or answer yes
 
 Reference page: [explain a technology](reference/skills/crav1-explain-tech.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/from-explain-tech.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-explain-tech.md

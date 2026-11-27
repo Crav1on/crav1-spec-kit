@@ -260,4 +260,4 @@ The kit is at [https://github.com/Crav1on/crav1-spec-kit](https://github.com/Cra
 | Cursor plugin just installed, want the command order | [plugins/crav1/README.md](../plugins/crav1/README.md) |
 | Every other page: walkthroughs, reference, and concepts, by type and by reader | [Docs index](README.md) |
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/install.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/install.md

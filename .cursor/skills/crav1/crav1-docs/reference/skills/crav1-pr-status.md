@@ -44,4 +44,4 @@ runs by itself: Calls no other skill. Names `/crav1-add-to-spec pr<n> candidates
 you run next: /crav1-merge-pr; /crav1-add-to-spec; /crav1-ado-sync; /crav1-review-pr
 first: `/crav1-pr-status pr<n> Where does this pull request stand, and what do I owe?`
 walkthrough: from-pr-status.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/reference/skills/crav1-pr-status.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-pr-status.md

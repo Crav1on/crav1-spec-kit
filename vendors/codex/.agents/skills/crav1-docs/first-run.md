@@ -75,4 +75,4 @@ Run `$crav1-plan-from-spec`. Read `plan.md` and `tasks.md` and accept them. When
 | One command in full | [Skills reference](reference/skills.md) |
 | Broken install or skill | [SUPPORT.md](../SUPPORT.md) |
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.207.0/docs/first-run.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/first-run.md

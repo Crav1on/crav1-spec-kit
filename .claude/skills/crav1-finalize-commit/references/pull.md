@@ -6,7 +6,7 @@ This run makes at most two commits: the drafted commit, and one merge commit whe
 
 ## Kit files
 
-`docs/specs/**/spec.md`, `docs/architecture/spec.md`, `docs/system/*.md` and `docs/notes/**`. `docs/specs/<slug>/walk-progress.md` is neither of those: its hash lines are settled by the stamp rule in step 3. A `docs/specs/<slug>/build-progress/*.md` file is the same kind of file (1.142.0). Every other file is a code file: its conflicts stay with the user, as before. Say which ones, stop, and do not commit the merge.
+`docs/specs/**/spec.md`, `docs/architecture/spec.md`, `docs/system/*.md` and `docs/notes/**`. `docs/specs/<slug>/walk-progress.md` is neither of those: its hash lines are settled by the stamp rule in step 3. A `docs/specs/<slug>/build-progress/*.md` file is the same kind of file (1.142.0). Installed kit copies are neither of those: step 1b settles them when both sides are pristine release copies (1.208.0). Every other file is a code file: its conflicts stay with the user, as before. Say which ones, stop, and do not commit the merge.
 
 ## Fetch
 
@@ -20,6 +20,13 @@ This run makes at most two commits: the drafted commit, and one merge commit whe
 `pull` with uncommitted changes: stop and name `commit` instead; never stash.
 
 1. `git pull --no-rebase --no-commit`. Never rebase. Never `git pull --no-rebase` without `--no-commit`: that auto-commits a clean merge, and the check below cannot run first. A clean merge stays uncommitted until the one merge commit in step 6.
+1b. Installed kit copies (1.208.0). Paths the update-kit vendor table owns, under `.cursor/`, `.claude/`, and `.agents/`. Run `scripts/kit_merge.py settle --root <repo>` from this skill. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Do not reimplement the compare. The same command is the rule whenever the kit finishes a merge that leaves these paths conflicted, including `git merge <base>` after `/crav1-open-pr` or `/crav1-merge-pr` says to merge the base in.
+
+   The script reads each side's `Kit version:` line (the changelog heading when that line is missing) and compares both sides to those releases with the same newline-normalized compare as `crav1-update-kit` `scripts/update_kit.py`. Pass `--release <version>=<dir>` for each side when that tree is already on disk. With no `--release`, it fetches the two published tags.
+
+   When both sides are pristine copies, it writes the newer release, including a file that release adds and a file it deletes, checks the working tree matches that release, runs `scripts/nothing_lost.py`, stages the kit paths, and prints one line. Say that line once. Do not commit when `nothing_lost` is not true, or when `other_conflicts` is not empty.
+
+   When either side of a kit file was edited by hand, the script writes nothing. Its `files` list is only those paths. Say its line, stop, and do not commit the merge. A project file, a spec, a note, and a template are not settled here.
 2. Conflicts in kit files, resolved by rule:
    - Both sides added lines in the same spot: keep both, ours first, then theirs. A `**New:**` line, a glossary row or an open question goes in its sorted place instead, as `crav1-add-to-spec` `references/merge-safe.md` says (1.84.0).
    - Open questions are matched by their words, never by a `Q<n>`: the same question on both sides is one question, with both sides' `Pending:`, `Asked:`, `Answered:` lines under it (one `Blocks:` line; the newer one).
@@ -35,7 +42,7 @@ This run makes at most two commits: the drafted commit, and one merge commit whe
    - **Build progress (1.142.0).** For each unmerged `docs/specs/<slug>/build-progress/*.md`, run `build_walk.py resolve-stamps --file <path> --yes` from `crav1-build-walk` `scripts/`. Hash lines are `Tasks version`, `Spec version`, `Plan version`, `Verify version`, and `Content stamp`. A `(live yes: …)` note is progress, as a checkbox is. The script takes the upstream side. A mixed hunk is not rewritten. Do not push.
 4. Run `notes_index.py --check` from crav1-add-to-spec's `scripts/`. When it fails, on a conflict or on a clean merge, rebuild with `notes_index.py` (no extra arguments) and `git add` the indexes. Do not commit yet.
 5. Run `scripts/nothing_lost.py` in this skill, with `--root` set to the repo. Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Before the merge commit, the working tree is the merge. Do not say Nothing lost unless the script prints `"nothing_lost": true`. Lines lost: do not commit; list each line with its file and side, and restore them first.
-6. One merge commit, and no other. Stage the rebuilt indexes with the merge. A settled `walk-progress.md` is already staged. A settled `build-progress` file is already staged. When the index was rebuilt, append `Rebuilt the notes index into this merge.` to the merge message, then commit that message once. Otherwise `git commit --no-edit`. Do not make a second commit for the index. Do not commit while a mixed `walk-progress.md` or `build-progress` conflict remains.
+6. One merge commit, and no other. Stage the rebuilt indexes with the merge. A settled `walk-progress.md` is already staged. A settled `build-progress` file is already staged. A settled kit copy is already staged. Run `scripts/kit_merge.py commit --root <repo>`. When the index was rebuilt, pass `--append "Rebuilt the notes index into this merge."`. That command is `git commit --no-edit --cleanup=strip` (an explicit stripped message when a sentence is appended), so a `# Conflicts:` list never lands in the message. Do not run `git commit --no-edit` without `--cleanup=strip`. Do not make a second commit for the index. Do not commit while a mixed `walk-progress.md` or `build-progress` conflict remains, or while a hand-edited kit copy is still unmerged.
 7. End, only when the script said nothing was lost: `Merged <upstream> into <branch>. Nothing lost. Ready to push.` When the index was rebuilt, say it is in the merge commit. The stamp line from step 3 was already said.
 
 If the merge is already committed when you get here (an older pull that auto-committed), do not make another commit. When the index check fails, rebuild it, leave it uncommitted, and name it on the `Uncommitted:` line.
