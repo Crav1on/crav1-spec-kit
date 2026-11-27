@@ -9,12 +9,13 @@ from __future__ import annotations
 
 import json
 import re
+import tempfile
 from dataclasses import dataclass, field
 from datetime import timedelta
 from pathlib import Path
 
 from crav1_2.cards import card_problems
-from crav1_2.ending import render_settled
+from crav1_2.ending import render_covered, render_settled
 from crav1_2.errors import EngineError
 from crav1_2.fold import fold_events
 from crav1_2.lines import line_has_mark, one_x_lines_unchanged
@@ -164,7 +165,9 @@ def link_to_spec(repo: Path, words: list[str], payload: dict | None) -> dict:
     if inv.dry_run:
         return _preview(plan)
     if not plan["cards"]:
-        return _finalize(repo, _shell(repo, plan, parked=False), [])
+        done = _finalize(repo, _shell(repo, plan, parked=False), [])
+        done["ending"] = render_covered()
+        return done
     session = _save(repo, plan, parked=inv.park, previous=None)
     if inv.answer:
         return _apply(repo, session, inv)
@@ -219,6 +222,9 @@ def _packet(repo: Path, inv: Invocation) -> dict:
     for note in notes:
         packet_notes.append({"note": note["note"], "markdown": _note_text(repo, note)})
     tasks = repo / "docs" / "specs" / inv.slug / "tasks.md"
+    tasks_text = tasks.read_text(encoding="utf-8") if tasks.is_file() else ""
+    decisions = render_decisions(state)
+    files = _finder_files(inv.slug, packet_notes, notes, spec_text, decisions, tasks_text)
     return {
         "wrote": False,
         "dry_run": inv.dry_run,
@@ -231,10 +237,8 @@ def _packet(repo: Path, inv: Invocation) -> dict:
         "parked": None,
         "session": None,
         "events": [],
-        "notes": packet_notes,
-        "spec_markdown": spec_text,
-        "decisions_markdown": render_decisions(state),
-        "tasks_markdown": tasks.read_text(encoding="utf-8") if tasks.is_file() else "",
+        "notes": [{"note": note["note"]} for note in packet_notes],
+        "finder_files": files,
     }
 
 
@@ -328,9 +332,7 @@ def _gap_from(raw: object, cite, ids: "_Ids", spec: str) -> dict:
     status = raw.get("status")
     if status not in {"covered", "silent", "conflicting", "vague"}:
         raise EngineError("Refused: status must be covered, silent, conflicting, or vague.")
-    note_id = raw.get("note")
-    if not isinstance(note_id, str) or not NOTE_ID.fullmatch(note_id):
-        raise EngineError("Refused: a finder item needs a note id.")
+    note_id = _finder_note(raw.get("note"))
     passages = raw.get("passages")
     if not isinstance(passages, list) or any(not isinstance(item, str) for item in passages):
         raise EngineError("Refused: passages must be a list of passage ids.")
@@ -641,12 +643,13 @@ def _preview(plan: dict) -> dict:
     proposed = []
     for card in plan["cards"]:
         proposed.extend(card["proposed"])
+    ending = render_covered() if not plan["cards"] else None
     return {
         "wrote": False,
         "dry_run": True,
         "needs_finder": False,
         "spec": plan["spec"],
-        "ending": None,
+        "ending": ending,
         "card_text": texts[0] if texts else "",
         "cards": texts,
         "proposed_items": proposed,
@@ -1186,6 +1189,112 @@ def _existing_fact(state: dict, note_id: str, passage_id: str, quote: str) -> st
         if fact["note"] == note_id and fact["passage"] == passage_id and fact["quote"] == quote:
             return fact["fact"]
     return None
+
+
+def _finder_note(value: object) -> str:
+    """A finder item names the note id. ``note-<id>`` is the command word; accept both."""
+    if not isinstance(value, str):
+        raise EngineError("Refused: a finder item needs a note id.")
+    note_id = value.strip()
+    prefixed = note_id[len("note-"):] if note_id.startswith("note-") else ""
+    if prefixed and NOTE_ID.fullmatch(prefixed):
+        note_id = prefixed
+    if not NOTE_ID.fullmatch(note_id):
+        raise EngineError("Refused: a finder item needs a note id.")
+    return note_id
+
+
+_TOPIC_STOP = frozenset({
+    "about", "after", "again", "also", "been", "before", "could", "does",
+    "each", "from", "have", "into", "just", "like", "more", "most", "only",
+    "other", "over", "same", "should", "some", "such", "than", "that",
+    "their", "them", "then", "there", "these", "they", "this", "those",
+    "very", "what", "when", "where", "which", "with", "would", "your",
+})
+
+
+def _finder_files(
+    slug: str,
+    packet_notes: list[dict],
+    notes: list[dict],
+    spec_text: str,
+    decisions: str,
+    tasks_text: str,
+) -> dict:
+    """Write the four finder inputs beside the process and return their paths.
+
+    The path guard allows only the session JSON under ``.crav1-2/sessions/``,
+    so these files live in a temp folder. The reply names the paths and does
+    not carry the spec body.
+    """
+    folder = Path(tempfile.mkdtemp(prefix=f"crav1-2-finder-{slug}-"))
+    bodies = {
+        "notes": _with_newline("\n\n".join(row["markdown"].rstrip() for row in packet_notes)),
+        "spec": _with_newline(_narrow_spec(spec_text, notes)),
+        "decisions": _with_newline(decisions),
+        "tasks": _with_newline(tasks_text),
+    }
+    paths = {}
+    for name, body in bodies.items():
+        path = folder / f"{name}.md"
+        path.write_text(body, encoding="utf-8")
+        paths[name] = str(path)
+    return paths
+
+
+def _with_newline(text: str) -> str:
+    if not text:
+        return ""
+    return text if text.endswith("\n") else text + "\n"
+
+
+def _narrow_spec(text: str, notes: list[dict]) -> str:
+    """Keep sections that share the note's words, plus Open questions.
+
+    A section stays when it shares one word of five or more letters, or two
+    words of four or more, with the note title, a quote, or a know heading.
+    No match keeps the whole spec.
+    """
+    topics = _topics(notes)
+    pieces = re.split(r"(?m)^## ", text)
+    if not topics or len(pieces) < 2:
+        return text
+    kept = []
+    matched = False
+    for piece in pieces[1:]:
+        heading, _sep, body = piece.partition("\n")
+        title = heading.strip().lower()
+        hit = _section_hit(heading + "\n" + body, topics)
+        if title == "open questions" or hit:
+            kept.append("## " + piece.strip() + "\n")
+            if hit and title != "open questions":
+                matched = True
+    if not matched:
+        return text
+    out = pieces[0].rstrip() + "\n\n" + "\n".join(kept)
+    return out if out.endswith("\n") else out + "\n"
+
+
+def _topics(notes: list[dict]) -> set[str]:
+    chunks = []
+    for note in notes:
+        chunks.append(str(note.get("title") or ""))
+        for passage in note.get("passage_list") or []:
+            chunks.append(str(passage.get("quote") or ""))
+        for block in note.get("know") or []:
+            chunks.append(str(block.get("heading") or ""))
+    found = set()
+    for word in re.findall(r"[a-z0-9]+", " ".join(chunks).lower()):
+        if len(word) >= 4 and word not in _TOPIC_STOP:
+            found.add(word)
+    return found
+
+
+def _section_hit(text: str, topics: set[str]) -> bool:
+    shared = topics & set(re.findall(r"[a-z0-9]+", text.lower()))
+    if any(len(word) >= 5 for word in shared):
+        return True
+    return len(shared) >= 2
 
 
 def _note_text(repo: Path, note: dict) -> str:

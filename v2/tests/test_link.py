@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import random
+import shutil
 import subprocess
 import sys
 import unittest
@@ -551,12 +552,69 @@ class Guard(Repo):
             "at": "2026-11-26T13:31:00+01:00",
             "finder": {"items": [{"status": "covered", "note": NOTE, "passages": ["p-001"]}]},
         })
-        self.assertTrue(covered["ending"].startswith("Run next:"))
+        self.assertEqual(
+            covered["ending"],
+            "Run next: nothing needed; the spec already covers this note.\n",
+        )
         self.assertNotIn("Also recorded:", covered["ending"])
         self.assertEqual((other / "spec.md").read_text(encoding="utf-8"), "# Weekly file\n\n## Constraints\n- The window is unnamed.\n")
         kinds = {event["type"] for event in covered["events"]}
         self.assertIn("fact.cited", kinds)
         self.assertIn("note.read", kinds)
+
+
+class FinderShape(Repo):
+    def test_note_prefix_is_a_note_id(self):
+        opened = link_to_spec(self.root, [SLUG], self.finder([self.silent(note=f"note-{NOTE}")]))
+        self.assertIn("Card:", opened["card_text"])
+        self.assertIsNone(opened["ending"])
+        with self.assertRaises(EngineError) as caught:
+            link_to_spec(self.root, [SLUG], self.finder([self.silent(note="note-not-a-date")]))
+        self.assertIn("a finder item needs a note id", caught.exception.message)
+
+    def test_covered_dry_run_returns_an_ending(self):
+        other = self.root / "docs" / "specs" / "weekly-file"
+        other.mkdir(parents=True)
+        (other / "spec.md").write_text("# Weekly file\n\n## Constraints\n- The window is unnamed.\n", encoding="utf-8")
+        before = self.snapshot()
+        dry = link_to_spec(self.root, ["weekly-file", "dry-run"], {
+            "at": "2026-11-26T13:31:00+01:00",
+            "finder": {"items": [{"status": "covered", "note": f"note-{NOTE}", "passages": ["p-001"]}]},
+        })
+        self.assertTrue(dry["dry_run"])
+        self.assertFalse(dry["wrote"])
+        self.assertEqual(dry["cards"], [])
+        self.assertEqual(
+            dry["ending"],
+            "Run next: nothing needed; the spec already covers this note.\n",
+        )
+        self.assertFalse(any(line.startswith("Next:") for line in dry["ending"].splitlines()))
+        self.assertEqual(self.snapshot(), before)
+
+    def test_finder_inputs_are_files_and_the_spec_is_narrowed(self):
+        extra = "\n## Payroll calendar\n\nThe payroll calendar lists pay dates for the year.\n"
+        self.spec_path().write_text(SPEC + extra, encoding="utf-8")
+        packet = link_to_spec(self.root, [SLUG], {})
+        self.assertTrue(packet["needs_finder"])
+        self.assertNotIn("spec_markdown", packet)
+        self.assertNotIn("Payroll", json.dumps(packet))
+        files = packet["finder_files"]
+        self.addCleanup(lambda: shutil.rmtree(Path(files["spec"]).parent, ignore_errors=True))
+        spec = Path(files["spec"]).read_text(encoding="utf-8")
+        self.assertIn("## Constraints", spec)
+        self.assertIn("## Open questions", spec)
+        self.assertNotIn("Payroll", spec)
+        self.assertIn(QUOTE, Path(files["notes"]).read_text(encoding="utf-8"))
+        self.assertIn("T1", Path(files["tasks"]).read_text(encoding="utf-8"))
+        for key in ("notes", "spec", "decisions", "tasks"):
+            self.assertTrue(Path(files[key]).is_file(), key)
+        agent = (V2 / "agents" / "crav1-2-gap-finder-agent.md").read_text(encoding="utf-8")
+        read = (V2 / "skills" / "crav1-2-link-to-spec" / "references" / "read.md").read_text(encoding="utf-8")
+        self.assertIn("YYYY-MM-DD-slug", agent)
+        self.assertIn("Do not write the `note-` prefix", agent)
+        self.assertIn("Read each path you are given", agent)
+        self.assertIn("finder_files.spec", read)
+        self.assertIn("Do not paste those files", read)
 
 
 def _fresh(root: Path, *words) -> dict:

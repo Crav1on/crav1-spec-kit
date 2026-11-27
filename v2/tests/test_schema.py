@@ -50,6 +50,21 @@ class Accept(unittest.TestCase):
         self.assertEqual(cleaned["data"]["passages"], 1)
         self.assertEqual(cleaned["data"]["passage_list"][0]["lines"], "L40-L42")
 
+    def test_passage_when_accepts_a_date_and_hhmm(self):
+        for value in (
+            "09:12",
+            "2026-11-24 15:57",
+            "2026-11-24 15:57Z",
+            "2026-11-24 15:57+01:00",
+            "2026-11-24 15:57 +0100",
+        ):
+            event = note_event()
+            event["data"]["passage_list"][0]["when"] = value
+            self.assertEqual(validate_event(event)["data"]["passage_list"][0]["when"], value)
+        dated = note_event()
+        dated["data"]["added"] = "2026-11-27"
+        self.assertEqual(validate_event(dated)["data"]["added"], "2026-11-27")
+
     def test_zulu_time_is_an_offset(self):
         event = note_event()
         event["at"] = "2026-11-25T10:41:00Z"
@@ -81,6 +96,10 @@ class Refuse(unittest.TestCase):
         bad_id = note_event()
         bad_id["id"] = "not-a-ulid"
         self._refuses(bad_id, "ULID")
+        for value in ("tomorrow", "99:99", "2026-02-31 15:57", "15:57+01:00"):
+            bad_when = note_event()
+            bad_when["data"]["passage_list"][0]["when"] = value
+            self._refuses(bad_when, "HH:MM")
 
     def test_mixed_origin_and_short_card(self):
         item = {

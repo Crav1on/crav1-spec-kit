@@ -15,12 +15,13 @@ def render_note(note: dict) -> str:
     kinds = list(note.get("kinds") or [])
     date = note["date"]
     added_by = note.get("added_by") or "engine"
+    added = note.get("added") or date
     files = list(note.get("files") or [])
     source = note.get("from_sources") or None
     lines = [
         f"# {title} ({_and(kinds)}, {date})",
         "",
-        f"Kinds: {', '.join(kinds)} · Date: {date} · Added: {date} by {added_by}",
+        f"Kinds: {', '.join(kinds)} · Date: {date} · Added: {added} by {added_by}",
         "Originals: " + (", ".join(files) if files else "none"),
         "From sources: " + (source if source else "none"),
     ]

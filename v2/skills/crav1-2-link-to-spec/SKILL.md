@@ -39,6 +39,6 @@ Print the engine's `ending` first when it is present. It already starts with `Ru
 
 When `dry_run` is true, print every entry in `cards`, then `proposed_items`. Nothing was written.
 
-When `needs_finder` is true, follow `references/read.md`.
+When `needs_finder` is true, follow `references/read.md`. The finder reads the files named in `finder_files`. Do not paste the spec into the chat.
 
 When `wrote` is false and `card_text` is set, print `card_text` and stop. The ending waits until the card is answered.

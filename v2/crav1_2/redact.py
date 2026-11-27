@@ -1,6 +1,7 @@
-"""Secret redaction, the same rule as 1.x sources: remove the value, keep the kind.
+"""Secret redaction. Remove the secret value, keep the kind.
 
-Personal data that is not a secret is left for the note. A secret is never a choice.
+Names and other personal data stay as written. A project's sot/ does not anonymise.
+There is no anonymise switch. A secret is never a choice.
 """
 
 from __future__ import annotations

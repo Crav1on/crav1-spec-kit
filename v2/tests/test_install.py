@@ -43,7 +43,7 @@ class Install(unittest.TestCase):
         plugin = self.home / ".cursor" / "plugins" / "local" / "crav1-2" / ".cursor-plugin" / "plugin.json"
         manifest = json.loads(plugin.read_text(encoding="utf-8"))
         self.assertEqual(manifest["name"], "crav1-2")
-        self.assertEqual(manifest["version"], "2.0.0-alpha.3")
+        self.assertEqual(manifest["version"], "2.0.0-alpha.4")
         skill = self.home / ".claude" / "skills" / "crav1-2-help" / "SKILL.md"
         self.assertIn("alpha", skill.read_text(encoding="utf-8").lower())
         self.assertFalse((self.home / ".claude" / "CLAUDE.md").exists())
@@ -66,7 +66,7 @@ class Install(unittest.TestCase):
             capture_output=True,
             env={**__import__("os").environ, "PYTHONPATH": str(engine)},
         )
-        self.assertEqual(probe.stdout.strip(), "2.0.0-alpha.3", probe.stderr)
+        self.assertEqual(probe.stdout.strip(), "2.0.0-alpha.4", probe.stderr)
         report = json.loads(run(self.home, "status").stdout)
         self.assertTrue(report["installed"])
         self.assertEqual(report["changed"], [])

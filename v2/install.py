@@ -16,7 +16,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-ENGINE = "2.0.0-alpha.3"
+ENGINE = "2.0.0-alpha.4"
 MIN_1X = (1, 205, 0)
 CODEX_NOTE = (
     "skipped: 1.x Codex install writes project .agents/skills/ and has no user-level skills path"

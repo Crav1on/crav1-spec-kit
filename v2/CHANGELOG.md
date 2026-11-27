@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.0.0-alpha.4 (unreleased)
+
+`/crav1-2-add-to-sot` mail capture. Not released. No tag.
+
+- A passage time may be `HH:MM` or a date and time (`2026-11-24 15:57`), with an optional zone. `HH:MM` stays valid. The note shows the full value. A mail passage carries the day.
+- The Added line uses the date the note is written and the person running the command (`git config user.name`, or the name the skill passes). The source date stays on Date. `added_by` is never a speaker label.
+- A mail file passed as `source`, or as a `.eml` word, is copied as an original. Secret values are removed. The note points at that file.
+- Quotes in a project's `sot/` keep real names. Only secret values are removed. The engine does not redact personal names. No project opt-in for anonymising exists, so none was added.
+- Until 2.0 and 1.x split, a capture that does not already hold a matched answer suggests `/crav1-add-to-spec` for the same source. The suggestion is not run. A matched answer still suggests `/crav1-2-link-to-spec`.
+- A finder item's `note` may be the id (`2026-11-25-outbound-channel`) or the command word (`note-<id>`). The engine keeps the id. The gap-finder agent is told to write the id only.
+- When every finder item is covered and there is no card, the ending is `Run next: nothing needed; the spec already covers this note.` Dry-run returns that ending and still writes nothing.
+- The engine writes the finder inputs to a temp folder and returns `finder_files` (notes, spec, decisions, tasks). The reply does not carry the spec body. The spec file keeps sections that share the note's words, plus open questions; no match keeps the whole spec. The files are outside the session JSON because the path guard allows only that JSON under `.crav1-2/sessions/`.
+
 ## 2.0.0-alpha.3 (unreleased)
 
 `/crav1-2-link-to-spec` and `crav1-2-gap-finder-agent`. Phase 1 is complete. Not released. No tag.

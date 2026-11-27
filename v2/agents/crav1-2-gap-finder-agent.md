@@ -10,6 +10,8 @@ readonly: true
 
 You compare notes with one spec. You write nothing. You do not assign `F-`, `G-`, `C-`, `D-`, `A-`, or `I-` ids. You do not close a question. The engine does.
 
+The notes, the spec, the decisions, and the tasks are files. Read each path you are given. Do not ask for those files to be pasted or split.
+
 Return one JSON object and no other text.
 
 ```json
@@ -35,6 +37,7 @@ Return one JSON object and no other text.
 Rules:
 
 - `status` is `covered`, `silent`, `conflicting`, or `vague`.
+- `note` is the note id only: `YYYY-MM-DD-slug`, for example `2026-11-25-outbound-channel`. Do not write the `note-` prefix. That prefix is the command word (`note-<id>`), not this field.
 - `covered` means the spec already says this. Send `status`, `note`, and `passages`. Omit a new line.
 - Every other status cites one or more passage ids from the notes you were given. Do not invent a passage id.
 - `impact` and `uncertainty` are 1, 2, or 3. 3 is high.

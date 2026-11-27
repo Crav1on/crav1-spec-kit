@@ -8,12 +8,13 @@ its session file.
 from __future__ import annotations
 
 import re
+import subprocess
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
 
 from crav1_2.cards import build_keep_card, format_card
-from crav1_2.ending import render_ending
+from crav1_2.ending import capture_follow, render_ending
 from crav1_2.errors import EngineError
 from crav1_2.fold import empty_state, fold_events
 from crav1_2.lint import lint_events
@@ -31,6 +32,7 @@ from crav1_2.schema import (
     VENDORS,
     now_iso,
     parse_at,
+    passage_when_problem,
     validate_event,
 )
 from crav1_2.sessions import write_session
@@ -41,7 +43,7 @@ _SOURCE = {"mail", "chat", "meeting", "session", "document", "fact", "from-sourc
 _CARD = {"keep-all", "pick-some", "stop"}
 _PAYLOAD_KEYS = {
     "title", "date", "added_by", "at", "slug", "vendor", "session_id",
-    "captured_from", "extractor", "originals", "from_sources", "card",
+    "captured_from", "extractor", "originals", "from_sources", "source", "card",
     "picks", "compacted", "session_file", "home",
 }
 _FROM = re.compile(r"^docs/sources/([A-Za-z0-9][A-Za-z0-9._-]*)/?$")
@@ -56,6 +58,7 @@ class Invocation:
     card: str | None = None
     picks: list[int] = field(default_factory=list)
     run_pick: str | None = None
+    source: str | None = None
 
     def has_source(self) -> bool:
         return bool(self.kinds) or self.from_sources or self.this_session
@@ -87,6 +90,11 @@ def parse_invocation(words: list[str]) -> Invocation:
             continue
         if isinstance(word, str) and RUN_ID.fullmatch(word):
             inv.run_pick = word
+            continue
+        if isinstance(word, str) and word.lower().endswith(".eml"):
+            if inv.source and inv.source != word:
+                raise EngineError("Refused: the mail file is given twice and they differ.")
+            inv.source = word
             continue
         raise EngineError(f"Refused: unknown word {word}. {_WORDS}")
     if inv.picks and inv.card != "pick-some":
@@ -196,7 +204,6 @@ def _prepare(repo: Path, inv: Invocation, payload: dict) -> dict:
         datetime.fromisoformat(str(date))
     except ValueError as exc:
         raise EngineError("Refused: date must be YYYY-MM-DD.") from exc
-    added_by = _line(payload.get("added_by") or "user", "added_by") or "user"
     at = payload.get("at") or now_iso()
     try:
         parse_at(at)
@@ -217,7 +224,11 @@ def _prepare(repo: Path, inv: Invocation, payload: dict) -> dict:
         redactions.extend(more)
     know, more = _redact_know(know)
     redactions.extend(more)
+    added_by = _added_by(repo, payload, passages)
+    added = datetime.now().astimezone().date().isoformat()
     originals, more = _originals(payload.get("originals") or [])
+    redactions.extend(more)
+    originals, more, source_display = _attach_mail(repo, inv, payload, originals)
     redactions.extend(more)
     vendor = None
     captured = None
@@ -262,6 +273,7 @@ def _prepare(repo: Path, inv: Invocation, payload: dict) -> dict:
         "title": title,
         "date": str(date),
         "added_by": added_by,
+        "added": added,
         "at": at,
         "not_before": (existing or {}).get("at"),
         "kinds": list(inv.kinds),
@@ -281,6 +293,7 @@ def _prepare(repo: Path, inv: Invocation, payload: dict) -> dict:
         "why": why,
         "preamble": preamble,
         "_originals": originals,
+        "source_display": source_display,
     }
 
 
@@ -343,8 +356,9 @@ def _one_passage(row: object, inv: Invocation) -> dict:
         raise EngineError("Refused: a passage needs a speaker.")
     passage = {"kind": kind, "who": who, "quote": quote}
     if "when" in row:
-        if not isinstance(row["when"], str) or not re.fullmatch(r"\d{2}:\d{2}", row["when"]):
-            raise EngineError("Refused: a passage time must be HH:MM.")
+        problem = passage_when_problem(row["when"])
+        if problem:
+            raise EngineError("Refused: " + problem)
         passage["when"] = row["when"]
     if "label" in row:
         if row["label"] not in LABELS:
@@ -466,6 +480,92 @@ def _originals(items: object) -> tuple[list[tuple[str, bytes]], list[str]]:
     return loaded, kinds
 
 
+def _added_by(repo: Path, payload: dict, passages: list[dict]) -> str:
+    """The person running the command. Never a passage speaker.
+
+    The skill may pass ``added_by``. When it does not, the name is
+    ``git config user.name``. A name that matches a speaker is refused,
+    including when that name is the only one git can offer.
+    """
+    speakers = set()
+    for passage in passages:
+        who = passage.get("who")
+        if isinstance(who, str) and who.strip():
+            speakers.add(who.strip().casefold())
+    raw = payload.get("added_by")
+    if raw is not None:
+        name = _line(raw, "added_by")
+        if not name or _same_speaker(name, speakers):
+            raise EngineError("Refused: added_by is the person running the command, not a speaker label.")
+        return name
+    git_name = _git_user_name(repo)
+    if git_name and not _same_speaker(git_name, speakers):
+        return git_name
+    if git_name:
+        raise EngineError("Refused: added_by is the person running the command, not a speaker label.")
+    raise EngineError(
+        "Refused: added_by is the person running the command. Pass it, or set git user.name. It must not be a speaker label."
+    )
+
+
+def _same_speaker(name: str, speakers: set[str]) -> bool:
+    return name.strip().casefold() in speakers
+
+
+def _git_user_name(repo: Path) -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(repo), "config", "--get", "user.name"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode != 0:
+        return None
+    name = result.stdout.strip()
+    if not name or "\n" in name or "\r" in name:
+        return None
+    return name
+
+
+def _attach_mail(
+    repo: Path, inv: Invocation, payload: dict, originals: list[tuple[str, bytes]]
+) -> tuple[list[tuple[str, bytes]], list[str], str | None]:
+    """Copy the mail file as an original when the run names one.
+
+    The extractor does not have to list it. Secret values are removed the
+    same way as any other original. ``from-sources`` still copies nothing.
+    """
+    raw = payload.get("source")
+    if raw is not None and not isinstance(raw, str):
+        raise EngineError("Refused: source must be a path.")
+    word = inv.source
+    if raw and word and raw != word:
+        raise EngineError("Refused: the mail file is given twice and they differ.")
+    chosen = raw or word
+    if not chosen:
+        return originals, [], None
+    if inv.from_sources:
+        raise EngineError("Refused: from-sources copies nothing.")
+    if "mail" not in inv.kinds:
+        raise EngineError("Refused: source is the mail file. Pass it with the mail word.")
+    path = Path(chosen)
+    if not path.is_file():
+        alt = repo / chosen
+        if alt.is_file():
+            path = alt
+        else:
+            raise EngineError("Refused: the mail file is not a file.")
+    name = path.name
+    if any(existing == name for existing, _data in originals):
+        return originals, [], chosen
+    extra, found = _originals([{"name": name, "from": str(path)}])
+    return extra + originals, found, chosen
+
+
 def _matches(passages: list[dict], questions: list[dict]) -> list[dict]:
     found = []
     for index, passage in enumerate(passages):
@@ -578,14 +678,15 @@ def _preview(repo: Path, prepared: dict, inv: Invocation) -> dict:
             "parked": None,
         }
     state, _events = _state(repo)
-    events, markdown, specs = _events_for(prepared, _selection(inv, prepared), "s-0000", state)
+    selected = _selection(inv, prepared)
+    events, markdown, specs = _events_for(prepared, selected, "s-0000", state)
     return {
         "wrote": False,
         "dry_run": True,
         "note_id": prepared["note_id"],
         "note_markdown": markdown,
         "events": events,
-        "ending": render_ending(specs, None),
+        "ending": render_ending(specs, None, _follow(repo, prepared, selected)),
         "card": prepared.get("card"),
         "card_text": _card_text(prepared),
         "proposal": prepared.get("preamble") or "",
@@ -661,10 +762,13 @@ def _finish_parked(repo: Path, parked: dict, inv: Invocation, payload: dict) -> 
 def _write(repo: Path, prepared: dict, inv: Invocation) -> dict:
     if prepared.get("empty"):
         return _empty(prepared)
+    prepared = dict(prepared)
+    prepared["added"] = datetime.now().astimezone().date().isoformat()
     require_init(repo)
     state, existing = _state(repo)
     run = prepared.get("_run") or _next_run(repo, existing)
-    events, markdown, specs = _events_for(prepared, _selection(inv, prepared), run, state)
+    selected = _selection(inv, prepared)
+    events, markdown, specs = _events_for(prepared, selected, run, state)
     before = lint_events(existing, repo)
     after = lint_events(existing + events, repo)
     if len(after) > len(before):
@@ -686,7 +790,7 @@ def _write(repo: Path, prepared: dict, inv: Invocation) -> dict:
         "note_id": prepared["note_id"],
         "note_markdown": markdown,
         "events": events,
-        "ending": render_ending(specs, prepared["note_id"]),
+        "ending": render_ending(specs, prepared["note_id"], _follow(repo, prepared, selected)),
         "card": prepared.get("card"),
         "card_text": "",
         "proposal": "",
@@ -724,6 +828,7 @@ def _events_for(prepared: dict, selected: list[tuple[int, dict]], run: str, stat
         "passages": len(assigned),
         "title": prepared["title"],
         "added_by": prepared["added_by"],
+        "added": prepared["added"],
         "passage_list": assigned,
     }
     if know:
@@ -757,9 +862,15 @@ def _events_for(prepared: dict, selected: list[tuple[int, dict]], run: str, stat
         if old_know or know:
             render_source["know"] = old_know + know
         current = state["notes"].get(prepared["note_id"]) or {}
-        for key in ("vendor", "captured_from", "session_id", "quotes", "redactions", "title", "added_by", "kinds", "files", "from_sources"):
+        for key in ("vendor", "captured_from", "session_id", "quotes", "redactions", "title", "added_by", "added", "kinds", "files", "from_sources"):
             if key in current and key not in render_source:
                 render_source[key] = current[key]
+        if current.get("added_by"):
+            render_source["added_by"] = current["added_by"]
+        if current.get("added"):
+            render_source["added"] = current["added"]
+        else:
+            render_source.pop("added", None)
         if current.get("files") and not prepared.get("files"):
             render_source["files"] = list(current["files"])
     verified = [passage for passage in assigned if passage.get("verified") is True]
@@ -843,6 +954,16 @@ def _stamps(start: str, count: int, not_before: str | None) -> list[str]:
         if base <= earlier:
             base = earlier + timedelta(seconds=1)
     return [(base + timedelta(seconds=offset)).isoformat() for offset in range(count)]
+
+
+def _follow(repo: Path, prepared: dict, selected: list[tuple[int, dict]]) -> list[str]:
+    return capture_follow(
+        repo,
+        kinds=list(prepared.get("kinds") or []),
+        title=str(prepared.get("title") or ""),
+        source=prepared.get("source_display"),
+        passages=[passage for _index, passage in selected],
+    )
 
 
 def _folder(value: str | None) -> str | None:
