@@ -9,9 +9,14 @@ from the project root:
     python -X utf8 kit_dry_run.py --pr 277 --spec "orders-api" --add codex
 
 It shallow-clones the kit at that pull request or branch into a temp folder,
-adds a detached temporary git worktree of this project at HEAD, runs the
-kit's own update_kit.py into the worktree, then `walk_progress.py start` and
-`readiness --text` there (plus any --extra), and prints one block between
+then dry-runs that head as if it were merged onto origin/main: a temporary
+merge in a scratch worktree. A conflict falls back to the branch and names
+the files that exist only on main, and those files are never reported as
+deletes. A `--spec` placeholder or a name that matches no spec stops before
+the update and lists the spec slugs. It adds a detached temporary git
+worktree of this project at HEAD, runs the kit's own update_kit.py into the
+worktree, then `walk_progress.py start` and `readiness --text` there (plus
+any --extra), and prints one block between
 `===== COPY FROM HERE =====` and `===== COPY TO HERE =====`. The block is
 saved in the temp folder and copied to the clipboard when a clipboard tool
 is there. The worktree and both temp folders are removed in a finally block.
@@ -118,7 +123,8 @@ def clone_kit(dest: Path, source: str | None, pr: int | None, branch: str | None
         code, out = run(GIT + ["clone", "--quiet", "--depth", "1", "--branch", branch or ref, url, str(dest)])
         return code == 0, out
     dest.mkdir(parents=True, exist_ok=True)
-    steps = [GIT + ["init", "--quiet"], GIT + ["fetch", "--quiet", "--depth", "1", url, f"pull/{pr}/head"],
+    steps = [GIT + ["init", "--quiet"], GIT + ["remote", "add", "origin", url],
+             GIT + ["fetch", "--quiet", "--depth", "1", "origin", f"pull/{pr}/head"],
              GIT + ["checkout", "--quiet", "--detach", "FETCH_HEAD"]]
     for cmd in steps:
         code, out = run(cmd, cwd=dest)
@@ -264,7 +270,175 @@ def flags_banner(repo: Path, kit: Path) -> str | None:
     return module.banner(repo)
 
 
-def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> list[str]:
+def _item_path(item: object) -> str | None:
+    if isinstance(item, dict):
+        path = item.get("path")
+        return path if isinstance(path, str) else None
+    return item if isinstance(item, str) else None
+
+
+def _drop_hidden(items: list, hide: set[str]) -> list:
+    return [item for item in items if _item_path(item) not in hide]
+
+
+def _scrub_deletes(text: str, hide: set[str]) -> str:
+    """Files that exist only on main are not deletes of the pull request (1.209.0)."""
+    if not hide:
+        return text
+    try:
+        data = json.loads(text)
+    except ValueError:
+        return text
+    if not isinstance(data, dict):
+        return text
+    files = data.get("files")
+    if isinstance(files, dict) and isinstance(files.get("delete"), list):
+        files["delete"] = _drop_hidden(files["delete"], hide)
+    templates = data.get("templates")
+    if isinstance(templates, dict) and isinstance(templates.get("delete"), list):
+        templates["delete"] = _drop_hidden(templates["delete"], hide)
+    if isinstance(data.get("delete"), list):
+        data["delete"] = _drop_hidden(data["delete"], hide)
+    if isinstance(data.get("touched"), list):
+        data["touched"] = _drop_hidden(data["touched"], hide)
+    return json.dumps(data)
+
+
+def _resolve_mod():
+    path = Path(__file__).resolve().parent.parent / ".cursor/skills/crav1/crav1-tasks-ready-to-build/scripts/resolve_spec.py"
+    if not path.is_file():
+        return None
+    spec = importlib.util.spec_from_file_location("crav1_dry_resolve", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def available_specs(repo: Path) -> str:
+    root = repo / "docs/specs"
+    if not root.is_dir():
+        return "(none)"
+    slugs = [
+        child.name for child in sorted(root.iterdir())
+        if child.is_dir() and child.name not in {"_template", "retired"} and (child / "spec.md").is_file()
+    ]
+    return ", ".join(slugs) if slugs else "(none)"
+
+
+def spec_problem(repo: Path, spec: str) -> str | None:
+    """A placeholder or an unknown spec stops the dry run. None when one spec matches."""
+    text = (spec or "").strip()
+    slugs = available_specs(repo)
+    if "<" in text and ">" in text:
+        return f"--spec '{text}' is a placeholder. Pass a spec slug. Available specs: {slugs}."
+    module = _resolve_mod()
+    if module is None:
+        names = {part.strip() for part in slugs.split(",")}
+        return None if text in names else f"No spec named '{text}'. Available specs: {slugs}."
+    query = text
+    direct = Path(text)
+    if not direct.is_absolute() and (repo / text).is_dir():
+        query = str(repo / text)
+    result = module.resolve(str(repo / "docs/specs"), query)
+    if result.get("ok"):
+        return None
+    if result.get("code") == "several":
+        names = ", ".join(item.get("slug") or "" for item in result.get("matches") or [])
+        return f"--spec '{text}' matches more than one spec: {names}. Pass one slug."
+    return f"No spec named '{text}'. Available specs: {slugs}."
+
+
+def _merge_base_ok(kit: Path, ref: str) -> bool:
+    code, _base = run(GIT + ["-C", str(kit), "merge-base", "HEAD", ref])
+    return code == 0
+
+
+def _fetch_main(kit: Path) -> tuple[str | None, str]:
+    """origin/main, else origin/master, deep enough that a merge-base exists.
+
+    A `--depth 1 --branch` clone does not fetch main, and a deepen of that one
+    refspec does not reach the branch point on every git. Add main to the
+    remote's branches and unshallow. The second value is the git error when
+    no main ref could be compared.
+    """
+    errors: list[str] = []
+    for name in ("main", "master"):
+        run(GIT + ["-C", str(kit), "remote", "set-branches", "--add", "origin", name])
+        ref = f"origin/{name}"
+        # --unshallow with the branch name pulls that history into a depth-1
+        # clone. A refspec-only deepen leaves the branch point out on some git.
+        code, out = run(GIT + ["-C", str(kit), "fetch", "--quiet", "--unshallow", "origin", name])
+        if code != 0:
+            code, out = run(GIT + ["-C", str(kit), "fetch", "--quiet", "origin",
+                                   f"+refs/heads/{name}:refs/remotes/origin/{name}"])
+        if code != 0:
+            errors.append(out.strip() or f"fetch {name} failed")
+            continue
+        if _merge_base_ok(kit, ref):
+            return ref, ""
+        run(GIT + ["-C", str(kit), "fetch", "--quiet", "--deepen=200", "origin"])
+        if _merge_base_ok(kit, ref):
+            return ref, ""
+        errors.append(f"no merge-base with {ref}")
+    return None, "; ".join(errors)
+
+
+def _behind_count(kit: Path, ref: str) -> int:
+    code, out = run(GIT + ["-C", str(kit), "rev-list", "--count", f"HEAD..{ref}"])
+    if code != 0:
+        return 0
+    try:
+        return int((out or "0").strip() or "0")
+    except ValueError:
+        return 0
+
+
+def _main_only_files(kit: Path, ref: str) -> list[str]:
+    """Paths added on main since this branch point. They are not pull-request deletes."""
+    code, base = run(GIT + ["-C", str(kit), "merge-base", "HEAD", ref])
+    if code != 0 or not base.strip():
+        return []
+    code, out = run(GIT + ["-C", str(kit), "diff", "--name-only", "--diff-filter=A", base.strip(), ref])
+    if code != 0:
+        return []
+    return sorted({line.strip().replace("\\", "/") for line in out.splitlines() if line.strip()})
+
+
+def settle_onto_main(kit: Path, scratch: Path) -> tuple[Path, str | None, set[str]]:
+    """Dry-run the pull request as if origin/main were merged in (1.209.0).
+
+    A branch that already contains main is used as-is. Otherwise main is
+    merged into a scratch worktree. A conflict keeps the branch, warns, and
+    returns the files that exist only on main so they are not reported as deletes.
+    """
+    ref, fetch_error = _fetch_main(kit)
+    if ref is None:
+        if fetch_error:
+            return kit, f"could not compare this branch with main ({fetch_error}); the dry run uses the branch as-is.", set()
+        return kit, None, set()
+    behind = _behind_count(kit, ref)
+    if behind == 0:
+        return kit, None, set()
+    only = _main_only_files(kit, ref)
+    code, _out = run(GIT + ["-C", str(kit), "worktree", "add", "--detach", "--quiet", str(scratch), "HEAD"])
+    if code != 0:
+        word = "commit" if behind == 1 else "commits"
+        warning = f"branch is behind main by {behind} {word}; these files come only from main: {', '.join(only)}"
+        return kit, warning, set(only)
+    code, _out = run(GIT + [
+        "-C", str(scratch), "-c", "user.name=person A", "-c", "user.email=a@example.com",
+        "merge", "--no-edit", ref,
+    ])
+    if code == 0:
+        return scratch, None, set()
+    run(GIT + ["-C", str(scratch), "merge", "--abort"])
+    run(GIT + ["-C", str(kit), "worktree", "remove", "--force", str(scratch)])
+    word = "commit" if behind == 1 else "commits"
+    warning = f"branch is behind main by {behind} {word}; these files come only from main: {', '.join(only)}"
+    return kit, warning, set(only)
+
+
+def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None, hide_deletes: set[str] | None = None) -> list[str]:
     """The PR kit's own update, the way /crav1-update-kit installs: detect, old release tree, plan, apply."""
     script = kit / UPDATE
     py = [sys.executable, "-X", "utf8", str(script)]
@@ -288,11 +462,13 @@ def update_into(worktree: Path, kit: Path, tmp: Path, source: str | None) -> lis
     plan_cmd = ["plan", "--old", str(old), "--new", str(kit), "--to-version", target]
     with Step("update plan"):
         code, out = run(py + plan_cmd + ["--root", str(worktree)], env_extra=dry)
+    out = _scrub_deletes(out, hide_deletes or set())
     lines.append(_summarise("plan", code, out))
     if code == 0:
         apply_cmd = ["apply", "--old", str(old), "--new", str(kit), "--yes"]
         with Step("update apply"):
             code, out = run(py + apply_cmd + ["--root", str(worktree)], env_extra=dry)
+        out = _scrub_deletes(out, hide_deletes or set())
         lines.append(_summarise("apply", code, out))
     return lines
 
@@ -494,6 +670,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Not a git repository: {Path(args.repo).resolve()}")
         return 2
     repo = Path(top.splitlines()[-1].strip())
+    problem = spec_problem(repo, args.spec)
+    if problem:
+        print(problem)
+        return 2
     stamp = time.strftime("%Y%m%d-%H%M%S")
     tmp_kit = Path(tempfile.mkdtemp(prefix="crk"))
     tmp_wt = Path(tempfile.mkdtemp(prefix="crw"))
@@ -501,20 +681,26 @@ def main(argv: list[str] | None = None) -> int:
     cleanup: list[str] = []
     before = snapshot(repo)
     added = False
+    scratch_added = False
     block: list[str] = []
     started = time.monotonic()
+    kit = tmp_kit / "k"
+    scratch = tmp_kit / "merged"
     try:
         with Step("cloning kit"):
-            ok, err = clone_kit(tmp_kit / "k", args.kit_source, args.pr, args.branch)
-        kit = tmp_kit / "k"
+            ok, err = clone_kit(kit, args.kit_source, args.pr, args.branch)
         which_ref = f"PR {args.pr}" if args.pr else f"branch {args.branch}"
         if not ok:
             block = [f"Kit clone of {which_ref} failed:", err]
         else:
-            _c, sha = run(["git", "-C", str(kit), "rev-parse", "--short", "HEAD"])
+            kit_tree, warning, hide = settle_onto_main(kit, scratch)
+            scratch_added = scratch.exists()
+            _c, sha = run(["git", "-C", str(kit_tree), "rev-parse", "--short", "HEAD"])
             _c, head = run(["git", "-C", str(repo), "rev-parse", "--short", "HEAD"])
-            block = [f"Kit: {kit_version(kit)} at {sha} ({which_ref})", f"Project HEAD: {head}", f"Spec: {args.spec}"]
-            banner = flags_banner(repo, kit)
+            block = [f"Kit: {kit_version(kit_tree)} at {sha} ({which_ref})", f"Project HEAD: {head}", f"Spec: {args.spec}"]
+            if warning:
+                block.append(warning)
+            banner = flags_banner(repo, kit_tree)
             if banner:
                 block.append(banner)
             block.append("")
@@ -524,18 +710,22 @@ def main(argv: list[str] | None = None) -> int:
                 block.append(f"git worktree add failed:\n{out}")
             else:
                 added = True
-                module = _flags_api(kit)
+                module = _flags_api(kit_tree)
                 if module is not None:
                     module.seed_worktree(repo, worktree)
-                block += ["--- Update ---", *update_into(worktree, kit, tmp_kit, args.kit_source)]
+                block += ["--- Update ---", *update_into(worktree, kit_tree, tmp_kit, args.kit_source, hide)]
                 if args.add:
-                    block += ["", "--- Add ---", *add_vendors(worktree, kit, args.add)]
-                block += ["", "--- Checks ---", *checks(worktree, kit, args.spec, args.extra)]
+                    block += ["", "--- Add ---", *add_vendors(worktree, kit_tree, args.add)]
+                block += ["", "--- Checks ---", *checks(worktree, kit_tree, args.spec, args.extra)]
     finally:
         with Step("cleanup"):
             if added:
                 code, out = run(["git", "-C", str(repo), "worktree", "remove", "--force", str(worktree)])
                 if code != 0:
+                    cleanup.append(f"git worktree remove failed: {out}")
+            if scratch_added and kit.exists():
+                code, out = run(GIT + ["-C", str(kit), "worktree", "remove", "--force", str(scratch)])
+                if code != 0 and scratch.exists():
                     cleanup.append(f"git worktree remove failed: {out}")
             code, out = run(["git", "-C", str(repo), "worktree", "prune"])
             if code != 0:

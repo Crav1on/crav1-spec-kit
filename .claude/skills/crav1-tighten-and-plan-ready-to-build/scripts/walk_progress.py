@@ -2334,6 +2334,11 @@ def start(args: argparse.Namespace) -> None:
     if kit:
         payload["kit_update"] = kit["line"]
         payload["kit_update_run"] = kit["run"]
+    # 1.209.0: findings recorded before topics existed get one derived topic, once.
+    topics_line = backfill_finding_topics(folder)
+    if topics_line:
+        payload["topics_line"] = topics_line
+        payload["resume"] = resume_payload(folder, no_playbook=not playbook_arg)
     if playbook_arg:
         payload["playbook"] = playbook_arg
         payload["playbook_status"] = playbook_payload(folder, playbook_arg)
@@ -3419,7 +3424,8 @@ def _question_alias(question: dict, kept: set[str], stored: list[dict], excluded
 
 
 def _oq_row(tid: str, question: dict, whole: bool, kept: set[str], alias_kept: set[str] | None = None) -> dict:
-    sentence = str(question.get("text") or "").strip()
+    # 1.209.0: the held line quotes the question's own Q/question field, not a statement or a reply.
+    sentence = str(question.get("prompt") or question.get("text") or "").strip()
     if question.get("mark") == "inferred":
         reason = f'open question "{sentence}" (inferred from the text)'
     elif question.get("mark") == "whole":
@@ -3438,6 +3444,8 @@ def _oq_row(tid: str, question: dict, whole: bool, kept: set[str], alias_kept: s
     }
     if question.get("who"):
         row["who"] = question["who"]
+    if question.get("owner_recorded"):
+        row["owner_recorded"] = True
     if question.get("quote"):
         row["quote"] = question["quote"]
     return row
@@ -7182,6 +7190,38 @@ def display_name(raw: str, limit: int = 42) -> str:
     if text and text[0].isalpha() and text[0].islower():
         text = text[0].upper() + text[1:]
     return text or "This finding"
+
+
+def backfill_finding_topics(root: Path) -> str | None:
+    """Give each finding with no topic the same topic a new finding would get (1.209.0).
+
+    Writes the progress file only when a topic was empty. A second start
+    changes nothing and returns None. The line names each finding once.
+    """
+    path = progress_path(root)
+    if not path.is_file():
+        return None
+    data = load(root)
+    filled: list[str] = []
+    seen: set[str] = set()
+    changed = False
+    for jump in data.get("jumps") or []:
+        if str(jump.get("topic") or "").strip():
+            continue
+        norm, display = ensure_topic("", jump.get("finding") or "")
+        if not norm:
+            continue
+        jump["topic"] = norm
+        changed = True
+        fid = str(jump.get("id") or "")
+        if fid in seen:
+            continue
+        seen.add(fid)
+        filled.append(named_item(display, fid))
+    if not changed:
+        return None
+    write_progress(root, data)
+    return "Filled finding topics: " + ", ".join(filled) + "."
 
 
 def ensure_topic(explicit: str, text: str) -> tuple[str, str]:

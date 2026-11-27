@@ -13,6 +13,18 @@ Kit 2.0 follows the newest published pre-release, and an update plan stays small
 
 Docs and tests: update-kit walkthrough, glossary, data layout, and `scripts/tests/test_kit_1210.py`.
 
+## 1.209.0 (2026-11-27)
+
+Findings keep a topic, a held task quotes the question, and a dry run of a branch behind main does not pretend main-only files were deleted.
+
+- **Finding topics.** On the next walk start, a finding recorded with no topic gets one, derived the same way a new finding does, and that topic is written back. The start says it in one line, `Filled finding topics: Static-IP notes (P9).` A later start says nothing.
+- **The question itself.** A held task quotes the question's own `Q` or `question` line. A statement or a reply on the same item is not the question.
+- **Waits-on lists.** A waits-on list is T numbers only, for example `waits on T3, T5`. The task itself stays `Name (T#)`. A pull-request wait is unchanged.
+- **Who owns the answer.** The ready check uses the question's `Ask` or `owner` line. The runner is the fallback only when none is recorded. With neither, the line still says nobody is named.
+- **Dry run onto main.** The maintainer dry run tries the pull request as if `origin/main` were merged in, in a scratch worktree. A conflict keeps the branch and says `branch is behind main by N commits; these files come only from main: ...`, and those files are never reported as deletes. A `--spec` placeholder, or a name that matches no spec, stops and lists the spec slugs. See CONTRIBUTING.md.
+
+Docs and tests: the tighten-and-plan and tasks-ready walkthroughs, glossary, data layout, and `scripts/tests/test_kit_1209.py`.
+
 ## 1.208.0 (2026-11-27)
 
 Parallel kit updates settle on their own, a merge message stays clean, and an update ending says what changed.

@@ -144,4 +144,8 @@ The `$crav1-tighten-and-plan-ready-to-build` ready check names the hard hit when
 
 `walk_progress.py code-drift --root <spec folder> --code-repo <checkout> --vendor codex` also reports commits merged in from the base that touch this slice's files and come from a branch the spec does not list, so they are offered for add-to-spec instead of counted as merged in. In the ready check, your own task that is pushed and waits for its pull request (for example `T30 is yours and waits for PR 85's merge.`) is waiting, not a blocker, so the other ready tasks still go into Run next; a real `Not ready: …` line comes right after Run next, before Held, and a merge wait names its PR, `Waiting: PR 85 to merge, then T28, T37 and T39 are ticked.`
 
+## 1.209.0 changes
+
+The next `start` derives one from the finding text, the same way a new finding gets a topic, writes it back, and the reply says that one line, `Filled finding topics: Static-IP notes (P9).` A later start does not say it again. The ready check in this walk quotes a held task's own `Q` or `question` line, keeps a waits-on list as T numbers, and names the `Ask` or `owner` on the question.
+
 human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-tighten-and-plan.md
