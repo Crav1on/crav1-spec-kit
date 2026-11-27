@@ -2783,7 +2783,7 @@ def _question_line(questions, names=None):
         return "none"
     parts = []
     for question in questions:
-        short = clean_prose(_first_sentence(question["text"]), names) or "open question"
+        short = clean_prose(_first_sentence(question.get("prompt") or question["text"]), names) or "open question"
         who = question.get("who") or ""
         if who.strip().lower() in NO_WHO:
             who = NOBODY_SHORT

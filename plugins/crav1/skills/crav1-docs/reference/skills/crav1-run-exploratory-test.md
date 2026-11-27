@@ -23,4 +23,4 @@ runs by itself: Calls `/crav1-fix-bug` only when the user says so in that turn.
 you run next: /crav1-finalize-commit
 first: `/crav1-run-exploratory-test @docs/specs/<slug>/ Use the slice once, then again with randomness. Write down bugs. Do not start Specify, Plan, or Build.`
 walkthrough: from-run-exploratory-test.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-run-exploratory-test.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-run-exploratory-test.md

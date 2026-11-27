@@ -20,4 +20,4 @@ runs by itself: Calls `$crav1-create-feature-branch` when the repo already has c
 you run next: $crav1-create-feature-branch; $crav1-review-architecture; $crav1-tighten-spec
 first: `$crav1-spark-to-spec Spark: <one or two sentences> Treat this as greenfield. Do not write code. Ask questions first.`
 walkthrough: from-nothing.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-spark-to-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-spark-to-spec.md

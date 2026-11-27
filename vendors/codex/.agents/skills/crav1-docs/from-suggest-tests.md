@@ -42,4 +42,4 @@ When a kept suggestion is not in the spec yet, Run next names `$crav1-add-to-spe
 
 Reference page: [suggest-tests-for-code](reference/skills/crav1-suggest-tests-for-code.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/from-suggest-tests.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/from-suggest-tests.md

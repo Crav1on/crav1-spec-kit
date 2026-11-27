@@ -8,6 +8,8 @@
 
 Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
 
+1.209.0: a finding with no topic gets one on the next walk start, derived the same way as a new finding, and `start` returns `topics_line` for that one line. A later start does not say it again.
+
 1.207.0: leftover wording in plan review is a patch (`--kind stale-wording`), not a full jump back. The card header is the name and the code, for example `Static-IP notes (P9)`. `clear --step` needs `--card` from that step's reopen card, and a reopen clear is never folded into another step's card. A `Stale since` line on or after the latest walk Done date counts as stale seen.
 
 1.202.0: the Reviewed line uses `plan_check.py open-count --review <file>` (`open: <n>`). Held includes a task that only waits, via `(after:)`, on a task that is not built yet, and the reason is on that held line.

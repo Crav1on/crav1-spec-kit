@@ -567,10 +567,13 @@ def apply_to_rows(rows: list[dict], claims: list[dict], user: str | None = None,
         if row.get("bucket") == "done":
             continue
         claim = by_task[task]
+        # 1.209.0: an Ask/owner on the question stays. The runner is the fallback only when none is recorded.
+        keep_owner = bool(row.get("owner_recorded")) and str(row.get("who") or "").strip()
         if is_own(claim, user, branch):
             row["claim"] = True
             row["own_claim"] = True
-            row["who"] = claim["user"]
+            if not keep_owner:
+                row["who"] = claim["user"]
             row["claim_since"] = claim.get("since")
             row["claim_stale"] = bool(claim.get("stale"))
             row["claim_phrase"] = "in progress by you"
@@ -579,7 +582,8 @@ def apply_to_rows(rows: list[dict], claims: list[dict], user: str | None = None,
         row["held"] = True
         row["claim"] = True
         row["reason"] = claim["phrase"]
-        row["who"] = claim["user"]
+        if not keep_owner:
+            row["who"] = claim["user"]
         row["claim_since"] = claim.get("since")
         row["claim_stale"] = bool(claim.get("stale"))
     return rows

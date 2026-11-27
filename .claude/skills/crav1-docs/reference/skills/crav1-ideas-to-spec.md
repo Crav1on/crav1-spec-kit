@@ -19,4 +19,4 @@ runs by itself: Calls `/crav1-create-feature-branch` when the repo already has c
 you run next: /crav1-create-feature-branch; /crav1-review-architecture; /crav1-tighten-spec
 first: `/crav1-ideas-to-spec <paste the pile in your own words. Mix product ideas and technical thoughts. You can mention an export format in the same text (EARS, BDD, OpenSpec, YAML, JSON, BMAD) or skip it and the skill will ask.> Treat hunches as proposed, not decided. Do not write code. Capture first, then architecture questions.`
 walkthrough: from-ideas.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.208.0/docs/reference/skills/crav1-ideas-to-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.209.0/docs/reference/skills/crav1-ideas-to-spec.md

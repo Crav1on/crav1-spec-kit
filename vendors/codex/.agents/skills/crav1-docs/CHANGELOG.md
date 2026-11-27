@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.209.0 (2026-11-27)
+
+Findings keep a topic, a held task quotes the question, and a dry run of a branch behind main does not pretend main-only files were deleted.
+
+- **Finding topics.** On the next walk start, a finding recorded with no topic gets one, derived the same way a new finding does, and that topic is written back. The start says it in one line, `Filled finding topics: Static-IP notes (P9).` A later start says nothing.
+- **The question itself.** A held task quotes the question's own `Q` or `question` line. A statement or a reply on the same item is not the question.
+- **Waits-on lists.** A waits-on list is T numbers only, for example `waits on T3, T5`. The task itself stays `Name (T#)`. A pull-request wait is unchanged.
+- **Who owns the answer.** The ready check uses the question's `Ask` or `owner` line. The runner is the fallback only when none is recorded. With neither, the line still says nobody is named.
+- **Dry run onto main.** The maintainer dry run tries the pull request as if `origin/main` were merged in, in a scratch worktree. A conflict keeps the branch and says `branch is behind main by N commits; these files come only from main: ...`, and those files are never reported as deletes. A `--spec` placeholder, or a name that matches no spec, stops and lists the spec slugs. See CONTRIBUTING.md.
+
+Docs and tests: the tighten-and-plan and tasks-ready walkthroughs, glossary, data layout, and `scripts/tests/test_kit_1209.py`.
+
 ## 1.208.0 (2026-11-27)
 
 Parallel kit updates settle on their own, a merge message stays clean, and an update ending says what changed.
@@ -180,23 +192,5 @@ Start checks that trust origin, claims that clear themselves, and fewer, plainer
 - **Walk fixes.** A locked skill inside the walk prints no Run next or `Uncommitted:` line; `spec-finding` asks a `kind-conflict` card when code-drift text is passed as spec text; after a jump-back the walk follows its `continue` list; the plan reviewer runs in the foreground; the uncommitted count includes changed notes and sources.
 
 Docs and tests: walkthroughs for the build walk and the spec walk; `scripts/tests/test_kit_1196.py`.
-
-## 1.195.0 (2026-11-20)
-
-Fixes from two live sessions: meeting imports, the spec walk's code checks, and the tighten cards.
-
-- **Meeting Run next names every changed spec.** The first changed spec gets the command; the rest follow as `Also changed, not tightened: <slugs>.` When an edit reopens a spec's open walk, the command is `$crav1-tighten-and-plan-ready-to-build <slug>` with the reason `The new information reopened the walk.` The fact branch's ending (`references/stop.md`) routes the same way.
-- **Save for later.** Meeting items get a fourth choice, save for later, which writes the slug (or `general` for team-workflow information) to a new note field `later_for`. `waiting_for` stays for parked specs only. `$crav1-help`, `$crav1-tighten-spec`, `$crav1-show-or-ask-open-questions` and `$crav1-retire-spec` list these notes as saved for later; `notes_index.py later --slug <slug>` lists them. New mark `later_for` in `marks.yaml`.
-- **One batch rule for meetings.** One to four items get one question each; more than four always get the batch card. The recap's `Noted` count is gone (every input is noted) and `Saved for later` counts the new choice.
-- **Reason lines in `$crav1-finalize-commit` endings.** Every Run next example in `references/commit.md` starts with its reason, for example `The commit is only local.`
-- **`.docx` meeting imports.** New `crav1-add-to-spec` `scripts/docx_to_md.py`: `convert` keeps paragraphs, headings, list levels and bold and reads the created date from `docProps/core.xml`; `check` compares the words in order. Standard library only, no network. Named in `references/sources-binary.md` and the meeting branch.
-- **The base, per branch.** `merged_since_sync.py check` finds each branch's base from `--base`, then the repo's `Merges into` in `docs/system/repos.md` (`--repos`), then a base `Synced at` line, then `origin/develop`, then the default branch, and reports `base` and `base_from`. Every caller passes `--base <Merges into>`.
-- **Code drift at the walk start.** `$crav1-tighten-and-plan-ready-to-build` runs `walk_progress.py code-drift --vendor codex` right after merged-since-sync at the start; the run before the plan review is a recheck. New `readiness --stale-seen`: when anything stale was seen, every reopen card recommends rerun, never nothing new.
-- **Only unrecorded commits count.** `code-drift` leaves out commits already named in the spec or in a note's `commits:` list, and base merge-ins, and reports `count`, `total`, `already_recorded` and `base_merge_ins`. New `--base`.
-- **Tighten-spec: whether findings and sources.** A finding that asks whether something is so, with no deciding source, recommends ask or keep. A patch that contradicts a source line quotes it and is never the recommendation; ask or keep is always listed, also on the batch card.
-- **One owner for acceptance ticks.** `$crav1-tighten-spec` ticks a spec acceptance box only through the new `tick-from-verify` resolution, which quotes the passing verify row. `$crav1-verify-build-against-spec` only reports the open box.
-- **Tighten-plan batch cap.** `plan_check.py batch --vendor codex` puts at most 8 findings on one card and names the rest for the next card. A finding with `changes_tasks` (adds, removes or reorders tasks) never goes on a yes-to-all card; it gets its own card.
-
-Docs and tests: walkthroughs for meetings, commit and the spec walk; data layout, glossary and marks; `scripts/tests/test_kit_1195.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.
