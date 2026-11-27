@@ -83,4 +83,4 @@ the branch checks use your repo's default branch (for example master), not alway
 
 a requirement that comes up on the design branch ends with Run next first and a full `$crav1-add-to-spec <slice> <text>` command. `stop and commit` commits only because this skill says that phrase is a yes.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-design-architecture.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-design-architecture.md

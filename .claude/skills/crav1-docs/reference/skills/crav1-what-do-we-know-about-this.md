@@ -54,4 +54,4 @@ runs by itself: Starts no skill except apply on /crav1-resolve-open-questions at
 you run next: The one skill it names, if any
 first: `/crav1-what-do-we-know-about-this What's the status of <the feature, slice, or resource>? What's pending?`
 walkthrough: from-what-do-we-know-about-this.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-what-do-we-know-about-this.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-what-do-we-know-about-this.md

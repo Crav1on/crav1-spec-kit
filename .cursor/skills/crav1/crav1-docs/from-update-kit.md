@@ -70,8 +70,18 @@ A script that prints Run next takes `--vendor`. The default stays `/`. `--vendor
 
 `/crav1-update-kit add codex` copies `vendors/codex/` into `.agents/skills/` from the installed release, so the other vendors stay as they are. `/crav1-update-kit remove codex` deletes kit-owned files that still match that release. A local edit is a clash: `keep` or `take`. The vendor list is `.crav1/kit.json`. `detect` reports `vendors_from` as `kit.json` or `inferred`. The project's `AGENTS.md` is not written. Commands in that copy are `$crav1-`.
 
+## Early-access flags
+
+`/crav1-update-kit` also takes `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. `flags-on kit2` turns on kit 2.0 for this repo. The kit writes `.crav1/flags.local.json` and lists `flags.local.json` in `.crav1/.gitignore`. The project's `.gitignore` is not changed.
+
+The next update installs kit 2.0 at user level from that same release when `kit2` is on. When `kit2` is off and kit 2.0 is installed, the update offers `uninstall-kit2` or `keep-kit2`. With no flag file, the update does not mention kit 2.0.
+
+## 1.206.0 changes
+
+The words are `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. `kit2` installs kit 2.0 at user level from the release the update is applying. With no flag file, plan and apply match 1.205.0.
+
 ## 1.205.0 changes
 
 A `crav1-` name pattern is not the list. A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are left alone: the update does not write, stage, or delete them. With no version, the target is the newest published 1.x tag. A `v2` tag, including `v2.0.0-alpha.1`, is not offered.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/from-update-kit.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/from-update-kit.md

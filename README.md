@@ -52,6 +52,20 @@ flowchart LR
 | Build | Build, Verify and fix | [Build](docs/reference/skills.md#build) |
 | Cross-cutting | Start, Meetings and open questions, Keep the picture current, Azure Boards, Testing helpers, Commit and pull request, Guided walks | [Cross-cutting](docs/reference/skills.md#cross-cutting) |
 
+## Early-access flags
+
+A repo can turn on an early-access feature with a local file git does not see. The file is `.crav1/flags.local.json`. The kit writes `.crav1/.gitignore` so that file stays on this machine. The project's `.gitignore` is not changed.
+
+The words are `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. One command may name several flags. Example: `flags-on kit2`. A name the registry does not know is refused in one line that names the known flags. Known names in that command are still applied. A flag already in the file that the registry does not know is kept and reported.
+
+With no flag file, an update behaves as it does today.
+
+| Flag | Status | What it does |
+| --- | --- | --- |
+| `kit2` | experimental | On update, install kit 2.0 at user level from that same release. Off, when kit 2.0 is installed, offer `uninstall-kit2` (listed files only) or `keep-kit2` |
+
+The registry lives in the update-kit flags module. Each entry has a one-line description and a status of `experimental` or `beta`. `kit2` is the first entry. Details: [Update the installed kit](docs/from-update-kit.md).
+
 ## Where next
 
 The [docs index](docs/README.md) is the one map of every page, by type and by reader. From there: [walkthroughs](docs/README.md#how-to-walkthroughs) for one goal step by step, the [skills reference](docs/reference/skills.md) for one command in full, [install](docs/install.md) for Cursor or Claude Code, [the method](docs/concepts/method.md) for the working loop, setup, best practices, and templates, and the [data layout](docs/concepts/data-layout.md) and [glossary](docs/concepts/glossary.md).

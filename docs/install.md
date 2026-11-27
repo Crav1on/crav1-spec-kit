@@ -187,7 +187,7 @@ On Claude Code 2.1.286, in a private throwaway git repo, the generated `.claude/
 
 Codex reads project skills from `.agents/skills/`. The kit's copy is generated as `vendors/codex/` in this repo. Each command-only skill has `agents/openai.yaml`. Commands are `$crav1-…`. The first line of each skill reads `../crav1-docs/reference/kit-rules.md`. The project's `AGENTS.md` is not written.
 
-In a project that already has the kit, run `/crav1-update-kit add codex`. The vendor list is `.crav1/kit.json`. `/crav1-update-kit remove codex` deletes only the kit's Codex files. Copilot is generated in this repo and is not installed by this release. Restart Codex after the files are written so the new skills load.
+In a project that already has the kit, run `/crav1-update-kit add codex`. The vendor list is `.crav1/kit.json`. `/crav1-update-kit remove codex` deletes only the kit's Codex files. Copilot is generated in this repo and is not installed by this release. Restart Codex after the files are written so the new skills load. `/crav1-update-kit` also takes `flags-list`, `flags-on <flag>`, and `flags-off <flag>`. `flags-on kit2` turns on kit 2.0 for this repo.
 
 ## After install
 

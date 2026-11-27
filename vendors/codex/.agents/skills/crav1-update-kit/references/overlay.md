@@ -45,3 +45,7 @@ A saved commit-style rule (`draft-commit-style` or `draft-commit-gitlog` in the 
 ## Commit
 
 On `yes`, after apply and after the migration card when there is one, run `commit --yes --from-version <installed> --to-version <target> --old <old-release> --new <new-release>`. The message is `Update CRAV1 kit vA to vB`. The commit stages files those release trees ship, including an updated template that still matched the old release. Project files stay unstaged, including a spec a migration just rewrote, a `crav1-2-` skill or agent, `.crav1-2/`, and `sot/`. On `write only`, do not commit.
+
+## Kit 2.0 flag (1.206.0)
+
+When `.crav1/flags.local.json` is missing, say nothing about kit 2.0. When `kit2` is true, plan dry-runs `v2/install.py install dry-run` from the release in `--new`, and apply runs `install` at user level after the kit files are written. The result is one `kit2_line`. Counts under `files` stay the same. When `kit2` is false and `~/.crav1-2/installed.json` exists, that line offers `uninstall-kit2` (Recommended) or `keep-kit2`. A file that cannot be read is one plain line, and the update continues with no flags. Do not write the flag file during plan or apply. The words that write it are in [flags.md](flags.md).

@@ -18,4 +18,4 @@ runs by itself: Calls `$crav1-create-feature-branch` when the repo already has c
 you run next: $crav1-create-feature-branch; $crav1-review-architecture; $crav1-tighten-spec; $crav1-finalize-commit
 first: `$crav1-bundle-to-specs @notes/overview.md @sketches/flow.png @legacy-api/ <optional sentence: new system, that code is context — or extract-as-is> Treat hunches as proposed, not decided. Do not write code. Map first, then landscape, then one spec per v0 slug.`
 walkthrough: from-bundle-to-specs.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-bundle-to-specs.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-bundle-to-specs.md

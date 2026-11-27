@@ -2,6 +2,18 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.206.0 (2026-11-27)
+
+Early-access flags for one repo, kept out of git. With no flag file, an update matches 1.205.0.
+
+- **Flag file.** `.crav1/flags.local.json`, for example `{"kit2": true}`. `.crav1/.gitignore` lists `flags.local.json`. The project's `.gitignore` is not changed. An unknown flag in the file is kept and reported. A file that cannot be read is one plain line, and the update continues with no flags.
+- **Words.** `flags-list`, `flags-on <flag> [<flag> ...]`, and `flags-off <flag> [<flag> ...]`. `flags-on kit2` turns kit 2.0 on for this repo. A name that is not known is refused in one line that names the known flags. Known names in the same command are still applied.
+- **kit2.** When the flag is on, the update also installs kit 2.0, or updates it, at user level from the release it is applying, through `v2/install.py`. When the flag is off and `~/.crav1-2/installed.json` exists, the update offers `uninstall-kit2`, which removes only the listed files, or `keep-kit2`. The result is one line. The update, add, and unchanged counts stay the same. With no flag file, nothing about kit 2.0 is printed.
+- **Registry.** Known flags live in the update-kit flags module. Each entry has a one-line description and a status of `experimental` or `beta`. `kit2` is the first entry (`experimental`).
+- **Dry run.** The maintainer dry run prints `Flags: none` or `Flags:` plus the flags that are on, and dry-runs the kit 2.0 step. With no flag file, the copy block is unchanged.
+
+Docs and tests: update-kit walkthrough, glossary, data layout, and `scripts/tests/test_kit_1206.py`.
+
 ## 1.205.0 (2026-11-25)
 
 Kit 1.x leaves a side-by-side kit 2.0 alone, and a 1.x update is never offered a 2.0 tag.
@@ -185,15 +197,5 @@ Fixes from a review session on the sweep, commit, review-pr, pr-status and add-t
 - **commit-now can ask the mention.** With several Feature lines in `work-item.md` and none clearly matching, `$crav1-finalize-commit commit-now` asks one card from `work_item_pick.py` (at most 4 options plus a typed Other) and never copies a mention from `git log` or the previous commit.
 - **ado_threads.py is the one Azure DevOps way.** New `pr` (description, votes), `iterations`, `changes`, `set-status --yes` (read back from the host) and `since-last` (against the PR note's Read line and saved description, never a temp file); `list` gives thread and comment dates. Output is UTF-8 JSON with accented characters intact. The add-to-spec, pr-status and review-pr docs no longer teach `az rest` or hand-made token calls.
 - `scripts/tests/test_kit_1193.py` (mocked Azure DevOps responses with non-ASCII text); the sweep ending tests use the Run next form. Claim ages read `CRAV1_NOW` when set; snapshot-check and the claim tests pin it, so they no longer fail once a fixture claim is 3 days old.
-
-## 1.192.0 (2026-11-18)
-
-A new cross-cutting skill, `$crav1-explain-tech`, explains one technology tied to where the specs use it.
-
-- **Short answer, fixed shape.** `$crav1-explain-tech <technology> [in <spec, topic or architecture>]` answers in about 150 to 250 words: what it is, how it works, where it shows up (links to the exact files and sections), why it is used, the main tradeoff and one alternative, then Run next. `deeper` gives 300 to 900 words and adds how it fits with the rest of the spec.
-- **Read from the specs.** `explain_tech.py find --vendor codex` lists every mention in specs, plans, tasks, notes, the architecture spec, ADRs, design topics and system notes (also `private-link`, `PrivateLink`), with links, owners (ADR deciders, `Owner:` lines, `## Approval needed`) and the spec to save to. A technology the specs never mention is said plainly, with no spec link, and Run next names research.
-- **Save only on request.** `save` (the word, or yes on the card) appends a dated `### <technology>` entry with the short explanation and links under `## Technology notes` in the spec's `notes.md` (created when missing). Links that are not in the specs are refused; nothing is written without the yes.
-- **Checked shape.** `check` tests the sections, their order, the word count and every link; kit-lint runs it on the skill's sample answers and checks its Run next layout.
-- Registered in the skills reference, guild routing (a Cross-cutting skill row and a choice-words row: `deeper`, `save`), the walkthrough `docs/from-explain-tech.md`, the glossary, and `scripts/tests/test_kit_1192.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

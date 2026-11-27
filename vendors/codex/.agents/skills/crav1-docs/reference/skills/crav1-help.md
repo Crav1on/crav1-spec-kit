@@ -41,4 +41,4 @@ runs by itself: Calls no skill.
 you run next: The skill or route step it names
 first: `$crav1-help I have new information from a meeting and tasks that are not built. What do I run, in order?`
 walkthrough: from-help.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/reference/skills/crav1-help.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/reference/skills/crav1-help.md

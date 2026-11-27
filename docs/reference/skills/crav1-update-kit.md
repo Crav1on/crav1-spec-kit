@@ -8,6 +8,8 @@
 
 Update the installed kit on the current branch to a published release.
 
+1.206.0: early-access flags live in `.crav1/flags.local.json` for one repo. `.crav1/.gitignore` lists `flags.local.json`. The project `.gitignore` is not changed. Words are `flags-list`, `flags-on <flag>`, and `flags-off <flag>`, and one command may name several flags. An unknown name is refused in one line that names the known flags; known names are still applied. A flag in the file that the registry does not know is kept and reported. A file that cannot be read is one plain line, and the update continues with no flags. `kit2` (experimental) installs kit 2.0 at user level from the same release through `v2/install.py` when it is on. When it is off and kit 2.0 is installed, the update offers `uninstall-kit2` or `keep-kit2`. The kit 2.0 result is one line. Update, add, and unchanged counts stay the same. With no flag file, nothing about kit 2.0 is printed.
+
 1.205.0: the commit stages files the release trees ship. Pass `--old` and `--new` (or `--new` on add, `--old` on remove). A `crav1-` name pattern is not the list. A skill or agent named `crav1-2-`, a `.crav1-2/` folder, and `sot/` are not written, staged, or deleted. With no version, the target is the latest published 1.x tag. `v2.0.0` and `v2.0.0-alpha.1` are not offered.
 
 1.204.0: Codex is installed. `.crav1/kit.json` lists the vendors. A missing file is inferred from marker files and written in the same yes. `add codex` copies `vendors/codex/` into `.agents/skills/` and does not upgrade the other vendors. `remove codex` deletes kit-owned files that still match the release; a local edit is a clash (`keep` or `take`); other files stay. `detect` adds `vendors_from`. The project `AGENTS.md` is never written. Copilot is not installed by this release.
@@ -34,27 +36,27 @@ The commit message is `Update CRAV1 kit vA to vB`. The script does not push. A p
 
 ## Runs when
 
-The installed kit should move to a published release. Called by the user, or by a guild agent. The user's yes in this run is still required before a write, a commit, or a push.
+The installed kit should move to a published release, or an early-access flag should be listed or changed. Called by the user, or by a guild agent. The user's yes in this run is still required before a write, a commit, or a push.
 
 ## Prompts
 
-Prompt budget: 2 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
+Prompt budget: 3 (the most prompts in one run, the closing yes included). A prompt may hold several questions. See the asking rule in `crav1.mdc`.
 
 ## Reads
 
-In short: The installed version, the published release tags, and the kit files on this branch.
+In short: The installed version, the published release tags, the kit files on this branch, and `.crav1/flags.local.json` when it exists.
 
-Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, `.crav1/kit.json` when it exists, and the working tree. It does not read a branch or an open pull request as a target.
+Reads `plugin.json` or the `Kit version:` line, the published `vX.Y.Z` tags, the old release, the new release, `vendors.json`, `.crav1/kit.json` when it exists, `.crav1/flags.local.json` when it exists, and the working tree. It does not read a branch or an open pull request as a target.
 
 ## Writes
 
-In short: Kit-owned files on this branch, `.crav1/kit.json`, the Codex tree when Codex is selected, a copied template that still matches the old release apart from line endings, an optional migration after a separate yes, and one local commit.
+In short: Kit-owned files on this branch, `.crav1/kit.json`, the flag file and `.crav1/.gitignore` when `flags-on` or `flags-off` is used, the Codex tree when Codex is selected, a copied template that still matches the old release apart from line endings, an optional migration after a separate yes, user-level kit 2.0 files when `kit2` is on, and one local commit.
 
-Writes kit-owned files on the current branch after a yes, including the Codex tree under `.agents/skills/` when Codex is selected, writes `.crav1/kit.json`, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. `add codex` commits `Add CRAV1 kit vendor codex vX.Y.Z`. `remove codex` commits `Remove CRAV1 kit vendor codex vX.Y.Z`. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged.
+Writes kit-owned files on the current branch after a yes, including the Codex tree under `.agents/skills/` when Codex is selected, writes `.crav1/kit.json`, writes `.crav1/flags.local.json` and `.crav1/.gitignore` for `flags-on` and `flags-off`, replaces a copied template that still matches the old release apart from line endings, and commits `Update CRAV1 kit vA to vB` when the user chose the commit. `add codex` commits `Add CRAV1 kit vendor codex vX.Y.Z`. `remove codex` commits `Remove CRAV1 kit vendor codex vX.Y.Z`. A migration listed for the jump is dry-run and written only on its own yes, and is left unstaged. When `kit2` is on, the update installs kit 2.0 at user level from that same release.
 
 ## Does not
 
-Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. A `crav1-2-` skill or agent, `.crav1-2/`, and `sot/` stay (1.205.0). Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit.
+Leaves specs, `walk-progress.md`, `build-progress/`, plans, tasks, notes, playbooks, the build map, persist rules (except a stale commit-style rule, 1.176.0), the transfer data policy, `kit-maintainer.mdc`, the project's `.gitignore`, and the project's `AGENTS.md` alone. A skill folder that does not start with `crav1-` stays a project file. A `crav1-2-` skill or agent, `.crav1-2/`, and `sot/` stay (1.205.0). Copilot is not installed by this release. Does not switch branches, rebase, or push. A plugin install gets no kit commit. With no flag file, kit 2.0 is not mentioned.
 
 Limits and exceptions: a target that is not a published release tag stops in one line. A clash is not overwritten. An edited template is listed and left. The kit source checkout is refused. An agent's yes does not write, commit, or push.
 

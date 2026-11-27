@@ -364,4 +364,4 @@ Stack, compatibility, performance, security.
 - [ ] T2: … (verify: <kind> — <named check>) (spec: …)
 ```
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.205.0/docs/concepts/method.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.206.0/docs/concepts/method.md

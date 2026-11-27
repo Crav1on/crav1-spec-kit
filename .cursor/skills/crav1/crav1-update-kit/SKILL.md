@@ -2,8 +2,9 @@
 name: crav1-update-kit
 description: >-
   Use when the user asks to update the installed CRAV1 kit to a published
-  release, or to add or remove one vendor such as Codex. Optional to vX.Y.Z.
-  Default is the latest 1.x release tag. Never a branch or an open pull request.
+  release, to add or remove one vendor such as Codex, or to set an early-access
+  flag with flags-on, flags-off, or flags-list. Optional to vX.Y.Z. Default is
+  the latest 1.x release tag. Never a branch or an open pull request.
 icon: refresh-cw
 color: blue
 ---
@@ -24,6 +25,7 @@ The script is `scripts/update_kit.py` in this skill's folder. The interpreter is
 4. Plugin or user scope (`mode` is `plugin`): read [references/plugin.md](references/plugin.md) and follow it. Do not read the overlay page.
 5. When the plan lists a migration id, read [references/migrations.md](references/migrations.md) after the kit files are replaced. When the list is empty, skip that page.
 6. When the user says `add <vendor>` or `remove <vendor>`, read [references/vendors.md](references/vendors.md) and follow it. A plain update does not read that page.
+7. When the user says `flags-list`, `flags-on`, or `flags-off`, read [references/flags.md](references/flags.md) and follow it. A plain update does not read that page. With no flag file, do not mention kit 2.0.
 
 ## Cards
 
@@ -40,6 +42,7 @@ The heads-up card is not skipped. A word in the opening message is not the yes. 
 - Files updated, merged, deleted, left alone, and any clash.
 - The commit `Update CRAV1 kit vA to vB`, or why there is none.
 - Tell the user to reload the window so the host loads the new skills.
+- When `.crav1/flags.local.json` is present, one line for the kit 2.0 step. With no flag file, that line is absent and kit 2.0 is not mentioned.
 
 ## Run ending (1.122.0)
 
@@ -78,9 +81,14 @@ Do not push unless the user, in this run, already said to push. Do not add a pus
 
 `vendors.json` next to this skill lists each host. `detect` reports `vendors` and `vendors_from` (`kit.json` or `inferred`). Cursor, Claude Code, and Codex are installed. Copilot is a row and is not installed by this release. The project's vendor list is `.crav1/kit.json`. `add` and `remove` are [references/vendors.md](references/vendors.md). `--vendor codex` on a script that prints Run next uses the Codex command prefix. With no `--vendor`, the prefix stays `/`.
 
+## Early-access flags (1.206.0)
+
+`flags-list`, `flags-on <flag>`, and `flags-off <flag>` are [references/flags.md](references/flags.md). One command may name several flags. `flags-on kit2` turns on kit 2.0 for this repo. The update that follows installs it at user level from that same release.
+
 ## Hard rules
 
-- Never write, commit, or push without the user's yes in this run.
+- Never write, commit, or push without the user's yes in this run. `flags-on` and `flags-off` are the yes for the flag file only.
+- The flag file is written only by `flags-on` and `flags-off`. Do not tell the user to change `.crav1/flags.local.json` themselves.
 - Never switch branches, and never rebase. Other branches stay on the old kit until this branch is merged into them.
 - Never target `main`, a branch, a commit, or an open pull request.
 - Never edit a spec, `walk-progress.md`, a `build-progress` file, a plan, a task list, a note, a playbook, or a build map as part of the file replace.

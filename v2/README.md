@@ -1,6 +1,6 @@
 # CRAV1 kit 2.0 (alpha)
 
-This folder is the kit 2.0 skeleton on `main`, next to 1.x. Nothing here is released. 1.x is not version-bumped. The 1.x doc check skips this folder so a 2.0 file is not treated as a 1.x workflow copy.
+This folder is the kit 2.0 skeleton on `main`, next to 1.x. Nothing here is released. The 1.x doc check skips this folder so a 2.0 file is not treated as a 1.x workflow copy. A repo turns it on with `flags-on kit2`.
 
 The engine is Python 3.10 or newer, standard library only. It appends `.crav1-2/events.jsonl`, folds that log into state, and rebuilds `sot/index.md`, `sot/facts.md`, `sot/decisions.md`, and `sot/assumptions.md`. A note page (`sot/<YYYY-MM-DD-slug>/note.md`) is rendered with passage anchors when the log carries the passage text. The engine does not commit.
 
@@ -36,7 +36,15 @@ Read-only. Words: `none` (or no word) for the index, `facts`, `decisions`, `assu
 
 ## Try it
 
-Use a scratch home and a scratch project. `--home` is a test hook, not a product option. The words are `install`, `uninstall`, `status`, and `dry-run`.
+On a project that already has kit 1.x, this is the path:
+
+```text
+/crav1-update-kit flags-on kit2
+```
+
+Then update the kit. The update installs kit 2.0 at user level from that same release. `flags-list` shows the flag. `flags-off kit2` turns it off. When kit 2.0 is installed, the update offers `uninstall-kit2` (listed files only) or `keep-kit2`.
+
+The scratch commands below try the engine in a temp project. `--home` is a test hook, not a product option. The update runs this install script. `flags-on kit2` only records the flag.
 
 ```bash
 mkdir -p /tmp/crav1-2-home /tmp/scratch-repo/docs/specs/partner-b-feed
