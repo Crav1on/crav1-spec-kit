@@ -59,7 +59,7 @@ After a quote is kept, `/crav1-add-to-spec` compares it with `docs/research/` th
 | Skill | `/crav1-tighten-plan` |
 | Subagent | `crav1-plan-reviewer-agent` |
 
-`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` from the accepted spec. The user calls it. It calls no skill. It stops before Build when `## Linter` says there is no linter, until the user chooses. A piece the user leaves is not turned into work on a later run unless the user says so.
+`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` from the accepted spec. The user calls it. It calls no skill. On a UI slice the plan is blocked until the UI screens are approved, and it covers only approved screens. It stops before Build when `## Linter` says there is no linter, until the user chooses. A piece the user leaves is not turned into work on a later run unless the user says so.
 
 `/crav1-review-plan` reads the plan and writes nothing. The user calls it. It calls no skill. It names `/crav1-tighten-plan` and does not run it.
 
@@ -77,6 +77,8 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 | Subagent | `crav1-build-task-agent` |
 
 `/crav1-build-walk` is in the Build lane. The user asks for the walk. It opens the build, verify, commit, and pull-request skills by file and does not replace them. The reply prints Run next first, one complete command per branch that can start, and a step skill's own Next is not printed. Recording a step commits the progress file and does not push. It does not push, open, or merge without a yes in that run. It never rebases. Since 1.155.0 a branch argument, `/crav1-build-walk <slug> <branch>`, builds every open task on that branch in one run. One start yes covers the claim and a push after each task. It stops only for a real stop, always before the merge, and never merges.
+
+`/crav1-verify-build-against-spec` checks the UI checks traced into `tasks.md`.
 
 Started from a ready-to-build report, the walk offers each ready branch as its own Next, with the T number beside the task name. A task that needs code from an unmerged branch is cut from that branch, and the merge list says the order back. Other-owner mode never opens a pull request and never merges.
 
