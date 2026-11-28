@@ -2,7 +2,7 @@
 
 <!-- Generated from docs/reference/workflow.yaml by scripts/gen-workflow.py. Do not edit by hand. -->
 
-Kit version: 1.210.0
+Kit version: 1.211.0
 
 This page is the one written source for the order of kit commands. `/crav1-help` answers from it and names the route it used. The `crav1.mdc` order lines and every skill's next step in the [skills reference](skills.md) are generated from the same file, [workflow.yaml](workflow.yaml).
 
@@ -32,19 +32,20 @@ You are starting a new feature from one or two sentences, a pile of ideas, or se
 | 4 | `/crav1-tighten-spec` | Always, before questions and the plan. |
 | 5 | `/crav1-resolve-open-questions` | When `## Open questions` still has items. |
 | 6 | `/crav1-ado-sync` | Optional. When the team tracks Features in Azure Boards. |
-| 7 | `/crav1-plan-from-spec` | The spec is tight and its questions are answered or kept open on purpose. |
-| 8 | `/crav1-review-plan` | Right after the plan is written. |
-| 9 | `/crav1-tighten-plan` | After the plan review. |
-| 10 | `/crav1-ado-sync` | Optional. When the Feature is in Azure Boards and the tasks should be too. |
-| 11 | `/crav1-tasks-ready-to-build` | Optional. Any time, to see which tasks are ready, which are blocked and why. Read-only. |
-| 12 | `/crav1-build-walk` | Optional. One work branch at a time: build, verify, commit, open the pull request, merge the base into the branch, merge the pull request, tick, then the next task. One Next while it runs. It does not replace build-tasks. |
-| 13 | `/crav1-build-tasks` or `/crav1-build-features` | One task, a range, or all (build-tasks), or whole features (build-features). Each task runs in its own worker that implements, commits, and verifies it, so they go straight to the pull request. |
-| 14 | `/crav1-verify-build-against-spec` | Against the spec and the plan, for the whole slice when you want one report. |
-| 15 | `/crav1-fix-build-gaps` | Optional. When `verify.md` has a failure, or to fix it against the running host (fix-build-gaps asks which). Do not edit `spec.md` in this loop. Then back to `/crav1-verify-build-against-spec`. |
-| 16 | `/crav1-finalize-commit` | When the slice verifies (it drafts first, then offers commit, copy, change, or stop). |
-| 17 | `/crav1-open-pr` | To push and open the pull request. |
-| 18 | `/crav1-review-pr` | Before the merge. |
-| 19 | `/crav1-merge-pr` | When the review says ship and the host checks are green. |
+| 7 | `/crav1-design-ui` | Optional. When the slice has a user-facing UI (1.211.0): screens, states, interactions, UI checks, one visual, and one sign-off item per screen. A named person's yes on each screen is recorded with `/crav1-record-approval` before the plan covers it. |
+| 8 | `/crav1-plan-from-spec` | The spec is tight and its questions are answered or kept open on purpose. In a UI slice, only signed-off screens are planned. |
+| 9 | `/crav1-review-plan` | Right after the plan is written. |
+| 10 | `/crav1-tighten-plan` | After the plan review. |
+| 11 | `/crav1-ado-sync` | Optional. When the Feature is in Azure Boards and the tasks should be too. |
+| 12 | `/crav1-tasks-ready-to-build` | Optional. Any time, to see which tasks are ready, which are blocked and why. Read-only. |
+| 13 | `/crav1-build-walk` | Optional. One work branch at a time: build, verify, commit, open the pull request, merge the base into the branch, merge the pull request, tick, then the next task. One Next while it runs. It does not replace build-tasks. |
+| 14 | `/crav1-build-tasks` or `/crav1-build-features` | One task, a range, or all (build-tasks), or whole features (build-features). Each task runs in its own worker that implements, commits, and verifies it, so they go straight to the pull request. |
+| 15 | `/crav1-verify-build-against-spec` | Against the spec and the plan, for the whole slice when you want one report. |
+| 16 | `/crav1-fix-build-gaps` | Optional. When `verify.md` has a failure, or to fix it against the running host (fix-build-gaps asks which). Do not edit `spec.md` in this loop. Then back to `/crav1-verify-build-against-spec`. |
+| 17 | `/crav1-finalize-commit` | When the slice verifies (it drafts first, then offers commit, copy, change, or stop). |
+| 18 | `/crav1-open-pr` | To push and open the pull request. |
+| 19 | `/crav1-review-pr` | Before the merge. |
+| 20 | `/crav1-merge-pr` | When the review says ship and the host checks are green. |
 
 <a id="new-info"></a>
 

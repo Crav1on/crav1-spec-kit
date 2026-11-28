@@ -30,4 +30,4 @@ runs by itself: Calls no skill. Names `$crav1-glossary research`; you type it.
 you run next: $crav1-finalize-commit
 first: `$crav1-glossary bcas`
 walkthrough: from-glossary.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-glossary.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-glossary.md

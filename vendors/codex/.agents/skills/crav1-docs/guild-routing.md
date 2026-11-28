@@ -18,6 +18,7 @@ skills:
 - $crav1-review-architecture
 - $crav1-tighten-spec
 - $crav1-resolve-open-questions
+- $crav1-design-ui
 subagents: crav1-spec-reviewer-agent, crav1-review-architecture-agent, crav1-bundle-slice-agent
 
 ## Plan
@@ -82,6 +83,7 @@ subagents: none
 - $crav1-show-or-ask-open-questions | Channel after ask (optional) | `research`
 - $crav1-record-approval | Write the line | `accept`
 - $crav1-add-to-spec | What you have | `fact` `dump` `code-change` `meeting` `mail` `chat`
+- $crav1-design-ui | The HTML mock (optional; a word in the invocation takes that choice without asking) | `with-mock` `skip-mock`
 - $crav1-build-tasks | Which tasks | `one-task` `range` `all-tasks`
 - $crav1-build-tasks | Branch | `new-branch`
 - $crav1-build-walk | Do this step | `yes` `stop` `release-claim`
@@ -136,6 +138,7 @@ specify:
     - crav1-review-architecture
     - crav1-tighten-spec
     - crav1-resolve-open-questions
+    - crav1-design-ui
   subagents:
     - crav1-spec-reviewer-agent
     - crav1-review-architecture-agent
@@ -194,4 +197,4 @@ cross_cutting:
   subagents: []
 ```
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/guild-routing.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/guild-routing.md

@@ -35,3 +35,7 @@ Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. On Windo
 - It keeps the file's line endings.
 
 An item that already has the same line is left as it is.
+
+## A cleared UI screen (1.211.0)
+
+A UI screen item from `$crav1-design-ui` may carry `Cleared: <date>, material change: <why>`. An `Approved:` line above the last `Cleared:` line no longer counts. It stays in the file. The new line is appended below the `Cleared:` line, even when its words match the old one. Pass `--item "UI screen <name> (S<n>)"` when the person signs off more than one screen.

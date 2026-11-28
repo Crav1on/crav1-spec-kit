@@ -8,6 +8,8 @@
 
 **Finished claims (1.196.0).** Also at the walk start, run `scripts/claims.py prune --root <spec-folder> --code-repo <code checkout> --base <Merges into>` in `crav1-build-walk`. No card: it clears claims whose tasks are all ticked or whose branch is merged into `origin/<base>`, and prints one summary line such as `Cleared 2 finished claims: T5 (PR 71), T8 (ticked).` Say that line; say nothing when there is none. Unfinished claims stay, with their age warning; a finished claim never warns. Never write a line saying claims or claimed tasks were kept or stay unchanged.
 
+**Signed-off UI screens at the start (1.211.0).** When the slice has `ui/`, also run `../crav1-design-ui/scripts/ui_screens.py status --root <spec-folder>` (skill `crav1-design-ui`). No card. It compares each screen with its item's `Screen:` mark. For each screen whose state is `changed`, say one line with its `why`: that signed-off screen had a material change since its yes. A `minor` change says nothing; the yes stays.
+
 Run these in order. When a playbook was named, the playbook question is answered before any later step, including a read-only check. Each one is the existing skill, not a copy of it. Open its file from this skill's folder, as [open-skill-file.md](../../crav1-docs/reference/open-skill-file.md) says (1.134.0). A step with nothing to do says so in one line, records `Result: nothing-to-do` with the versions it covers, and moves on. Record that one step right then. One `record` call per step. Do not record several steps in one command. Do not pass `--when`. The script stamps Done. `record` refuses more than one step.
 
 **Inside the walk (1.196.0).**
@@ -62,9 +64,19 @@ Not fixed steps. Security and tests stay optional. When one of them finishes ins
 - Open `../crav1-show-or-ask-open-questions/SKILL.md` (`$crav1-show-or-ask-open-questions`), when a question is for someone else.
 - Open `../crav1-suggest-tests-for-code/SKILL.md` (`$crav1-suggest-tests-for-code`), when the spec names existing code and the acceptance lines do not already name the checks. A kept suggestion goes through add-to-spec, which that skill opens on yes. This walk does not write the tests.
 
+## Before the plan, the UI step (1.211.0)
+
+Not an extra and not offered. After the extras batch, run `<interpreter> -X utf8 ../crav1-design-ui/scripts/ui_screens.py status --root <spec-folder>` (skill `crav1-design-ui`). It writes nothing.
+
+- `ui` is `no` (no UI words, or a `UI: none` line in `spec.md`): say nothing and go on to the plan.
+- `ui` is `unclear`, or `yes` with a screen whose state is `new`, `changed` or `waiting`, or the user asks to change a screen: Open `../crav1-design-ui/SKILL.md` (`$crav1-design-ui`) and follow it inside the walk, with its own cards and its one closing yes. Inside the walk it prints no Run next. When it finishes, record `- Extra: design-ui` with `--yes`, as the extras are recorded.
+- A screen whose state is `changed` is a signed-off screen with a material change since its yes. Say its `why` once, at this point and at the walk start: `Orders list (S1) was signed off; the states changed since, so its yes is cleared on the next UI step.`
+
+The plan step's UI gate then decides. When it prints Run next (no screen signed off yet), the walk pauses: say `Paused at plan-from-spec.` and print that Run next as-is. It names `$crav1-design-ui` and `$crav1-record-approval`. The walk never writes `Approved:`.
+
 ## 5. Plan
 
-Open `../crav1-plan-from-spec/SKILL.md` (`$crav1-plan-from-spec`). That skill writes `plan.md` and `tasks.md`, and an `## Approval needed` item when a constraint says a named person gives a yes before something (`references/write.md` in that skill, "Approval needed"). When both already match the spec and it has nothing to add, say so and move on. Do not write the plan, or that item, from this walk.
+Open `../crav1-plan-from-spec/SKILL.md` (`$crav1-plan-from-spec`). Its UI gate runs first and the plan covers only signed-off screens. That skill writes `plan.md` and `tasks.md`, and an `## Approval needed` item when a constraint says a named person gives a yes before something (`references/write.md` in that skill, "Approval needed"). When both already match the spec and it has nothing to add, say so and move on. Do not write the plan, or that item, from this walk.
 
 ## After the plan, questions with no Blocks line
 

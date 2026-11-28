@@ -19,13 +19,16 @@ flow:
 - `write` also passes `--yes`.
 - On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`.
 - Elsewhere it is `python3`.
+- a UI screen item from `/crav1-design-ui` is `UI screen <name> (S<n>): ...`; pass `--item "UI screen <name> (S<n>)"` when the person has more than one item.
+- A `Cleared: <date>, material change: <why>` mark means the `Approved:` lines above it no longer count; they stay, and the new line goes below the mark.
+- After a UI screen's yes the Run next is `/crav1-plan-from-spec <slug>`.
 
 ## Choice words
 - question: Write the line
   - `accept`: write the Approved line shown in this run
 called_by: Called by the user.
 runs by itself: Calls no skill.
-you run next: /crav1-build-tasks; /crav1-finalize-commit
+you run next: /crav1-build-tasks; /crav1-plan-from-spec; /crav1-finalize-commit
 first: `/crav1-record-approval Person: <who> Source: <link, or mail, or meeting> <date> Quote: "<their words>"`
 walkthrough: from-record-approval.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-record-approval.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-record-approval.md

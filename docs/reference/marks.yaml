@@ -37,6 +37,49 @@ marks:
     read_by: [crav1-add-to-spec, crav1-ado-sync, crav1-build-features, crav1-build-tasks, crav1-help, crav1-plan-from-spec, crav1-show-or-ask-open-questions]
     since: 1.60.0
 
+  - id: ui-none
+    name: "UI: none"
+    group: spec
+    files: ["docs/specs/<slug>/spec.md (under the title)"]
+    format: "UI: none (<reason>)"
+    pattern: '^UI: none \(.+\)$'
+    examples:
+      - "UI: none (a nightly export job with no screen)"
+    meaning: "The slice has no user-facing surface; the plan and the walk do not ask again."
+    written_by: [crav1-design-ui]
+    read_by: [crav1-plan-from-spec, crav1-tighten-and-plan-ready-to-build]
+    mention: 'UI: none'
+    since: 1.211.0
+
+  - id: ui-screen
+    name: "UI screen heading"
+    group: ui
+    files: ["docs/specs/<slug>/ui/experience.md", "docs/specs/<slug>/ui/design.md"]
+    format: "### <name> (S<n>)"
+    pattern: '^### [^<>]+ \(S\d+\)$'
+    examples:
+      - "### Orders list (S1)"
+      - "### Order editor window (S2)"
+    meaning: "One screen or window, with its own sign-off item. The id stays when the name changes."
+    written_by: [crav1-design-ui]
+    read_by: [crav1-plan-from-spec]
+    mention: '\(S<n>'
+    since: 1.211.0
+
+  - id: ui-check
+    name: "UI acceptance check"
+    group: ui
+    files: ["docs/specs/<slug>/ui/experience.md (under a screen's #### Checks)"]
+    format: "- [ ] <yes/no check a stranger could mark> (S<n>-C<n>)"
+    pattern: '^- \[[ x]\] .+ \(S\d+-C\d+\)$'
+    examples:
+      - '- [ ] With no orders, the list shows "No orders yet" and a New order button. (S1-C1)'
+    meaning: "One yes/no UI check. Plan traces it into tasks.md; verify marks the written line."
+    written_by: [crav1-design-ui]
+    read_by: [crav1-plan-from-spec, crav1-verify-build-against-spec, crav1-plan-reviewer-agent]
+    mention: 'S(?:<n>|\d+)-C(?:<n>|\d+)'
+    since: 1.211.0
+
   - id: moved
     name: "Moved pointer"
     group: spec
@@ -380,7 +423,7 @@ marks:
     examples:
       - "  - Person: the partner"
     meaning: "The person whose yes the item waits on."
-    written_by: [crav1-plan-from-spec, crav1-build-tasks]
+    written_by: [crav1-plan-from-spec, crav1-build-tasks, crav1-design-ui]
     read_by: [crav1-tasks-ready-to-build, crav1-record-approval, crav1-show-or-ask-open-questions]
     readiness: true
     mention: 'Person:'
@@ -390,13 +433,14 @@ marks:
     name: "Holds"
     group: approval
     files: ["docs/specs/<slug>/spec.md (indented under an Approval needed item)"]
-    format: "  - Holds: T<n>[, T<n>]"
-    pattern: '^  - Holds: T\d+(, T\d+)*$'
+    format: "  - Holds: T<n>[, T<n>] | none (<reason>)"
+    pattern: '^  - Holds: (?:T\d+(, T\d+)*|none \(.+\))$'
     examples:
       - "  - Holds: T4"
       - "  - Holds: T2, T4"
-    meaning: "The tasks that wait until a matching Approved line is recorded. Other tasks can still start."
-    written_by: [crav1-plan-from-spec, crav1-build-tasks]
+      - "  - Holds: none (UI screen S1; the plan waits for this yes)"
+    meaning: "The tasks that wait until a matching Approved line is recorded. Other tasks can still start. A UI screen item holds `none (...)`; the plan waits for it."
+    written_by: [crav1-plan-from-spec, crav1-build-tasks, crav1-design-ui]
     read_by: [crav1-tasks-ready-to-build, crav1-build-tasks, crav1-record-approval]
     readiness: true
     mention: 'Holds:'
@@ -416,6 +460,35 @@ marks:
     readiness: true
     mention: 'Approved:'
     since: 1.141.0
+
+  - id: approval-ui-screen
+    name: "Screen (UI sign-off)"
+    group: approval
+    files: ["docs/specs/<slug>/spec.md (indented under a UI screen's Approval needed item)"]
+    format: "  - Screen: S<n>, version <12 hex>, shape name=<6 hex> path=<6 hex> layout=<6 hex> states=<6 hex> interactions=<6 hex> checks=<6 hex> other=<6 hex>"
+    pattern: '^  - Screen: S\d+, version [0-9a-f]{12}, shape name=[0-9a-f]{6} path=[0-9a-f]{6} layout=[0-9a-f]{6} states=[0-9a-f]{6} interactions=[0-9a-f]{6} checks=[0-9a-f]{6} other=[0-9a-f]{6}$'
+    examples:
+      - "  - Screen: S1, version 3f0c9a1b2d4e, shape name=1a2b3c path=4d5e6f layout=7a8b9c states=0d1e2f interactions=3a4b5c checks=6d7e8f other=9a0b1c"
+    meaning: "The screen this item signs off, with hashes from scripts/ui_screens.py. A changed shape is material; a changed version alone (a typo) is not. Never typed by hand."
+    written_by: [crav1-design-ui]
+    read_by: [crav1-plan-from-spec, crav1-tighten-and-plan-ready-to-build]
+    mention: 'Screen:'
+    since: 1.211.0
+
+  - id: approval-ui-cleared
+    name: "Cleared (UI material change)"
+    group: approval
+    files: ["docs/specs/<slug>/spec.md (indented under a UI screen's Approval needed item)"]
+    format: "  - Cleared: <YYYY-MM-DD>, material change: <why>"
+    pattern: '^  - Cleared: \d{4}-\d{2}-\d{2}, material change: .+$'
+    examples:
+      - "  - Cleared: 2026-11-28, material change: the states changed"
+      - "  - Cleared: 2026-11-28, material change: the screen's name and its path or window changed"
+    meaning: "A material change cleared that screen's yes. An Approved line above it no longer counts."
+    written_by: [crav1-design-ui]
+    read_by: [crav1-record-approval, crav1-plan-from-spec]
+    mention: 'Cleared:'
+    since: 1.211.0
 
   # ---------- research stale marks ----------
   - id: stale-note
@@ -547,6 +620,20 @@ marks:
     read_by: [crav1-build-tasks, crav1-review-plan, crav1-tasks-ready-to-build, crav1-verify-build-against-spec]
     mention: 'T#|T1|tasks\.md'
     since: 1.0.0
+
+  - id: task-verify-ui
+    name: "(verify: ui …) on a UI check"
+    group: plan
+    files: ["docs/specs/<slug>/tasks.md (on a task line)"]
+    format: "(verify: ui — <named check>) (spec: ui/experience.md S<n>-C<n>)"
+    pattern: '^\(verify: ui [—-] .+\) \(spec: ui/experience\.md S\d+-C\d+\)$'
+    examples:
+      - '(verify: ui — no orders shows "No orders yet" and a New order button) (spec: ui/experience.md S1-C1)'
+    meaning: "A task that proves one written UI check of a signed-off screen; no pixel comparison."
+    written_by: [crav1-plan-from-spec]
+    read_by: [crav1-verify-build-against-spec, crav1-review-plan, crav1-plan-reviewer-agent]
+    mention: 'verify: ui'
+    since: 1.211.0
 
   - id: task-verify
     name: "(verify: …)"

@@ -33,6 +33,7 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 | Skill | `/crav1-review-architecture` |
 | Skill | `/crav1-tighten-spec` |
 | Skill | `/crav1-resolve-open-questions` |
+| Skill | `/crav1-design-ui` |
 | Subagent | `crav1-spec-reviewer-agent` |
 | Subagent | `crav1-review-architecture-agent` |
 | Subagent | `crav1-bundle-slice-agent` |
@@ -40,6 +41,8 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 `/crav1-tighten-spec` tightens the picked issue in an existing spec. The user calls it. It calls no skill. It does not rewrite the spec to match the code, and it does not clear a stale research mark.
 
 `/crav1-resolve-open-questions` settles open questions and **Conflict:** lines. Nothing is written until one confirm. `/crav1-add-to-spec` and `/crav1-finalize-commit` name it when they write a Conflict line, and do not run it.
+
+`/crav1-design-ui` (1.211.0) designs a slice's user-facing screens after the spec is accepted and before the plan. The user calls it, and the tighten-and-plan walk opens it on its own when the slice has a UI. It calls no skill. It writes `ui/design.md`, `ui/experience.md`, one visual, and one Approval needed item per screen; the yes is `/crav1-record-approval`. It refuses application code and does not commit. It is not a starter option.
 
 A guided walk from a draft spec through the plan until ready to build is `/crav1-tighten-and-plan-ready-to-build` (1.119.0). It is cross-cutting, so neither Specify nor Plan owns it. It runs the Specify skills this lane already owns, inside the walk, and does not replace them. It does not start Build. The new-slice route is unchanged. Architecture review stays optional on that route. Inside the walk it always runs.
 
@@ -56,7 +59,7 @@ After a quote is kept, `/crav1-add-to-spec` compares it with `docs/research/` th
 | Skill | `/crav1-tighten-plan` |
 | Subagent | `crav1-plan-reviewer-agent` |
 
-`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` from the accepted spec. The user calls it. It calls no skill. It stops before Build when `## Linter` says there is no linter, until the user chooses. A piece the user leaves is not turned into work on a later run unless the user says so.
+`/crav1-plan-from-spec` writes `plan.md` and `tasks.md` from the accepted spec. The user calls it. It calls no skill. On a UI slice the plan is blocked until the UI screens are approved, and it covers only approved screens. It stops before Build when `## Linter` says there is no linter, until the user chooses. A piece the user leaves is not turned into work on a later run unless the user says so.
 
 `/crav1-review-plan` reads the plan and writes nothing. The user calls it. It calls no skill. It names `/crav1-tighten-plan` and does not run it.
 
@@ -74,6 +77,8 @@ The same walk, `/crav1-tighten-and-plan-ready-to-build`, runs `/crav1-plan-from-
 | Subagent | `crav1-build-task-agent` |
 
 `/crav1-build-walk` is in the Build lane. The user asks for the walk. It opens the build, verify, commit, and pull-request skills by file and does not replace them. The reply prints Run next first, one complete command per branch that can start, and a step skill's own Next is not printed. Recording a step commits the progress file and does not push. It does not push, open, or merge without a yes in that run. It never rebases. Since 1.155.0 a branch argument, `/crav1-build-walk <slug> <branch>`, builds every open task on that branch in one run. One start yes covers the claim and a push after each task. It stops only for a real stop, always before the merge, and never merges.
+
+`/crav1-verify-build-against-spec` checks the UI checks traced into `tasks.md`.
 
 Started from a ready-to-build report, the walk offers each ready branch as its own Next, with the T number beside the task name. A task that needs code from an unmerged branch is cut from that branch, and the merge list says the order back. Other-owner mode never opens a pull request and never merges.
 
@@ -211,6 +216,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-show-or-ask-open-questions` | Channel after ask (optional) | `research` |
 | `/crav1-record-approval` | Write the line | `accept` |
 | `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code-change` · `meeting` · `mail` · `chat` |
+| `/crav1-design-ui` | The HTML mock (optional; a word in the invocation takes that choice without asking) | `with-mock` · `skip-mock` |
 | `/crav1-build-tasks` | Which tasks | `one-task` · `range` · `all-tasks` |
 | `/crav1-build-tasks` | Branch | `new-branch` |
 | `/crav1-build-walk` | Do this step | `yes` · `stop` · `release-claim` |
@@ -269,6 +275,7 @@ specify:
     - crav1-review-architecture
     - crav1-tighten-spec
     - crav1-resolve-open-questions
+    - crav1-design-ui
   subagents:
     - crav1-spec-reviewer-agent
     - crav1-review-architecture-agent

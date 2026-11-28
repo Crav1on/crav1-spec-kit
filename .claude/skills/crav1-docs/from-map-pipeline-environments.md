@@ -55,4 +55,4 @@ Uncommitted: 1 file; commit with /crav1-finalize-commit when ready.
 
 Reference page: [map-pipeline-environments](reference/skills/crav1-map-pipeline-environments.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-map-pipeline-environments.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/from-map-pipeline-environments.md

@@ -10,6 +10,8 @@ writes: Writes `verify.md`. After a yes on a tick-pending line, ticks that one `
 leaves alone: Leaves `spec.md` and product code alone. Does not tick a row without a yes, and does not re-implement.
 limits: does not run `$crav1-fix-bug` or `$crav1-review-pr`.
 flow:
+- a task with `(verify: ui — …)` is checked against its written line in `ui/experience.md`, the id in `(spec: ui/experience.md S1-C1)`, by looking at the running screen.
+- No screenshot or pixel comparison against the mock or a Salt block; the mock under `ui/mock/` is not evidence.
 - the tick offer for a task recorded merged sits inside Run next, label above `verify_rows.py tick --file <spec-folder>/verify.md --task <T#> --merged yes`, never after the ending; the tick is written only after a yes.
 - `verify_rows.py set` keeps CRLF files CRLF and re-sorts a count line only when its ids change.
 - a rerun verifies again only the rows whose branch or tip moved since the last verify, or every row when spec.md, plan.md or tasks.md changed (`scripts/verify_rows.py scope`), and the reply says which rows were kept (`Kept from the last verify: T1, T3 (branch and tip unchanged).`).
@@ -51,4 +53,4 @@ runs by itself: Calls no skill.
 you run next: $crav1-fix-build-gaps; $crav1-finalize-commit
 first: `$crav1-verify-build-against-spec @docs/specs/<slug>/`
 walkthrough: from-verify.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-verify-build-against-spec.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-verify-build-against-spec.md

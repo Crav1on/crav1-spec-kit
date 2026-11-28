@@ -8,6 +8,8 @@
 
 Turn an accepted spec into a file-level plan.md and independently testable tasks.md.
 
+1.211.0: UI gate. Before any file it runs skill `crav1-design-ui` `scripts/ui_screens.py gate --root <spec-folder> --text`. A UI slice with no signed-off screen, or a binary file under `ui/`, stops before `plan.md` and `tasks.md` with Run next naming [`/crav1-design-ui`](crav1-design-ui.md) and [`/crav1-record-approval`](crav1-record-approval.md). Otherwise the plan covers only the signed-off screens; it reads `ui/design.md` and `ui/experience.md` and never `ui/mock/`. Each UI check `(S<n>-C<n>)` traces into `tasks.md` as `(verify: ui — <named check>) (spec: ui/experience.md S<n>-C<n>)`; `ui_screens.py trace` lists any check left with no task. `ui` is a verify kind.
+
 1.176.0: the recap ends with Run next, `Review the plan, which is written and not reviewed yet:` above [`/crav1-review-plan`](crav1-review-plan.md) <slug>`, no `Next:` line. A `## Linter` section that names a tool, or records going on without one, counts as named even beside a partial `No linter ... for <part>` line.
 
 1.159.0: the After writing recap (paths written, task count, acceptance lines no task matched by wording, to compare by meaning first, the dependency waves, verify notes with no kind, kept-open questions and their `Blocks:` lines, approval items, stale research, the linter line and the one `Next` line) is printed by `scripts/plan_check.py recap`; the agent passes only what it alone knows (built pieces, the branch read, unmapped security checks). `plan_check.py order` checks the waves after `tasks.md` is written. The After writing list moved word for word to `references/recap.md`, the plan.md section list and host setup tasks to `references/write.md`.
@@ -56,9 +58,9 @@ Writes `plan.md` and `tasks.md`, and matching OpenSpec export files when those a
 
 ## Does not
 
-Leaves `spec.md` alone except a `Blocks:` line under a kept-open question and an `## Approval needed` item from a constraint. Leaves a claimed `In progress:` task line in `tasks.md` unchanged. Leaves application code and any linter install alone.
+Leaves `spec.md` alone except a `Blocks:` line under a kept-open question and an `## Approval needed` item from a constraint. Leaves a claimed `In progress:` task line in `tasks.md` unchanged. Leaves `ui/` and the UI mock alone. Leaves application code and any linter install alone.
 
-Limits and exceptions: when `## Linter` says this repo has no linter for the code the tasks will touch, it stops before Build until the user chooses. A line under `## Dismissed test suggestions` is not a task. A kept test suggestion that is already an acceptance line maps to a task. A gap or a disagreement is finish, add a verify test, or leave before any task exists. A later run does not turn a left piece into work unless the user says so. Stale research does not fail the gate.
+Limits and exceptions: in a UI slice with no signed-off screen it stops before writing `plan.md` or `tasks.md` and names [`/crav1-design-ui`](crav1-design-ui.md) and [`/crav1-record-approval`](crav1-record-approval.md) (1.211.0). When `## Linter` says this repo has no linter for the code the tasks will touch, it stops before Build until the user chooses. A line under `## Dismissed test suggestions` is not a task. A kept test suggestion that is already an acceptance line maps to a task. A gap or a disagreement is finish, add a verify test, or leave before any task exists. A later run does not turn a left piece into work unless the user says so. Stale research does not fail the gate.
 
 ## You run next / Runs by itself
 

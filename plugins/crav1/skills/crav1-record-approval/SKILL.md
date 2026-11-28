@@ -24,6 +24,8 @@ A missing person, source, or quote: stop and ask for that value. Do not guess. A
 
 Find the spec with `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs` when they did not point at a folder, as `crav1-docs/reference/running-scripts.md` says. Several matches: list them and stop.
 
+**UI screens (1.211.0).** `/crav1-design-ui` writes one item per screen, `UI screen <name> (S<n>): ...`. When the person has more than one item, add `--item "UI screen <name> (S<n>)"` to `show` and `write`. A `Cleared:` mark on the item means a material change cleared the earlier yes; that `Approved:` line stays and no longer counts, and the new line goes below the mark.
+
 ## Show, then accept
 
 Read [references/line.md](references/line.md). Pick the interpreter as `crav1-docs/reference/running-scripts.md` says. Run `<interpreter> -X utf8 scripts/approval_needed.py show --root <spec-folder> --person "<person>" --source-date <date> --source "<source>" --quote "<quote>" --recorder "<recorder>" --accepted <date>` and show what it prints: the `Approved:` line, the constraint, and the tasks it unblocks. An earlier quote never counts by itself. The word `yes` inside the quote is not acceptance.
@@ -47,7 +49,7 @@ The personal-data and secrets check runs on the quote before the write. Follow s
 
 You do not edit `plan.md`, `tasks.md`, `verify.md`, or `docs/system/`. You do not send, post, or reply. You do not commit, push, or open a pull request.
 
-End with the line, who it is for, and which tasks it unblocks. the Run next reason "that approval is on record and the task can start" and the command alone in its code span `/crav1-build-tasks <T#>` When the task is a live `apply`, say the build still needs the user's own yes in that run, and the task stays unticked until then. Leave the Uncommitted line when the spec changed.
+End with the line, who it is for, and which tasks it unblocks. the Run next reason "that approval is on record and the task can start" and the command alone in its code span `/crav1-build-tasks <T#>` When the task is a live `apply`, say the build still needs the user's own yes in that run, and the task stays unticked until then. For a UI screen item there is no task yet: the Run next reason is "that screen is signed off and the plan can cover it" and the command is `/crav1-plan-from-spec <slug>`. Leave the Uncommitted line when the spec changed.
 
 ## Run ending (1.122.0)
 

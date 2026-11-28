@@ -33,6 +33,8 @@ Read `spec.md`, plus `diagrams.md`, `adr/`, `export/` if present. Treat `spec.md
 
 Say which gate failed. Next command: `/crav1-tighten-spec` and/or `/crav1-resolve-open-questions`. Do not draft a fake plan.
 
+**UI gate (1.211.0).** First follow `references/ui-gate.md` (`ui_screens.py gate`).
+
 **Ready with leftovers (1.87.0, 1.125.0):** each kept-open question that does not block a first demo becomes its own entry under **Risks** in `plan.md`. Do not ask whether to park it, keep it, or answer it, and do not answer it silently. Answering stays with `/crav1-resolve-open-questions`. The `Blocks:` line and the risk wording are in `references/write.md` ("Blocks lines"). When you cannot tell whether a leftover is current work or later, that section's one short batch is the ask.
 
 Stale research does not fail this gate. A `Stale since` line under `## Research findings`, or a stale block on a note that section links to, is listed under Risks. Follow the readers section of skill `crav1-add-to-spec`, `references/research-stale.md`. Do not block the plan. Do not clear the mark. Do not treat the stale research as current.
@@ -41,7 +43,7 @@ If two architecture shapes still fit the spec (ADR still `proposed`, no constrai
 
 ## Built pieces (before any task)
 
-Read `references/built-pieces.md` ("Built pieces (before any task)") only when any acceptance line may already be built (code exists for the slug).
+Read `references/built-pieces.md` only when any acceptance line may already be built (code exists for the slug).
 
 ## Write (after the gate)
 
@@ -85,7 +87,7 @@ Do not start coding in this chat.
 
 ## Parked and retired specs (1.60.0)
 
-Read `references/parked.md` ("Parked and retired specs (1.60.0)") only when the spec is parked or retired.
+Read `references/parked.md` only when the spec is parked or retired.
 
 ## Hard rules
 

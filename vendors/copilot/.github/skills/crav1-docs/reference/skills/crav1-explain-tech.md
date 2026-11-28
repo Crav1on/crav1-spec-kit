@@ -28,4 +28,4 @@ runs by itself: Calls no skill. Runs `scripts/explain_tech.py --vendor copilot`.
 you run next: nothing in particular
 first: `/crav1-explain-tech Service Bus`
 walkthrough: from-explain-tech.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-explain-tech.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-explain-tech.md

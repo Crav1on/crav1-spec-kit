@@ -50,4 +50,4 @@ runs by itself: Repos plus a bundle: Calls `$crav1-create-feature-branch` in tha
 you run next: $crav1-add-to-spec; $crav1-tighten-spec; $crav1-finalize-commit
 first: `$crav1-existing-to-specs @repo-a/ @repo-b/ @notes/old-spec.md @tickets/ The repos are what exists. The dump is what to match. Do not write code. Ask where the specs go, then map, and stop.`
 walkthrough: from-existing-to-specs-with-bundle.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-existing-to-specs.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-existing-to-specs.md

@@ -11,6 +11,7 @@ writes: Before go-ahead only `docs/architecture/designs/<topic>/` through `scrip
 leaves alone: Leaves `## Confirmed`, `## Accepted from a guess`, `## How the repos connect`, `left-out.md`, requirements, plans, tasks, verify, research notes, question mark lines, application code, pipelines, and live infrastructure alone. Does not commit, push, merge, tag, or open a pull request.
 limits: A run without the user never settles a decision, stages, or gives go-ahead. A choice that reverses an accepted ADR, a constraint, or a current environment fact needs a separate yes. A requirement is routed to `$crav1-add-to-spec`.
 flow:
+- when a slice needs both a UI design and an architecture design, `$crav1-design-ui` runs first.
 - `$crav1-design-architecture` (1.181.0, preview) decides how the landscape should change: systems and services and how they connect, environments, infrastructure and hosting, data flows, integrations, and deployment.
 - The sandbox is `docs/architecture/designs/<topic>/` on its own design branch: one goal per topic in `goal.md`, one or more designs under `designs/<name>/`, and `compare.md` once a topic fans out.
 - The end state is designed first; staging happens only on `stage-it`, and the user names and divides the stages.
@@ -68,4 +69,4 @@ runs by itself: Calls no skill. It may name `$crav1-tighten-spec`, `$crav1-plan-
 you run next: $crav1-tighten-spec; $crav1-plan-from-spec; $crav1-add-to-spec; $crav1-show-or-ask-open-questions
 first: `$crav1-design-architecture orders should retry failed payments without blocking checkout`
 walkthrough: from-design-architecture.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-design-architecture.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-design-architecture.md

@@ -46,6 +46,8 @@ A mail, a transcript, a chat, a screenshot, or another original that is quoted i
 
 No `plan.md`. No `tasks.md`. A missing `docs/system/` is not seeded here. This command does not create `glossary.md`. A meaning the new information does not state is `to be researched`. A quote that is a yes for an `## Approval needed` item is not written as `Answered:` or `Approved:`.
 
+when the slice has a `ui/` folder, `/crav1-add-to-spec` warns before the write card when the new information touches a signed-off UI screen, for example `This change touches the signed-off screen Orders list (S1).` It does not edit `ui/` and does not clear the yes. Run [`/crav1-design-ui`](from-design-ui.md) to change the screen; it says whether the change is material (the yes is cleared) or a typo (the yes stays).
+
 On yes each note gains `Superseded <date> by <decision>.` A verbatim quote is left as it is.
 
 ## After
@@ -70,4 +72,4 @@ A dump or a code change confirms the sort on one card: `yes (Recommended)`, or t
 
 Reference page: [add-to-spec](reference/skills/crav1-add-to-spec.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-add.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/from-add.md

@@ -9,7 +9,7 @@ license: MIT
 disable-model-invocation: true
 metadata:
   crav1-vendor: copilot
-  crav1-version: 1.210.0
+  crav1-version: 1.211.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.
@@ -93,6 +93,7 @@ The sandbox is `docs/architecture/designs/<topic>/` on its own design branch (re
 - Claims in confirmed specs, code or config are facts when the file shows them. Claims in a user-supplied file stay ideas until one of those sources supports them.
 - A choice that would reverse an accepted ADR, a constraint, an approval item, or a current environment fact is a revisit and needs a separate yes.
 - A requirement that shows up is named as one and routed to `/crav1-add-to-spec` at the end. It is not designed here.
+- When a slice needs both a UI design and an architecture design, `/crav1-design-ui` runs first (1.211.0).
 - Design the end state first. Stage only when the user asks. The user names and divides the stages.
 - Before go-ahead, write nothing outside the topic folder. Do not write `Asked:` or `Pending:` lines in any spec.
 - A run without the user never settles a decision, never stages, never gives go-ahead, and never writes a real ADR.

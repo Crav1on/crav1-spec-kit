@@ -11,6 +11,8 @@ writes: Writes `docs/specs/<slug>/walk-progress.md` through `scripts/walk_progre
 leaves alone: Leaves `spec.md`, `plan.md`, and `tasks.md` to the skills that own them, except that one `Blocks:` pass. Does not change `Answer:` or `Change:` lines in the playbook. Does not start `/crav1-build-tasks`, `/crav1-build-features`, or `/crav1-verify-build-against-spec`. Never writes `verify.md`. Does not git-commit.
 limits: A headless run stops. No playbook skips step 1. Architecture review always runs inside the walk even though the new-slice route marks it optional. Needs verify is named and not started. An open plan-review warning is not ready. The progress script does not decide that a playbook was already applied unless this walk recorded that apply.
 flow:
+- before the plan step, when skill `crav1-design-ui` `scripts/ui_screens.py status` says the slice has a UI (or it is unclear), the walk opens `/crav1-design-ui` on its own, not as an offer, and records `- Extra: design-ui`.
+- When the plan's UI gate finds no signed-off screen, the walk pauses at plan-from-spec and prints that Run next, naming `/crav1-design-ui` and `/crav1-record-approval`.
 - a finding with no topic gets one on the next walk start, derived the same way as a new finding, and `start` returns `topics_line` for that one line.
 - leftover wording in plan review is a patch (`--kind stale-wording`), not a full jump back.
 - The card header is the name and the code, for example `Static-IP notes (P9)`.
@@ -157,4 +159,4 @@ runs by itself: Opens each locked skill's file from this skill's folder and foll
 you run next: /crav1-build-walk; /crav1-build-tasks
 first: `/crav1-tighten-and-plan-ready-to-build @docs/specs/<slug>/ <optional playbook file, or leave it out>`
 walkthrough: from-tighten-and-plan.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-tighten-and-plan-ready-to-build.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-tighten-and-plan-ready-to-build.md

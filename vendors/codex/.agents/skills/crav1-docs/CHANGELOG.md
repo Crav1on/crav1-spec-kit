@@ -2,6 +2,23 @@
 
 Notable changes to **CRAV1 Spec Kit** (`crav1`). Version matches `plugins/crav1/.cursor-plugin/plugin.json`.
 
+## 1.211.0 (2026-11-28)
+
+A UI design step before the plan, signed off one screen at a time through the existing approval flow.
+
+- **`$crav1-design-ui`.** For a slice with a user-facing UI, after `spec.md` is accepted and before `$crav1-plan-from-spec`. A slice that clearly has no UI skips it. When the spec names a screen and there is no `ui/` folder, it asks once: design the UI, or skip with a `UI: none (<reason>)` line in `spec.md`. It sits in Specify next to plan-from-spec. The six starter options are unchanged.
+- **Two files.** `docs/specs/<slug>/ui/design.md` holds the look, the layout per screen, colours, fonts, and the tokens (colours, typography, spacing, radius) in one DESIGN.md-style `yaml` block. There is no separate tokens file. `ui/experience.md` holds the screens and windows (`### <name> (S<n>)`), at least the empty, loading, error and full-of-data states, the interactions that apply, and yes/no UI checks such as `(S1-C1)`. Templates are in `docs/specs/_template/ui/` and the skill's `assets/`. The written Markdown wins over any picture.
+- **One visual, always.** The kit suggests one type with a one-line reason: a throwaway HTML mock under `ui/mock/` when zoom, docking, motion or a clickable flow matter (never shipped, not a plan input), PlantUML Salt for a static layout, Mermaid for flows and states. Text art only when none can be rendered. `with-mock` and `skip-mock` take that choice without asking.
+- **Sign-off per screen.** `ui_screens.py sync --yes` adds one `## Approval needed` item per screen through the same `add_item` code in `approval_needed.py`, with `Holds: none (...)` and a `Screen:` mark of per-screen hashes. The yes is an `Approved:` line from `$crav1-record-approval`; the design step never writes one. A new screen gets its own item, so earlier screens stay approved.
+- **Material or not.** A change to a signed-off screen's layout, states, interactions, checks, name or path clears its yes with `Cleared: <date>, material change: <why>`. An `Approved:` line above that mark stays and no longer counts. A typo, a case or punctuation change, or a non-UI edit keeps the yes. The kit says which kind it found and why. `$crav1-add-to-spec` and the walk warn when a change touches a signed-off screen.
+- **Plan gate.** `$crav1-plan-from-spec`, and the walk's plan step, stop before `plan.md` and `tasks.md` in a UI slice with no signed-off screen, and name `$crav1-design-ui` and `$crav1-record-approval` as Run next. Otherwise the plan covers only signed-off screens and traces each UI check into `tasks.md` as `(verify: ui — <named check>) (spec: ui/experience.md S1-C1)`. `ui` is a verify kind. `$crav1-review-plan` treats a plan that ignores the approved UI files as a finding. `$crav1-verify-build-against-spec` checks the written lines, with no screenshot or pixel comparison.
+- **Screenshots.** A screenshot attached with feedback is looked at only to understand it. What it shows is written as text in `ui/experience.md` or `ui/design.md`. No binary file is written under `docs/specs/`, and `sync` and the plan gate refuse while one is under `ui/`.
+- **The walk.** `$crav1-tighten-and-plan-ready-to-build` opens `$crav1-design-ui` on its own before the plan when the slice has a UI and records `- Extra: design-ui`. `$crav1-design-architecture` gains one line: when both apply, the UI design runs first.
+
+Decided in this release: screen ids are `S<n>` and check ids `S<n>-C<n>`, in the kit's plain-name-then-code style. Material versus minor is decided from per-part hashes of a spelling-tolerant word key, so the check needs no stored copy of the approved text; a doubt counts as material. A clear is a `Cleared:` mark under the item, because the `Approved:` line is never removed. When it is unclear whether a slice has a UI, the plan gate stops and the design step asks.
+
+Docs and tests: `docs/from-design-ui.md`, the spec-to-plan, tighten-and-plan, record-approval, add, verify and design-architecture walkthroughs, the method, glossary, data layout, marks, and `scripts/tests/test_kit_1211.py`.
+
 ## 1.210.0 (2026-11-27)
 
 Kit 2.0 follows the newest published pre-release, and an update plan stays small.
@@ -171,22 +188,5 @@ Build-walk endings that follow the real step, checked facts, release gates in th
 - **Small fixes.** No `Next:` lines in walk prose. pr-status finds the Azure DevOps organization in `repos.md`. merge-pr fetches before the PR-note check. Every Windows `--query` value is quoted. Build-walk cards show plain labels.
 
 Docs and tests: build walk, tighten and plan, verify, update kit and pr-status walkthroughs; `scripts/tests/test_kit_1198.py`.
-
-## 1.197.0 (2026-11-20)
-
-Fixes from a live spec walk: cleaner batch cards, a prod lint that judges each check, release gates, quieter acceptance checks and a scoped plan review.
-
-- **Whole labels only.** The batch label map replaces an option only when the whole option, or the part before its `:`, is an internal id. Words such as keep or ask inside option text stay as written.
-- **Prod lint per item.** `plan_check.py lint --vendor codex` reads each verify item and its target: file names such as `main.prod.bicepparam`, PROD-like settings, unit and contract items, local compiles and read-only checks are not flagged. A `(manual, prod` task whose own text drops, deletes or changes data needs `owner:` and a Risks line.
-- **Release gate.** A task marked `(after-release: main)`, or a manual prod task that a Risks line ties to a release, is Waiting in the ready check and is never offered as the first task. New mark in the data layout.
-- **Quiet tickable.** `walk_progress.py tickable --vendor codex` asks only about a failing row or a passing row with no evidence. Untested and pending rows stay open with no question; one `waiting_line` counts them.
-- **Small fixes.** `start` uses the playbook it found by name (no second run). The claims "Kept claimed tasks" line is gone when nothing changed. `start_check.py` reads the PR number from Azure DevOps `Merge pull request 82 from` subjects. Housekeeping says `Applying with no card` and `plan_check.py reviewed --items --vendor codex` leaves housekeeping out of the open count.
-- **Card rules.** A batch question is only the short `Card:` line; the items live in the bullets and the `On yes:` line. Before a yes the walk says what it would change, never that it already did.
-- **Fewer cards.** Plan-from-spec applies housekeeping refreshes with one summary line, and the ready check is recorded with no save card.
-- **Scoped plan review.** New `walk_progress.py review-packet --vendor codex` writes the reviewer's input outside the repo: the changed tasks, their spec sections by line range, and the plan's Risks and Linter, with a quick mode for small changes. The reviewer runs in the foreground and never reads `spec.md` whole.
-- **Local fast-forward card.** The build walk's card for a code base branch behind origin now reads `Your local develop in orders-api is 2 commits behind origin/develop. Update it locally before the build?`, with **Update local develop** and a result line that says nothing is pushed, then the work branch and task it builds. New `code-behind --branch --task`.
-- **Bare PR numbers from a specs-only checkout.** When no record names the number and this checkout holds no code, `pr_common.py resolve` checks the code repos in `repos.md` read-only and uses the single match, otherwise asks with those repos listed. It never suggests installing a CLI before the host is known. `$crav1-review-pr` ends with a Run next block when the host is still unknown.
-
-Docs and tests: the spec walk walkthrough, question cards, pr-common and marks; `scripts/tests/test_kit_1197.py`.
 
 The newest 15 releases are above. The full changelog is https://github.com/Crav1on/crav1-spec-kit/blob/main/CHANGELOG.md.

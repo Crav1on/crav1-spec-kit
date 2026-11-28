@@ -34,6 +34,10 @@ One line under that item in `docs/specs/<slug>/spec.md`:
   - Approved: the partner, 2026-10-02, https://github.com/example/widgets/pull/12#discussion_r9, "Yes, apply the policy." (accepted by Alex 2026-11-12)
 ```
 
+## A UI screen (1.211.0)
+
+[`/crav1-design-ui`](from-design-ui.md) writes one item per screen, such as `UI screen Orders list (S1): the product owner approves ...`. When the person signs off more than one screen, name the item by its first words, `UI screen Orders list (S1)`. A screen whose item carries `Cleared: <date>, material change: <why>` needs a new yes: the old `Approved:` line stays and no longer counts, and the new line goes below the `Cleared:` mark. After a screen's yes, Run next is `/crav1-plan-from-spec <slug>`, since the plan can now cover that screen.
+
 The item, the constraint, and any `Asked:` or `Pending:` line stay. A live `apply` still needs your own yes in the build run.
 
 ## After
@@ -42,4 +46,4 @@ Run next, with the reason "that approval is on record and the task can start" an
 
 Reference page: [record-approval](reference/skills/crav1-record-approval.md)
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-record-approval.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/from-record-approval.md

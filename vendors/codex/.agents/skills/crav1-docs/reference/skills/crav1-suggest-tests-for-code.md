@@ -25,4 +25,4 @@ runs by itself: Opens `$crav1-add-to-spec` for one kept suggestion and for one d
 you run next: $crav1-plan-from-spec
 first: `$crav1-suggest-tests-for-code @<one repo or one area> @docs/specs/<slug>/ Suggest tests for what this code can break. Do not write the tests. Do not change the code.`
 walkthrough: from-suggest-tests.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-suggest-tests-for-code.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-suggest-tests-for-code.md

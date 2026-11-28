@@ -41,9 +41,12 @@ def _kit(argv):
 def _scripts(kit):
     root = os.path.join(kit, ".cursor", "skills", "crav1")
     found = []
+    # Sorted (1.211.0): several skills ship a same-named wrapper (claims.py,
+    # repo_sync.py), and the catalog keeps the last one. An unsorted walk made
+    # the result depend on the filesystem's directory order.
     for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [d for d in dirnames if d not in SKIP_DIR_NAMES]
-        for name in filenames:
+        dirnames[:] = sorted(d for d in dirnames if d not in SKIP_DIR_NAMES)
+        for name in sorted(filenames):
             if name.endswith(".py"):
                 found.append(os.path.join(dirpath, name))
     return found

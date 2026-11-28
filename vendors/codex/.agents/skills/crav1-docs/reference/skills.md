@@ -15,6 +15,7 @@ Starters: $crav1-spark-to-spec, $crav1-ideas-to-spec, $crav1-bundle-to-specs, $c
 - $crav1-review-architecture | Spec, diagrams, or ADRs exist
 - $crav1-tighten-spec | The spec is still mushy
 - $crav1-resolve-open-questions | Open questions remain
+- $crav1-design-ui | An accepted spec has a user-facing UI to design before the plan
 
 ## Plan
 
@@ -92,4 +93,4 @@ Starters: $crav1-spark-to-spec, $crav1-ideas-to-spec, $crav1-bundle-to-specs, $c
 - crav1-build-task-agent | build | One `T#` from implement to commit, in isolation. | reads: One `T#` (`spec.md`, `plan.md`, `tasks.md`). | writes: That task's code, `tasks.md`, `verify.md`, `fix-log.md` when a fix runs, and the commits | leaves alone: `spec.md`, other `T#`s, push, and the pull request.
 - crav1-bundle-slice-agent | specify | One v0 feature slug after the intake map. | reads: `docs/system/` and what the parent passes for that slug. | writes: `docs/specs/<slug>/` only | leaves alone: `docs/system/`, `work-item.md`, code, and every other slug.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills.md

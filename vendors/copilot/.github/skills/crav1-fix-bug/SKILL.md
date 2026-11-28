@@ -8,7 +8,7 @@ license: MIT
 disable-model-invocation: true
 metadata:
   crav1-vendor: copilot
-  crav1-version: 1.210.0
+  crav1-version: 1.211.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.

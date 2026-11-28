@@ -217,4 +217,4 @@ the ready check and the build map name a task by its text up to the first verify
 
 a held task quotes the question's own `Q:` or `question:` line. A waits-on list names only the T numbers, for example `waits on T3, T5`, while the task itself stays `Ship the form (T12)`. Who has the answer is the `owner:` line, then `Ask:`.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-tasks-ready-to-build.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/from-tasks-ready-to-build.md

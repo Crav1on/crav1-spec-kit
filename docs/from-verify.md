@@ -41,6 +41,10 @@ A test skipped for a missing dependency is not a pass. The task is not marked ve
 
 When the evidence passed, the `tasks.md` row is still `[ ]`, and the pull request is recorded merged, the status is **Implemented, verified, tick pending**. That is not Not implemented. The reply's Run next skips every task the ready check already counts as done and names the first task that can start. Since 1.169.0 `verify.md` has no `Next:` line. The open checkbox stays a Gap. The report may also offer the tick on its own line. Say yes and it ticks that one row. It does not re-implement. That offer is an alternative exit. It does not replace the Next line for tasks that can start.
 
+## UI checks (1.211.0)
+
+A task with `(verify: ui — <named check>) (spec: ui/experience.md S1-C1)` comes from a signed-off screen designed with [`/crav1-design-ui`](from-design-ui.md). `/crav1-verify-build-against-spec` checks the written line `(S1-C1)` in `ui/experience.md` on the running screen and records pass or fail. There is no screenshot or pixel comparison against the mock or a Salt block, and the mock under `ui/mock/` is not evidence.
+
 ## What gets written
 
 - `docs/specs/<slug>/verify.md`: the acceptance matrix, plus **Skipped tests** when you chose skip for a missing dependency. Since 1.136.0 the TL;DR includes **Implemented, verified, tick pending**. Since 1.167.0 the Tasks overview has one row per T# in `tasks.md`; a row for a T# that `tasks.md` does not have is dropped and the reply names it, so the ready check's `**Catch up first**` block needs only this command for both a behind task and a stray row.

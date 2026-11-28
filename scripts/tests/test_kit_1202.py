@@ -151,7 +151,8 @@ class VendorGenerate(unittest.TestCase):
         self.assertFalse(list(codex.rglob("AGENTS.md")))
         self.assertFalse(list(copilot.rglob("AGENTS.md")))
         yaml_files = list(codex.rglob("openai.yaml"))
-        self.assertEqual(len(yaml_files), 45)
+        # One per command-only skill; 46 since /crav1-design-ui (1.211.0).
+        self.assertEqual(len(yaml_files), 46)
         self.assertFalse((codex / ".agents/skills/crav1-help/agents/openai.yaml").exists())
         self.assertFalse((codex / ".agents/skills/crav1-update-kit/agents/openai.yaml").exists())
         instructions = (copilot / ".github/instructions/crav1.instructions.md").read_text(encoding="utf-8")

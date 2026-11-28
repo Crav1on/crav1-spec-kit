@@ -180,8 +180,9 @@ def has_section(text: str, heading: str) -> bool:
 
 # ---------- order ----------
 
+# "ui" (1.211.0): a written UI check from ui/experience.md, (spec: ui/experience.md S1-C1).
 KINDS = ("unit", "system", "browser", "integration", "contract", "load", "speed",
-         "accessibility", "golden", "property", "manual")
+         "accessibility", "golden", "property", "manual", "ui")
 TASK_LINE = re.compile(r"^\s*-\s*\[( |x|X)\]\s*T(\d+)\s*:\s*(.*)$")
 VERIFY = re.compile(r"\(verify:\s*([^)]*)\)", re.I)
 

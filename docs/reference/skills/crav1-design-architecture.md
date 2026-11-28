@@ -8,6 +8,8 @@
 
 Work out an architecture change with the user, one decision at a time, in a sandbox until go-ahead.
 
+1.211.0: when a slice needs both a UI design and an architecture design, [`/crav1-design-ui`](crav1-design-ui.md) runs first.
+
 [`/crav1-design-architecture`](crav1-design-architecture.md) (1.181.0, preview) decides how the landscape should change: systems and services and how they connect, environments, infrastructure and hosting, data flows, integrations, and deployment. It reads what the kit knows, shows two or three real options per decision with a reasoned recommendation first, folds in the user's own ideas as their own option, and records each settled choice as a draft ADR in a sandbox.
 
 The sandbox is `docs/architecture/designs/<topic>/` on its own design branch: one goal per topic in `goal.md`, one or more designs under `designs/<name>/`, and `compare.md` once a topic fans out. The end state is designed first; staging happens only on `stage-it`, and the user names and divides the stages. A stage may wait on a stakeholder decision. No other skill reads the sandbox, even after it is merged (except [`/crav1-explain-tech`](crav1-explain-tech.md), which only lists mentions read-only and calls them not decided, 1.192.0).

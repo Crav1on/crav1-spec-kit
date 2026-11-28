@@ -196,12 +196,15 @@ DONE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$")
 
 # Optional extras the walk can offer. They are not locked steps. Recording
 # one when the walk finishes it counts that write as inside the walk.
+# design-ui (1.211.0) is not offered: the walk opens it on its own before the
+# plan when the slice has a UI, and records it here the same way.
 EXTRAS = (
     "review-security",
     "research",
     "model-data",
     "show-or-ask-open-questions",
     "suggest-tests-for-code",
+    "design-ui",
 )
 for _extra in EXTRAS:
     COVERS[_extra] = ("spec", "plan", "tasks")
