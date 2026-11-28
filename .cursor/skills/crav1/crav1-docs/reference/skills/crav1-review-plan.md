@@ -10,6 +10,8 @@ writes: Writes nothing.
 leaves alone: Leaves the plan and code alone.
 limits: the parent delegates the critique and does not review in its own voice. It names `/crav1-tighten-plan` and does not run it. A piece marked already there or left as committed is not a missing task.
 flow:
+- when the slice has `ui/`, the parent runs skill `crav1-design-ui` `scripts/ui_screens.py trace` and passes its lines and the UI file paths.
+- A plan that ignores the approved UI files is a plan finding: a check of a signed-off screen with no task, a task for a screen with no yes, a UI check with no `ui` or `browser` kind, or the mock used as a plan input.
 - `P# open` is the `open` value from `plan_check.py open-count --review <file>`.
 - The parent uses that number and does not count the `P#` lines.
 - the review ends with Run next, `Walk the plan findings, which aren't walked yet:` above `/crav1-tighten-plan <slug>`, no `Next:` line.
@@ -19,4 +21,4 @@ runs by itself: Calls no skill.
 you run next: /crav1-tighten-plan
 first: `/crav1-review-plan @docs/specs/<slug>/`
 walkthrough: from-spec-to-plan.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-review-plan.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-review-plan.md

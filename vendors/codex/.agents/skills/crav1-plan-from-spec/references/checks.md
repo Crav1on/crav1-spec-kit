@@ -22,6 +22,7 @@ Name these only when the thing being built needs them:
 - **contract** — two parts share a published API or message shape
 - **load** or **speed** — only when the spec already says how fast or how big. Quote that limit. Do not invent a performance goal.
 - **accessibility** — when someone uses the screen, named with the browser check. Do not add a browser check only to hold an accessibility check.
+- **ui** — a UI acceptance check from `ui/experience.md` of a screen that has its yes (1.211.0). Name the check in its own words and its id in the spec mark: `(verify: ui — empty list shows "No orders yet") (spec: ui/experience.md S1-C1)`. Verify marks the written line yes or no on the running screen. No screenshot or pixel comparison against the mock or a Salt block.
 - **golden** or **property** — an algorithm with many inputs. That check is still a unit test.
 
 ## When the spec already requires them

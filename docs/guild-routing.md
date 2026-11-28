@@ -33,6 +33,7 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 | Skill | `/crav1-review-architecture` |
 | Skill | `/crav1-tighten-spec` |
 | Skill | `/crav1-resolve-open-questions` |
+| Skill | `/crav1-design-ui` |
 | Subagent | `crav1-spec-reviewer-agent` |
 | Subagent | `crav1-review-architecture-agent` |
 | Subagent | `crav1-bundle-slice-agent` |
@@ -40,6 +41,8 @@ The same list is where a lone user sees the ways to start: [plugins/crav1/README
 `/crav1-tighten-spec` tightens the picked issue in an existing spec. The user calls it. It calls no skill. It does not rewrite the spec to match the code, and it does not clear a stale research mark.
 
 `/crav1-resolve-open-questions` settles open questions and **Conflict:** lines. Nothing is written until one confirm. `/crav1-add-to-spec` and `/crav1-finalize-commit` name it when they write a Conflict line, and do not run it.
+
+`/crav1-design-ui` (1.211.0) designs a slice's user-facing screens after the spec is accepted and before the plan. The user calls it, and the tighten-and-plan walk opens it on its own when the slice has a UI. It calls no skill. It writes `ui/design.md`, `ui/experience.md`, one visual, and one Approval needed item per screen; the yes is `/crav1-record-approval`. It refuses application code and does not commit. It is not a starter option.
 
 A guided walk from a draft spec through the plan until ready to build is `/crav1-tighten-and-plan-ready-to-build` (1.119.0). It is cross-cutting, so neither Specify nor Plan owns it. It runs the Specify skills this lane already owns, inside the walk, and does not replace them. It does not start Build. The new-slice route is unchanged. Architecture review stays optional on that route. Inside the walk it always runs.
 
@@ -211,6 +214,7 @@ The merged skills take exact choice words instead of `--flags`. A word in the in
 | `/crav1-show-or-ask-open-questions` | Channel after ask (optional) | `research` |
 | `/crav1-record-approval` | Write the line | `accept` |
 | `/crav1-add-to-spec` | What you have | `fact` · `dump` · `code-change` · `meeting` · `mail` · `chat` |
+| `/crav1-design-ui` | The HTML mock (optional; a word in the invocation takes that choice without asking) | `with-mock` · `skip-mock` |
 | `/crav1-build-tasks` | Which tasks | `one-task` · `range` · `all-tasks` |
 | `/crav1-build-tasks` | Branch | `new-branch` |
 | `/crav1-build-walk` | Do this step | `yes` · `stop` · `release-claim` |
@@ -269,6 +273,7 @@ specify:
     - crav1-review-architecture
     - crav1-tighten-spec
     - crav1-resolve-open-questions
+    - crav1-design-ui
   subagents:
     - crav1-spec-reviewer-agent
     - crav1-review-architecture-agent

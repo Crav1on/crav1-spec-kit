@@ -14,6 +14,8 @@ The line is `Approved: <person>, <source date>, <source>, "<quote>" (accepted by
 
 1.144.0: the spec folder command is `<interpreter> -X utf8 <skill crav1-tasks-ready-to-build>/scripts/resolve_spec.py "<query>" --root docs/specs`. `show` and `write` pass `--root`, `--person`, `--source-date`, `--source`, `--quote`, `--recorder`, and `--accepted`. `write` also passes `--yes`. On Windows `<interpreter>` is `python` with `PYTHONUTF8=1`. Elsewhere it is `python3`.
 
+1.211.0: a UI screen item from [`/crav1-design-ui`](crav1-design-ui.md) is `UI screen <name> (S<n>): ...`; pass `--item "UI screen <name> (S<n>)"` when the person has more than one item. A `Cleared: <date>, material change: <why>` mark means the `Approved:` lines above it no longer count; they stay, and the new line goes below the mark. After a UI screen's yes the Run next is [`/crav1-plan-from-spec`](crav1-plan-from-spec.md) <slug>`.
+
 ## Choice words
 
 Exact words for bots and scripted runs (no `--flags`). A word in the invocation takes that choice without asking. A headless or bot run with no word stops and names the valid words.
@@ -50,7 +52,7 @@ Limits and exceptions: No item, or two items, stops and lists them. It does not 
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-build-tasks`](crav1-build-tasks.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
+- You run next: [`/crav1-build-tasks`](crav1-build-tasks.md); [`/crav1-plan-from-spec`](crav1-plan-from-spec.md); [`/crav1-finalize-commit`](crav1-finalize-commit.md)
 - Runs by itself: Calls no skill.
 
 ## Lane and group

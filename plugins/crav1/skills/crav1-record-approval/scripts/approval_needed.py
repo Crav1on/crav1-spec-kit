@@ -7,6 +7,10 @@ matching `Approved:` line clears that hold. The line is never removed.
 
 `Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)`
 
+Since 1.211.0 a `Cleared: <date>, material change: <why>` mark (written by
+/crav1-design-ui for a UI screen) means the Approved lines above it no longer
+count. They stay in the file. A new Approved line below it counts.
+
 The source date is the quote's date. The accepted date is the day this run
 accepted it. An earlier quote does not count until `write --yes`.
 
@@ -236,11 +240,16 @@ def items(spec_text: str, task_ids: list[str] | None = None) -> list[dict]:
                 parsed = parse_approved(mark)
                 if parsed:
                     approved.append(parsed)
+            elif mark.startswith("Cleared:"):
+                # 1.211.0: a material change cleared the yes. Approved lines
+                # above this mark stay in the file and no longer count.
+                approved = []
             elif mark.startswith("Asked:"):
                 asked = True
             elif mark.startswith("Pending:"):
                 pending = True
         who = person or _who_from_text(row["text"])
+        cleared = any(mark.startswith("Cleared:") for mark in row["marks"])
         hold = holds_lines[-1] if holds_lines else None
         if hold is None:
             named = _text_tasks(row["text"], task_ids)
@@ -267,6 +276,8 @@ def items(spec_text: str, task_ids: list[str] | None = None) -> list[dict]:
             "asked": asked,
             "pending": pending,
             "holding": match is None and bool(tasks),
+            "cleared": cleared,
+            "marks_all": list(row["marks"]),
         })
     return out
 
@@ -481,18 +492,40 @@ def _insert_block(text: str, block: str) -> str:
     return "".join(lines)
 
 
-def add_item(text: str, person: str, what: str, holds_ids: list[str]) -> tuple[str, str]:
-    """Return (new text, status). status is wrote or already."""
+def add_item(
+    text: str,
+    person: str,
+    what: str,
+    holds_ids: list[str],
+    title: str | None = None,
+    holds_text: str | None = None,
+    extra_marks: list[str] | None = None,
+    screen: str | None = None,
+) -> tuple[str, str]:
+    """Return (new text, status). status is wrote or already.
+
+    1.211.0: the UI design step adds one item per screen through this same
+    path. `screen` is the screen id (S1); an item whose Screen: mark names it
+    already exists. `title` replaces "<person> approves <what>", `holds_text`
+    is a `none (<reason>)` Holds value, and `extra_marks` follow Holds.
+    """
     existing = items(text, None)
     for item in existing:
+        if screen:
+            for mark in item.get("marks_all") or []:
+                if re.match(rf"^Screen:\s*{re.escape(screen)},", mark):
+                    return text, "already"
+            continue
         if same_person(item.get("who"), person) and what.lower() in item["text"].lower():
             return text, "already"
     nl = newline_of(text)
-    holds_s = ", ".join(holds_ids)
+    holds_s = holds_text if holds_text else ", ".join(holds_ids)
+    head = title if title else f"{person} approves {what}"
     block = nl.join([
-        f"- {person} approves {what}.",
+        f"- {head.rstrip('.')}.",
         f"  - Person: {person}",
         f"  - Holds: {holds_s}",
+        *[f"  - {mark}" for mark in (extra_marks or [])],
         "",
     ])
     return _insert_block(text, block), "wrote"
@@ -506,7 +539,10 @@ def _append_approved(text: str, person: str | None, item_prefix: str | None, lin
     if len(hits) != 1:
         return text, "ambiguous"
     target = hits[0]["text"]
-    if any(mark.strip() == line for mark in _marks_of(text, target)):
+    marks = _marks_of(text, target)
+    # 1.211.0: only marks after the last Cleared line count as already there.
+    cut = max((i for i, mark in enumerate(marks) if mark.startswith("Cleared:")), default=-1)
+    if any(mark.strip() == line for mark in marks[cut + 1:]):
         return text, "already"
     nl = newline_of(text)
     lines = text.splitlines(keepends=True)

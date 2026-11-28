@@ -39,8 +39,13 @@ routes:
       - skills: [crav1-ado-sync]
         optional: true
         when: When the team tracks Features in Azure Boards.
+      - skills: [crav1-design-ui]
+        optional: true
+        when: "When the slice has a user-facing UI (1.211.0): screens, states, interactions, UI checks, one visual, and one sign-off item per screen. A named person's yes on each screen is recorded with `$crav1-record-approval` before the plan covers it."
+        then:
+          crav1-design-ui: [crav1-record-approval, crav1-plan-from-spec]
       - skills: [crav1-plan-from-spec]
-        when: The spec is tight and its questions are answered or kept open on purpose.
+        when: The spec is tight and its questions are answered or kept open on purpose. In a UI slice, only signed-off screens are planned.
       - skills: [crav1-review-plan]
         when: Right after the plan is written.
       - skills: [crav1-tighten-plan]
@@ -194,7 +199,8 @@ also_next:
   crav1-read-environment: [$crav1-finalize-commit]
   crav1-create-feature-branch: [$crav1-finalize-commit]
   crav1-show-or-ask-open-questions: [$crav1-add-to-spec, $crav1-record-approval, $crav1-finalize-commit]
-  crav1-record-approval: [$crav1-build-tasks, $crav1-finalize-commit]
+  crav1-record-approval: [$crav1-build-tasks, $crav1-plan-from-spec, $crav1-finalize-commit]
+  crav1-design-ui: [$crav1-finalize-commit]
   crav1-add-to-spec: [$crav1-finalize-commit]
   crav1-review-pr: [$crav1-refresh-system-notes after an outside pull request merges, $crav1-finalize-commit]
   crav1-merge-pr: [$crav1-finalize-commit]

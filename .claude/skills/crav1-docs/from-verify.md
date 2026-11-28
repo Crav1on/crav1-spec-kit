@@ -41,6 +41,10 @@ A run with no window writes the question to the two-pass questions file in the s
 
 When the evidence passed, the `tasks.md` row is still `[ ]`, and the pull request is recorded merged, the status is **Implemented, verified, tick pending**. `verify.md` has no `Next:` line.
 
+## UI checks (1.211.0)
+
+A task with `(verify: ui — <named check>) (spec: ui/experience.md S1-C1)` comes from a signed-off screen designed with [`/crav1-design-ui`](from-design-ui.md). `/crav1-verify-build-against-spec` checks the written line `(S1-C1)` in `ui/experience.md` on the running screen and records pass or fail. There is no screenshot or pixel comparison against the mock or a Salt block, and the mock under `ui/mock/` is not evidence.
+
 ## What gets written
 
 - `docs/specs/<slug>/verify.md`: the acceptance matrix, plus **Skipped tests** when you chose skip for a missing dependency. the TL;DR includes **Implemented, verified, tick pending**. the Tasks overview has one row per T# in `tasks.md`; a row for a T# that `tasks.md` does not have is dropped and the reply names it, so the ready check's `**Catch up first**` block needs only this command for both a behind task and a stray row.
@@ -85,4 +89,4 @@ there is one wording for evidence that passed while the row is still `[ ]`: `Imp
 
 When a test dependency is down, `/crav1-verify-build-against-spec` runs `scripts/dep_check.py containers --service <name>` first: a stopped docker or podman container, or a stopped podman machine, gets its start commands (`podman machine start`, `podman start <name>`), and an install is offered only when no runtime or container exists.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-verify.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/from-verify.md

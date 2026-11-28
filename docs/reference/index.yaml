@@ -66,6 +66,11 @@ skills:
     starter: false
     page: reference/skills/crav1-add-to-spec.md
     purpose: "Bring new information into existing specs; asks what you have: a fact, a dump, a code change, or a meeting."
+  crav1-design-ui:
+    lane: specify
+    starter: false
+    page: reference/skills/crav1-design-ui.md
+    purpose: "Design a slice's user-facing screens after the spec is accepted and before the plan, with one sign-off item per screen."
   crav1-plan-from-spec:
     lane: plan
     starter: false

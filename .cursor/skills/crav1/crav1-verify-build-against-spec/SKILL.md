@@ -39,11 +39,11 @@ A task downstream of an **Implemented, verify failed** task (it waits on it, dir
 
 Read `references/tick-pending.md` only when a row is tick pending. 1.182.0: the old `Implemented, verified on branch` is the same state; it is read, never written, and rewritten once when the row script next writes the file.
 
-Read `references/host-setup-task.md` ("Host setup tasks") only when a task is marked `(host setup)` (1.115.0, skill `crav1-host-setup`).
+Read `references/host-setup-task.md` only when a task is marked `(host setup)` (1.115.0, skill `crav1-host-setup`).
 
 ## Branches (1.64.0)
 
-Read `references/work-branches.md` ("Work branches") only when the spec has work branches (its `Synced at` lines, Match `Branch:` list, or task `(branch: …)` parts, minus base branches and `(dropped)` entries).
+Read `references/work-branches.md` only when the spec has work branches (its `Synced at` lines, Match `Branch:` list, or task `(branch: …)` parts, minus base branches and `(dropped)` entries).
 
 Read `references/sub-branches.md` ("Sub-branches and reverts") only when a branch entry has `(into <spec branch>)`, or a merged change was later undone on the base.
 
@@ -64,7 +64,7 @@ Then:
 
 1. If any acceptance or task verify is **live** (running Aspire/compose/dev host, published URL, browser against localhost), follow this skill’s [references/live-host.md](references/live-host.md) **before** that evidence. Record refresh/health in **Commands run**.
 2. Before any test command, run the local dependency preflight in this skill's [references/test-dependencies.md](references/test-dependencies.md): detect what the tests need (Azurite, a database container, an emulator), check each is running, and ask start, skip, or stop for one that is not. Then run the documented test/lint commands from `AGENTS.md` or the repo README when they exist. Record the command and outcome. A test skipped for a missing dependency blocks **Implemented, verified** unless the user chose skip; that task is **Claimed done, unverified**, and the missing dependency goes at the top of the report as a blocker.
-3. For UI acceptance, use the browser if available; otherwise mark **untested** and say why.
+3. For UI acceptance, use the browser if available; otherwise mark **untested** and say why. A `verify: ui` task: `references/ui-checks.md`.
 4. Map `tasks.md` rows: checked but failing verify → **Implemented, verify failed**; evidence passed, row still `[ ]`, pull request recorded merged → **Implemented, verified, tick pending**; passed on an unmerged branch → **Implemented, verified, tick pending** too (1.182.0); other unchecked → **Not implemented**.
 
 ## Write `docs/specs/<slug>/verify.md`

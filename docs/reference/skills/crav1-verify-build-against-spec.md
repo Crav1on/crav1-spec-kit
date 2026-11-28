@@ -8,6 +8,8 @@
 
 Map every v0 acceptance line to tests or UI checks and report pass, fail, or missing.
 
+1.211.0: a task with `(verify: ui — …)` is checked against its written line in `ui/experience.md`, the id in `(spec: ui/experience.md S1-C1)`, by looking at the running screen. No screenshot or pixel comparison against the mock or a Salt block; the mock under `ui/mock/` is not evidence.
+
 1.180.0: the tick offer for a task recorded merged sits inside Run next, label above `verify_rows.py tick --file <spec-folder>/verify.md --task <T#> --merged yes`, never after the ending; the tick is written only after a yes. A Not implemented row is verified first.
 
 1.176.0: new status **Implemented, verified on branch** for evidence that passed on an unmerged work branch; a check that can only pass after the merge is pending. It becomes tick pending once the merge is recorded. `verify_rows.py set` keeps CRLF files CRLF and re-sorts a count line only when its ids change.

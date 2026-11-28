@@ -208,6 +208,8 @@ Force:
 
 Write or update `docs/specs/<change>/spec.md` (or Spec Kit / OpenSpec’s layout).
 
+**A user-facing UI.** When the slice has screens or windows, run `/crav1-design-ui` after the spec is accepted and before the plan. It writes `ui/design.md` (look, layout, tokens) and `ui/experience.md` (screens, states, interactions, and yes/no UI checks), one visual (an HTML mock, PlantUML Salt, or Mermaid), and one Approval needed item per screen. The written Markdown wins over any picture. A named person signs off each screen with `/crav1-record-approval`. The plan covers only signed-off screens. A material change to a screen clears its yes; a typo keeps it. A slice with no UI skips this step. Walkthrough: [Design the UI before the plan](../from-design-ui.md).
+
 ### B. Plan (`plan.md` and `tasks.md`)
 
 Run `/crav1-plan-from-spec`. The skill writes `docs/specs/<change>/plan.md` and `tasks.md` with file paths, constraints, and tasks. When the spec is partial or `## In the code` names paths, it reads that repo and branch and lists each built piece before any task. A piece that already matches v0 is marked already there. Each task verify note names the kind of check and the checks that must pass, before any code. `/crav1-verify-build-against-spec` is the gate that says those named checks passed.
@@ -364,4 +366,4 @@ Stack, compatibility, performance, security.
 - [ ] T2: … (verify: <kind> — <named check>) (spec: …)
 ```
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/concepts/method.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/concepts/method.md

@@ -44,6 +44,7 @@ The core loop, after a starter:
 
 - [From a draft spec to an accepted spec](from-draft-spec.md)
 - [Tighten and plan until ready to build](from-tighten-and-plan.md): one guided walk, with or without a playbook, stopping before build
+- [Design the UI before the plan](from-design-ui.md): screens, states, interactions, UI checks, one visual, and one sign-off per screen, for a slice with a user-facing UI
 - [From a spec to a plan](from-spec-to-plan.md)
 - [Build tasks](from-plan-to-build.md)
 - [Build one branch, then the next](from-build-walk.md)
@@ -194,4 +195,4 @@ The old names were removed in 1.58.0 and no longer run. Use the new name, with t
 | `$crav1-exploratory-test` | [`$crav1-run-exploratory-test`](reference/skills/crav1-run-exploratory-test.md) | — |
 | `$crav1-feature-branch` | [`$crav1-create-feature-branch`](reference/skills/crav1-create-feature-branch.md) | — |
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/README.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/README.md

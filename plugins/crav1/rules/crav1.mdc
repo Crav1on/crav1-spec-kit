@@ -9,10 +9,10 @@ Specs, not chat history, are the source of truth. Put change work under `docs/sp
 
 When the user asks for startup options, name only these six: `/crav1-spark-to-spec`, `/crav1-ideas-to-spec`, `/crav1-bundle-to-specs`, `/crav1-existing-to-specs`, `/crav1-read-environment`, and `/crav1-fix-bug`. Every other skill is a later skill. Naming the list runs nothing.
 
-Type `/crav1` to list kit skills. Typical order, by route (generated from `docs/reference/workflow.yaml`):
+Type `/crav1` to list kit skills. Order by route (from `docs/reference/workflow.yaml`):
 
 <!-- crav1-order:start -->
-- New slice: spark-to-spec or ideas-to-spec or bundle-to-specs → create-feature-branch (optional) → review-architecture (optional) → tighten-spec → resolve-open-questions → ado-sync (optional) → plan-from-spec → review-plan → tighten-plan → ado-sync (optional) → tasks-ready-to-build (optional) → build-walk (optional) → build-tasks or build-features → verify-build-against-spec → fix-build-gaps (optional) → finalize-commit → open-pr → review-pr → merge-pr.
+- New slice: spark-to-spec or ideas-to-spec or bundle-to-specs → create-feature-branch (optional) → review-architecture (optional) → tighten-spec → resolve-open-questions → ado-sync (optional) → design-ui (optional) → plan-from-spec → review-plan → tighten-plan → ado-sync (optional) → tasks-ready-to-build (optional) → build-walk (optional) → build-tasks or build-features → verify-build-against-spec → fix-build-gaps (optional) → finalize-commit → open-pr → review-pr → merge-pr.
 - New information on an existing slice: add-to-spec → tighten-spec → resolve-open-questions → plan-from-spec → ado-sync (optional) → tasks-ready-to-build (optional) → build-tasks → verify-build-against-spec → finalize-commit.
 - Bug: fix-bug → tighten-spec or plan-from-spec or build-tasks → verify-build-against-spec → fix-build-gaps (optional) → finalize-commit → open-pr.
 - Before a pull request: review-pr → tighten-spec or plan-from-spec or build-tasks (optional) → finalize-commit → open-pr → pr-status (optional).

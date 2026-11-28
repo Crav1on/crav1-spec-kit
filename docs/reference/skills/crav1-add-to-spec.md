@@ -8,6 +8,8 @@
 
 Bring new information into existing specs; asks what you have: a fact, a dump, a code change, or a meeting.
 
+1.211.0: when a target slice has `ui/experience.md`, it runs skill `crav1-design-ui` `scripts/ui_screens.py touches --root <spec-folder> --text "<the kept text>"` before the write card and says each line once: the change touches a signed-off screen. It does not edit `ui/` and does not clear a yes; [`/crav1-design-ui`](crav1-design-ui.md) decides whether the change is material.
+
 1.207.0: after an `Answered:` line, and when a stale research point is settled, `scripts/stale_state_lines.py` lists leftover open-state notes and old values. A quote is excluded. On yes each note gains `Superseded <date> by <decision>.`
 
 1.200.0: `scripts/ending.py` prints the ending from the shared run-ending helper, Run next first. Before a write, the same helper's stay card applies when a `design/<topic>` branch is checked out or owns the change: the recommended option stays on that branch, and the card never offers a switch to the default branch.

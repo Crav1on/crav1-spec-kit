@@ -10,7 +10,7 @@ license: MIT
 disable-model-invocation: true
 metadata:
   crav1-vendor: copilot
-  crav1-version: 1.210.0
+  crav1-version: 1.211.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.
@@ -90,6 +90,10 @@ A thin spec (match status `not in the code`, or only Match / What the dump says 
 ### Research compare
 
 Also compare the kept quote with research. Follow [references/research-stale.md](references/research-stale.md). Read [references/research-stale-mark.md](references/research-stale-mark.md) only on a hit. Read `docs/research/*.md` and `## Research findings` on the specs this quote touches, and the notes those findings link to. List a clear contradiction and an answered open question. An unclear case is not a hit. Ask before any new mark. Write the stale block and the findings line only after the user says yes. Then offer the revisit draft. The kit drafts only. It does not send it. It does not contact the note's owner. When the user pointed this command at an updated note in `docs/research/`, or this run writes one, follow the clear section, [references/research-stale-clear.md](references/research-stale-clear.md). Judge each listed point. An older mark with no point lines is not one point. Split it as that file says. Also route the note's own open questions when the answer lies outside the note's owner. That still runs when the mark clears. Do not ask the user whether the update resolves the mark. A kept quote that answers a point already waiting is re-checked there too. That re-check does not ask.
+
+## Signed-off UI screens (1.211.0)
+
+When a target slice has `ui/experience.md`, run `<interpreter> -X utf8 ../crav1-design-ui/scripts/ui_screens.py touches --root <spec-folder> --text "<the kept text>"` (skill `crav1-design-ui`) before the write card. Say each of its `lines` once, above that card: the change touches a signed-off screen. This skill does not edit `ui/` and does not clear a yes. When the screen should change, the Run next is `/crav1-design-ui <slug>`, which says whether the change is material.
 
 ## Walk restamp (1.148.0)
 

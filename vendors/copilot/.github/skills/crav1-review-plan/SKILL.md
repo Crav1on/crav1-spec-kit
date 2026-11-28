@@ -8,7 +8,7 @@ license: MIT
 disable-model-invocation: true
 metadata:
   crav1-vendor: copilot
-  crav1-version: 1.210.0
+  crav1-version: 1.211.0
 ---
 
 Read `../crav1-docs/reference/kit-rules.md` first.
@@ -30,6 +30,8 @@ Pass the subagent these paths (read-only): `spec.md`, `plan.md`, `tasks.md`, plu
 ## What to tell the subagent
 
 Instruct it to follow its own prompt and the check rules in `crav1-plan-from-spec` [references/checks.md](../crav1-plan-from-spec/references/checks.md) (skill `crav1-plan-from-spec`, `references/checks.md`), including **Linter, before Build**. A stale research finding that the plan left out of Risks is a plan issue. Stale research does not block the plan. A plan that never says whether this repo has a linter or checker for the code the tasks will touch is not complete. Finish with numbered **Issues for `/crav1-tighten-plan`** (`P1`, `P2`, …), one finding each. Mark any finding that is really a spec defect as **spec** (do not pretend the plan can fix it). No single global patch recommendation.
+
+**Signed-off UI (1.211.0).** When the slice has `ui/`, run `<interpreter> -X utf8 ../crav1-design-ui/scripts/ui_screens.py trace --root <spec-folder>` (skill `crav1-design-ui`) before delegating, and pass its `lines` plus the paths `ui/design.md` and `ui/experience.md`. A plan that ignores the approved UI files is a **plan** finding: a check of a signed-off screen with no task, a task for a screen with no yes, a UI check with no `(verify: ui — …)` or `browser` kind, or the mock under `ui/mock/` named as a plan input or a file likely touched.
 
 ## Record the review
 

@@ -8,6 +8,8 @@
 
 Walk a draft spec through architecture, tighten, questions, and the plan until the ready check is clear.
 
+1.211.0: before the plan step, when skill `crav1-design-ui` `scripts/ui_screens.py status` says the slice has a UI (or it is unclear), the walk opens [`/crav1-design-ui`](crav1-design-ui.md) on its own, not as an offer, and records `- Extra: design-ui`. At the walk start it says one line for each signed-off screen with a material change since its yes. When the plan's UI gate finds no signed-off screen, the walk pauses at plan-from-spec and prints that Run next, naming [`/crav1-design-ui`](crav1-design-ui.md) and [`/crav1-record-approval`](crav1-record-approval.md).
+
 1.209.0: a finding with no topic gets one on the next walk start, derived the same way as a new finding, and `start` returns `topics_line` for that one line. A later start does not say it again.
 
 1.207.0: leftover wording in plan review is a patch (`--kind stale-wording`), not a full jump back. The card header is the name and the code, for example `Static-IP notes (P9)`. `clear --step` needs `--card` from that step's reopen card, and a reopen clear is never folded into another step's card. A `Stale since` line on or after the latest walk Done date counts as stale seen.

@@ -12,6 +12,7 @@ The command is [`$crav1-design-architecture`](reference/skills/crav1-design-arch
 | Fix numbered defects in one spec | `$crav1-tighten-spec` |
 | Answer questions already written in a spec | `$crav1-resolve-open-questions` |
 | Decide how the landscape should change | `$crav1-design-architecture` |
+| Design a slice's screens before the plan | [`$crav1-design-ui`](from-design-ui.md); when a slice needs both, it runs first (1.211.0) |
 
 ## 1. Start
 
@@ -83,4 +84,4 @@ the branch checks use your repo's default branch (for example master), not alway
 
 a requirement that comes up on the design branch ends with Run next first and a full `$crav1-add-to-spec <slice> <text>` command. `stop and commit` commits only because this skill says that phrase is a yes.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-design-architecture.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/from-design-architecture.md

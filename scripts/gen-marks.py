@@ -38,6 +38,7 @@ GROUPS = {
     "approval": "Approval needed",
     "research": "Research and stale marks",
     "plan": "`plan.md` and `tasks.md`",
+    "ui": "`ui/` (UI design, 1.211.0)",
     "walk": "Walk progress",
     "playbook": "`docs/playbooks/`",
     "system": "`docs/system/`",

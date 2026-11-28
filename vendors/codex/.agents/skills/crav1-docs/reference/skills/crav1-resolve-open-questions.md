@@ -41,7 +41,7 @@ flow:
   note: Every **Conflict:** line in the spec is listed after the questions as C1, C2 (1.111.0, no word): one question per conflict, the decided line and the new quote side by side, a recommendation first, written after one confirm. Topic words or `<spec> Q#` (for example `orders Q3`) open one question and stop after it, with no next question, ending with the still-open titles; several matches: one question listing up to 4.
 called_by: Called by the user.
 runs by itself: On apply, a kept item opens `$crav1-add-to-spec` `references/fact.md` and does not start that command. The question walk calls no skill.
-you run next: $crav1-ado-sync; $crav1-plan-from-spec
+you run next: $crav1-ado-sync; $crav1-design-ui; $crav1-plan-from-spec
 first: `$crav1-resolve-open-questions @docs/specs/<slug>/spec.md`
 walkthrough: from-draft-spec.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-resolve-open-questions.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-resolve-open-questions.md

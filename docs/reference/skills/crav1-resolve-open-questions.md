@@ -69,7 +69,7 @@ Leaves application code and kept-open questions alone. Does not change `Answer:`
 
 ## You run next / Runs by itself
 
-- You run next: [`/crav1-ado-sync`](crav1-ado-sync.md); [`/crav1-plan-from-spec`](crav1-plan-from-spec.md)
+- You run next: [`/crav1-ado-sync`](crav1-ado-sync.md); [`/crav1-design-ui`](crav1-design-ui.md); [`/crav1-plan-from-spec`](crav1-plan-from-spec.md)
 - Runs by itself: On apply, a kept item opens [`/crav1-add-to-spec`](crav1-add-to-spec.md) `references/fact.md` and does not start that command. The question walk calls no skill.
 
 ## Lane and group

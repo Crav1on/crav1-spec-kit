@@ -8,6 +8,8 @@
 
 Start the crav1-plan-reviewer-agent subagent on plan.md and tasks.md against spec.md.
 
+1.211.0: when the slice has `ui/`, the parent runs skill `crav1-design-ui` `scripts/ui_screens.py trace` and passes its lines and the UI file paths. A plan that ignores the approved UI files is a plan finding: a check of a signed-off screen with no task, a task for a screen with no yes, a UI check with no `ui` or `browser` kind, or the mock used as a plan input.
+
 1.202.0: `P# open` is the `open` value from `plan_check.py open-count --review <file>`. The parent uses that number and does not count the `P#` lines.
 
 1.176.0: the review ends with Run next, `Walk the plan findings, which aren't walked yet:` above [`/crav1-tighten-plan`](crav1-tighten-plan.md) <slug>`, no `Next:` line.

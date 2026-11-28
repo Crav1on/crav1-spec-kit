@@ -46,7 +46,7 @@ flow:
   - `pull-spec-changes`: pull spec changes
 called_by: Called by the user and by `$crav1-ado-sync`.
 runs by itself: Suggest Features: Calls no skill. Push Features: Calls `$crav1-ado-sync`, and `$crav1-add-to-spec` when a preview change belongs in the spec. Push tasks: Calls `$crav1-add-to-spec` when a preview change belongs in the spec. Pull tasks: Calls `$crav1-add-to-spec` for each kept change. Pull spec changes: Calls `$crav1-add-to-spec` for one kept change and for one answer.
-you run next: $crav1-plan-from-spec; $crav1-tasks-ready-to-build; $crav1-build-walk; $crav1-build-tasks; $crav1-build-features; $crav1-finalize-commit
+you run next: $crav1-design-ui; $crav1-plan-from-spec; $crav1-tasks-ready-to-build; $crav1-build-walk; $crav1-build-tasks; $crav1-build-features; $crav1-finalize-commit
 first: `$crav1-ado-sync`
 walkthrough: from-ado-sync-suggest-features.md
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/reference/skills/crav1-ado-sync.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/reference/skills/crav1-ado-sync.md

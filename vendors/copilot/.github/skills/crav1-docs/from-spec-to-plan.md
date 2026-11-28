@@ -50,6 +50,10 @@ When the spec's work sits on several branches (its `Synced at` lines, its Match 
 
 A constraint such as `The partner gives a yes before the CI build policy script is applied.` becomes an item under `## Approval needed`, with `Person:` and `Holds:` for the tasks that do that work. `/crav1-plan-from-spec` writes the item. It does not write `Approved:`.
 
+## A slice with a user-facing UI (1.211.0)
+
+Before any file, `/crav1-plan-from-spec` runs the UI gate. A slice with screens is designed first with [`/crav1-design-ui`](from-design-ui.md), and each screen is signed off with `/crav1-record-approval`. When no screen has its yes, the plan stops before writing `plan.md` or `tasks.md`, and Run next names `/crav1-design-ui` and `/crav1-record-approval`. It reads `ui/design.md` and `ui/experience.md`, never the mock under `ui/mock/`. Each UI check becomes a task with `(verify: ui — <named check>) (spec: ui/experience.md S1-C1)`. A slice with a `UI: none (<reason>)` line, or with no screen in the spec, has no UI step. `/crav1-review-plan` files a finding when the plan ignores the approved UI files: a check with no task, a task for a screen with no yes, or the mock used as a plan input.
+
 ## A wait on another pull request (1.201.1)
 
 A task that should start only after another pull request merges, and that pull request has no task of its own, carries `(after: PR 87)`. When the task text says `after PR 87 merges` and the mark is missing, `plan_check.py order --vendor copilot` names the line. On yes, `plan_check.py after-pr --root <spec-folder> --yes --vendor copilot` writes the mark.
@@ -70,4 +74,4 @@ The run ends as [How a run ends](reference/run-ending.md) says: Run next, never 
 
 A task listed in `docs/specs/<slug>/claims.md` as `In progress:` is left unchanged: no renumber, reorder, rewrite, or removal. After writing `tasks.md`, the plan step preserves those lines and says once which claimed tasks were kept.
 
-human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.210.0/docs/from-spec-to-plan.md
+human: https://github.com/Crav1on/crav1-spec-kit/blob/v1.211.0/docs/from-spec-to-plan.md

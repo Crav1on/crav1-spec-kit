@@ -14,6 +14,7 @@ This is cross-cutting. It may run from any lane. It does not move work into Spec
 | Fix numbered defects in one spec | `/crav1-tighten-spec` |
 | Answer questions already written in a spec | `/crav1-resolve-open-questions` |
 | Decide how the landscape should change | `/crav1-design-architecture` |
+| Design a slice's screens before the plan | [`/crav1-design-ui`](from-design-ui.md); when a slice needs both, it runs first (1.211.0) |
 
 ## 1. Start
 

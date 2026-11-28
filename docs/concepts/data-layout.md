@@ -60,8 +60,10 @@ docs/specs/
     fix-log.md       # one gap from verify-build-against-spec, fix + re-proof
     live-fix.md      # legacy; new incidents go in fix-log.md
     work-item.md     # optional Azure Boards id starter (comment only)
+    ui/              # design.md and experience.md templates (1.211.0)
   <change-id>/
     spec.md
+    ui/              # design.md, experience.md, optional mock/; only with a user-facing UI (1.211.0)
     plan.md
     tasks.md
     verify.md
@@ -104,6 +106,7 @@ docs/specs/
 | `docs/architecture/designs/<topic>/` | A design sandbox: goal, competing designs, decisions, draft ADRs, open questions, stages, comparisons, `session.json` (open, parked or ended), and `proposal.md` / `proposal.html` (1.181.0, session and proposal 1.200.0). Each open question in `questions.md` may carry `Asked: <date>` (1.201.1). Dated proposal pages may also live under `docs/architecture/proposals/<date>/`. At go-ahead the chosen design is copied under `## Decided, not built yet` in `docs/architecture/spec.md` | `/crav1-design-architecture`, through its `scripts/design_run.py` only | `/crav1-design-architecture` only. Every other skill ignores this folder, also after the design branch is merged |
 | `docs/data-model/<model>/` | Confirmed and proposed data model, questions, both comparison views, pinned sources, `history.md` for revised items (1.121.0), and immutable review snapshots | `/crav1-model-data`; `reviews/` by `/crav1-what-do-we-know-about-this` `report-data-model-full` | `/crav1-model-data`, `/crav1-what-do-we-know-about-this` |
 | `docs/specs/<slug>/spec.md` | What and why, acceptance, open questions | spark, ideas, intake (through `crav1-bundle-slice-agent`), match; then tighten-spec, resolve-open-questions, add-to-spec, match-dump, add-to-spec, and review-security | Every later lane |
+| `docs/specs/<slug>/ui/` | `design.md` (look, layout, tokens) and `experience.md` (screens, states, interactions, UI checks); the Markdown is the source of truth. Optional throwaway `mock/`, never a plan input. No binary file (1.211.0) | `/crav1-design-ui`, after one yes | `/crav1-plan-from-spec` (signed-off screens), `/crav1-review-plan`, `/crav1-verify-build-against-spec` |
 | `docs/specs/<slug>/plan.md`, `tasks.md` | How, constraints, files, linter; ordered testable tasks | `/crav1-plan-from-spec`, `/crav1-tighten-plan`; `[x]` on a task row by implement and build-tasks | Build, verify, review |
 | `docs/specs/<slug>/build-map.md` | How the slice will be built, by branch, in waves. The row branch is `(map:)`, else `(branch:)`, else the plan step, else `committed later on` (1.129.0). Since 1.133.0 the Tasks field is `T#` plus the short name (`T5 orders-api: require pipeline 6 as build validation`). A done task is `~~T# short name~~ ✓ done` with its pull request, branch, or commit. Other prose drops task ids. A mismatch note when the task text names another branch. Since 1.132.0 a ticked task stays in its wave. A wave whose every task is done is a `<details>` block; the rows stay. Rewritten every ready check, so the ids match `tasks.md`; committed with the spec | `/crav1-tasks-ready-to-build`, through `scripts/build_map.py` | The owner, `/crav1-build-tasks`, and `/crav1-tasks-ready-to-build` `build-map` |
 | `docs/specs/<slug>/build-progress/<branch>.md` | Position of `/crav1-build-walk` for one work branch (1.142.0). The file name writes each `/` as `--`. It records the step, normalized hashes (`Content stamp: normalized`), `Owner:`, `Cut from:`, and the merge list. A checkbox, a `(PR n)`, and `(live yes: …)` do not change the hash. Not the source of truth | `/crav1-build-walk`, through `scripts/build_walk.py`, after a yes | `/crav1-build-walk`. `/crav1-finalize-commit` settles a stamp-only conflict. `/crav1-update-kit` leaves it alone |
@@ -221,6 +224,8 @@ The ready check also reads three lines it does not write (1.209.0). `Q:` or `que
   - Approved: the partner, 2026-10-02, https://github.com/example/widgets/pull/12#discussion_r9, "Yes, apply the policy." (accepted by Alex 2026-11-12)
 ```
 
+A UI screen item from `/crav1-design-ui` (1.211.0) has `Holds: none (...)` and a `Screen:` mark of per-screen hashes; the plan waits for its yes. A material change appends `Cleared:`, and an `Approved:` line above it no longer counts. Example: [Design the UI](../from-design-ui.md#what-gets-written).
+
 `Person:` is who gives the yes. `Holds:` is the tasks that wait. A matching `Approved:` line clears the hold and stays. The source date is the quote's date. The date in parentheses is the day it was accepted. `/crav1-show-or-ask-open-questions` may write `Asked:` or `Pending:` under the item and never sends the draft. An edit confined to this section does not reopen a tighten-and-plan step. The ready check reads the live section.
 
 ## Readiness marks
@@ -235,8 +240,8 @@ The ready check also reads three lines it does not write (1.209.0). `Q:` or `que
 | `Blocks: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec` | The question blocks only those tasks. This line wins over a plan Risk that says do not implement until resolved. |
 | `Blocks: none [(<reason>)]` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions`, `/crav1-plan-from-spec`, `/crav1-tighten-and-plan-ready-to-build` | The question blocks no current task. A short reason in parentheses is optional. Since 1.137.0 a missing Blocks line holds T# ids named in the question text, and holds the whole slice only when no task is named and resolve-open-questions has never been recorded. |
 | `Blocks: whole slice` | `docs/specs/<slug>/spec.md` (indented under a kept-open question) | `/crav1-resolve-open-questions` | The question holds every unfinished task. The ready check says Holds the whole slice. This stays after resolve-open-questions is recorded and through an open-questions edit. A missing Blocks line does not mean this. |
-| `Person: <who>` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks` | The person whose yes the item waits on. |
-| `Holds: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks` | The tasks that wait until a matching Approved line is recorded. Other tasks can still start. |
+| `Person: <who>` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-design-ui` | The person whose yes the item waits on. |
+| `Holds: T<n>[, T<n>] \| none (<reason>)` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-design-ui` | The tasks that wait until a matching Approved line is recorded. Other tasks can still start. A UI screen item holds `none (...)`; the plan waits for it. |
 | `Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-record-approval` | A lasting record of a named person's yes. The source date is the quote's date. The last date is when it was accepted. Resolve and every other skill leave the line in place. This is not the data-model stage line. |
 | `Reviewed: <date>, P# open: <n>` | `docs/specs/<slug>/plan.md` (under the # Plan title) | `/crav1-review-plan`, `/crav1-tighten-plan` | The plan was reviewed, and how many reviewer findings are still open. |
 | `(after: T<n>[, T<n>][, PR <n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | The task needs those tasks done first, or waits until that pull request is merged. |
@@ -323,6 +328,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | Mark | Format | Where | Written by | Read by | Since |
 | --- | --- | --- | --- | --- | --- |
 | Parked | `Parked: <YYYY-MM-DD>, <reason>` | `docs/specs/<slug>/spec.md` (first line) | `/crav1-retire-spec` | `/crav1-add-to-spec`, `/crav1-ado-sync`, `/crav1-build-features`, `/crav1-build-tasks`, `/crav1-help`, `/crav1-plan-from-spec`, `/crav1-show-or-ask-open-questions` | 1.60.0 |
+| UI: none | `UI: none (<reason>)` | `docs/specs/<slug>/spec.md` (under the title) | `/crav1-design-ui` | `/crav1-plan-from-spec`, `/crav1-tighten-and-plan-ready-to-build` | 1.211.0 |
 | Moved pointer | `Moved: <retired \| merged \| converted> <YYYY-MM-DD>, see <new path>. Reason: <reason>` | `docs/specs/<slug>/spec.md` (the old path, whole file) | `/crav1-retire-spec` | `/crav1-add-to-spec`, `/crav1-ado-sync`, `/crav1-build-features`, `/crav1-build-tasks`, `/crav1-help`, `/crav1-plan-from-spec`, `/crav1-show-or-ask-open-questions` | 1.60.0 |
 | Retired | `Retired: <YYYY-MM-DD>, <reason>` | `docs/specs/retired/<slug>/spec.md` (first line) | `/crav1-retire-spec` | — | 1.60.0 |
 | Merged | `Merged: <YYYY-MM-DD> into <target slug>, <reason>` | `docs/specs/retired/<slug>/spec.md` (first line) | `/crav1-retire-spec` | — | 1.60.0 |
@@ -357,9 +363,11 @@ Every mark and line format the kit writes inside product files, generated from [
 
 | Mark | Format | Where | Written by | Read by | Since |
 | --- | --- | --- | --- | --- | --- |
-| Person | `  - Person: <who>` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks` | `/crav1-tasks-ready-to-build`, `/crav1-record-approval`, `/crav1-show-or-ask-open-questions` | 1.141.0 |
-| Holds | `  - Holds: T<n>[, T<n>]` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks` | `/crav1-tasks-ready-to-build`, `/crav1-build-tasks`, `/crav1-record-approval` | 1.141.0 |
+| Person | `  - Person: <who>` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-design-ui` | `/crav1-tasks-ready-to-build`, `/crav1-record-approval`, `/crav1-show-or-ask-open-questions` | 1.141.0 |
+| Holds | `  - Holds: T<n>[, T<n>] \| none (<reason>)` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-plan-from-spec`, `/crav1-build-tasks`, `/crav1-design-ui` | `/crav1-tasks-ready-to-build`, `/crav1-build-tasks`, `/crav1-record-approval` | 1.141.0 |
 | Approved (person's yes) | `  - Approved: <person>, <source date>, <source>, "<quote>" (accepted by <recorder> <date>)` | `docs/specs/<slug>/spec.md` (indented under an Approval needed item) | `/crav1-record-approval` | `/crav1-tasks-ready-to-build`, `/crav1-build-tasks`, `/crav1-resolve-open-questions`, `/crav1-show-or-ask-open-questions` | 1.141.0 |
+| Screen (UI sign-off) | `  - Screen: S<n>, version <12 hex>, shape name=<6 hex> path=<6 hex> layout=<6 hex> states=<6 hex> interactions=<6 hex> checks=<6 hex> other=<6 hex>` | `docs/specs/<slug>/spec.md` (indented under a UI screen's Approval needed item) | `/crav1-design-ui` | `/crav1-plan-from-spec`, `/crav1-tighten-and-plan-ready-to-build` | 1.211.0 |
+| Cleared (UI material change) | `  - Cleared: <YYYY-MM-DD>, material change: <why>` | `docs/specs/<slug>/spec.md` (indented under a UI screen's Approval needed item) | `/crav1-design-ui` | `/crav1-record-approval`, `/crav1-plan-from-spec` | 1.211.0 |
 
 ### Research and stale marks
 
@@ -379,6 +387,7 @@ Every mark and line format the kit writes inside product files, generated from [
 | --- | --- | --- | --- | --- | --- |
 | Reviewed | `Reviewed: <date>, P# open: <n>` | `docs/specs/<slug>/plan.md` (under the # Plan title) | `/crav1-review-plan`, `/crav1-tighten-plan` | `/crav1-tasks-ready-to-build`, `/crav1-help` | 1.54.0 |
 | Task line | `- [ ] T<n>: <what> (verify: <kind> — <named check>) (spec: <REQ or acceptance>)` | `docs/specs/<slug>/tasks.md` | `/crav1-plan-from-spec`, `/crav1-tighten-plan`, `/crav1-build-tasks` | `/crav1-build-tasks`, `/crav1-review-plan`, `/crav1-tasks-ready-to-build`, `/crav1-verify-build-against-spec` | 1.0.0 |
+| (verify: ui …) on a UI check | `(verify: ui — <named check>) (spec: ui/experience.md S<n>-C<n>)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec` | `/crav1-verify-build-against-spec`, `/crav1-review-plan`, `crav1-plan-reviewer-agent` | 1.211.0 |
 | (verify: …) | `(verify: <kind> — <named check>[; <kind> — <named check>])` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-build-tasks`, `/crav1-review-plan` | 1.0.0 |
 | (spec: …) | `(spec: <REQ or acceptance>)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-review-plan`, `/crav1-ado-sync` | 1.0.0 |
 | (after: …) | `(after: T<n>[, T<n>][, PR <n>])` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec`, `/crav1-tighten-plan` | `/crav1-tasks-ready-to-build`, `/crav1-help` | 1.54.0 |
@@ -388,6 +397,13 @@ Every mark and line format the kit writes inside product files, generated from [
 | (map: …) | `(map: [<repo> ]<branch>)` | `docs/specs/<slug>/tasks.md` (end of a task line) | `/crav1-plan-from-spec`, `/crav1-create-feature-branch`, `/crav1-tasks-ready-to-build`, `/crav1-tighten-plan` | `/crav1-tasks-ready-to-build`, `/crav1-build-tasks`, `/crav1-create-feature-branch`, `/crav1-build-features` | 1.128.0 |
 | Runs live | `(Runs live)` | `docs/specs/<slug>/tasks.md` (on a task line) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
 | Live yes | `(live yes: <name>, <YYYY-MM-DD>)` | `docs/specs/<slug>/tasks.md` (on a Runs live task line) | `/crav1-build-walk` | `/crav1-build-walk` | 1.142.0 |
+
+### `ui/` (UI design, 1.211.0)
+
+| Mark | Format | Where | Written by | Read by | Since |
+| --- | --- | --- | --- | --- | --- |
+| UI screen heading | `### <name> (S<n>)` | `docs/specs/<slug>/ui/experience.md`; `docs/specs/<slug>/ui/design.md` | `/crav1-design-ui` | `/crav1-plan-from-spec` | 1.211.0 |
+| UI acceptance check | `- [ ] <yes/no check a stranger could mark> (S<n>-C<n>)` | `docs/specs/<slug>/ui/experience.md` (under a screen's #### Checks) | `/crav1-design-ui` | `/crav1-plan-from-spec`, `/crav1-verify-build-against-spec`, `crav1-plan-reviewer-agent` | 1.211.0 |
 
 ### Walk progress
 
